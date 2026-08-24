@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Bree_Serif, Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
@@ -9,6 +10,22 @@ import {
   SITE_TITLE,
   SITE_URL,
 } from "./config/site";
+
+// Globální typografie webu — herní serifový font (nadpisy, navigace,
+// tlačítka, karty) + čitelný sans pro delší texty. Viz CLAUDE.md pro
+// detaily o tom, jak byl font vybraný (podle oficiálních screenshotů hry).
+const breeSerif = Bree_Serif({
+  weight: "400",
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -41,8 +58,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="cs">
-      <body className="bg-gray-900 text-white antialiased">
+    <html lang="cs" className={`${breeSerif.variable} ${inter.variable}`}>
+      <body className="bg-gray-900 font-sans text-white antialiased">
         {children}
         <Analytics />
         {GOATCOUNTER_CODE && (

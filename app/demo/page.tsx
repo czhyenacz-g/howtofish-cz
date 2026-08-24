@@ -42,13 +42,20 @@ const SECTION_CARDS = [
     label: "Achievementy",
     text: "Seznam úspěchů a jak je splnit.",
   },
+  {
+    // /hra je od začátku na finální top-level URL (ne pod /demo), proto
+    // se sem odkazuje přímo bez BASE prefixu — viz zadání pro /hra.
+    href: "/hra",
+    label: "Hra",
+    text: "Minihra Chyť úlovek — zkus si rychlý lov přímo v prohlížeči.",
+  },
 ] as const;
 
 export default function DemoHome() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-16">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="mb-4 text-4xl font-bold">{SITE_TAGLINE}</h1>
+        <h1 className="mb-4 font-serif text-4xl">{SITE_TAGLINE}</h1>
         <p className="text-gray-400">{SITE_DESCRIPTION}</p>
       </div>
 
@@ -59,7 +66,7 @@ export default function DemoHome() {
             href={card.href}
             className="rounded-lg border border-gray-800 bg-gray-800/40 p-5 transition hover:border-amber-400"
           >
-            <h2 className="mb-1 font-semibold text-amber-400">{card.label}</h2>
+            <h2 className="mb-1 font-serif text-amber-400">{card.label}</h2>
             <p className="text-sm text-gray-400">{card.text}</p>
           </Link>
         ))}

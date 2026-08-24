@@ -12,13 +12,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // /ryby jde do sitemap až po spuštění webu — viz SITE_LAUNCHED.
+  // /ryby a /hra jdou do sitemap až po spuštění webu — viz SITE_LAUNCHED.
   if (SITE_LAUNCHED) {
     entries.push({
       url: `${SITE_URL}/ryby`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
+    });
+
+    entries.push({
+      url: `${SITE_URL}/hra`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
     });
 
     for (const fish of fishEntries) {

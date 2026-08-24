@@ -4,9 +4,9 @@ import { SITE_LAUNCHED, SITE_URL } from "./config/site";
 export default function robots(): MetadataRoute.Robots {
   const disallow = ["/demo"];
 
-  // /ryby je disallow, dokud web není spuštěný — viz SITE_LAUNCHED.
+  // /ryby a /hra jsou disallow, dokud web není spuštěný — viz SITE_LAUNCHED.
   if (!SITE_LAUNCHED) {
-    disallow.push("/ryby");
+    disallow.push("/ryby", "/hra");
   }
 
   return {

@@ -67,7 +67,7 @@ export default function Home() {
           Česká encyklopedie ryb a úlovků ze hry How to Fish.
         </p>
 
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-amber-400/60 bg-amber-400/10 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-amber-300 sm:text-base">
+        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-amber-400/60 bg-amber-400/10 px-4 py-2 font-serif text-sm uppercase tracking-wide text-amber-300 sm:text-base">
           Spouštíme {LAUNCH_DATE_LABEL}
         </div>
 
@@ -80,7 +80,7 @@ export default function Home() {
           href={STEAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-10 inline-flex items-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-base font-bold text-gray-900 shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 sm:text-lg"
+          className="mt-10 inline-flex items-center gap-2 rounded-full bg-amber-400 px-8 py-4 font-serif text-base text-gray-900 shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 sm:text-lg"
         >
           How to Fish na Steamu
         </a>
