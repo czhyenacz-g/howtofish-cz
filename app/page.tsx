@@ -1,19 +1,5 @@
-import { DISCLAIMER, LAUNCH_DATE_LABEL, STEAM_URL } from "./config/site";
-
-function FishIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 48 32"
-      className={className}
-      aria-hidden="true"
-      fill="currentColor"
-    >
-      <polygon points="0,16 14,4 14,28" />
-      <polygon points="14,4 40,10 40,22 14,28" />
-      <circle cx="34" cy="13" r="2" fill="#0a2e42" />
-    </svg>
-  );
-}
+import Image from "next/image";
+import { DISCLAIMER, LAUNCH_DATE_LABEL, SITE_NAME, STEAM_URL } from "./config/site";
 
 export default function Home() {
   return (
@@ -64,18 +50,20 @@ export default function Home() {
         />
       </svg>
 
-      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-20 text-center sm:py-24">
-        <h1 className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
-          <FishIcon className="h-9 w-9 shrink-0 text-amber-400 sm:h-12 sm:w-12" />
-          <span className="-rotate-1 text-4xl font-black tracking-tight sm:text-5xl md:text-6xl">
-            How to Fish
-          </span>
-          <span className="rotate-3 rounded-full bg-amber-400 px-2.5 py-1 text-sm font-extrabold text-gray-900 sm:text-base">
-            CZ
-          </span>
+      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-16 text-center sm:py-20">
+        <h1 className="w-full max-w-[320px] sm:max-w-[420px] md:max-w-[520px]">
+          <Image
+            src="/images/howtofish-main-logo.png"
+            alt={SITE_NAME}
+            width={1536}
+            height={1024}
+            priority
+            sizes="(max-width: 640px) 320px, (max-width: 768px) 420px, 520px"
+            className="h-auto w-full rounded-2xl shadow-2xl shadow-black/40"
+          />
         </h1>
 
-        <p className="mt-5 max-w-md text-lg text-cyan-100/90 sm:text-xl">
+        <p className="mt-6 max-w-md text-lg text-cyan-100/90 sm:text-xl">
           Česká encyklopedie ryb a úlovků ze hry How to Fish.
         </p>
 

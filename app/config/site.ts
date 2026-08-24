@@ -15,6 +15,11 @@ export const STEAM_URL = "https://store.steampowered.com/app/4001890/How_to_Fish
 
 export const LAUNCH_DATE_LABEL = "1. 9. 2026";
 
+// Přepínač pro spuštění webu 1. 9. 2026. Dokud je false, `/ryby` a jeho
+// detaily jsou noindex,nofollow a mimo sitemap (viz app/ryby/layout.tsx
+// a app/sitemap.ts) — v den spuštění stačí přepnout na true.
+export const SITE_LAUNCHED = false;
+
 export const NAV_LINKS = [
   { href: "/navody", label: "Návody" },
   { href: "/ryby", label: "Ryby" },
