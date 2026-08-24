@@ -6,10 +6,14 @@ import { usePathname } from "next/navigation";
 import { NAV_LINKS, SITE_NAME } from "../config/site";
 import FishSilhouette from "./FishSilhouette";
 
-// "Hra" je od začátku na finální top-level URL (/hra), takže patří do
-// navigace jen tam, kde Header běží bez basePath (skutečné stránky), ne
-// pod /demo (kde by ukazovala na neexistující /demo/hra).
-const HRA_LINK = { href: "/hra", label: "Hra" } as const;
+// "Hra" a "Živě" jsou od začátku na finálních top-level URL (/hra,
+// /stream), takže patří do navigace jen tam, kde Header běží bez
+// basePath (skutečné stránky), ne pod /demo (kde by ukazovaly na
+// neexistující /demo/hra nebo /demo/stream).
+const TOP_LEVEL_EXTRA_LINKS = [
+  { href: "/hra", label: "Hra" },
+  { href: "/stream", label: "Živě" },
+] as const;
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -27,7 +31,7 @@ function tabClass(active: boolean, tilt: string) {
 export default function Header({ basePath = "" }: { basePath?: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const links = basePath === "" ? [...NAV_LINKS, HRA_LINK] : NAV_LINKS;
+  const links = basePath === "" ? [...NAV_LINKS, ...TOP_LEVEL_EXTRA_LINKS] : NAV_LINKS;
 
   useEffect(() => {
     setOpen(false);

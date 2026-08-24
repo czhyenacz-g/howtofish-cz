@@ -86,8 +86,29 @@ předávat. `/ryby` se tímto přesunem vůbec nezabývá — je už na fináln�
 **Přidání nové ryby/tvora:** stačí přidat záznam do `fishEntries` v
 `data/fish.ts` (typ `FishEntry`) — `/ryby` i statické stránky
 `/ryby/[slug]` se dogenerují samy při dalším buildu. Necituj bez ověření
-ze dvou nezávislých zdrojů, viz pole `sources`/`verified` u každého
-záznamu a poznámka v hlavičce souboru.
+ze dvou nezávislých zdrojů, viz pole `sources`/`verification` (úrovně
+`game-confirmed` > `official` > `community` > `unverified`) u každého
+záznamu a poznámka v hlavičce souboru. Nikdy nepoužívej jako zdroj
+`howtofishgame.wiki` ani jinou wiki, jejíž obsah se neshoduje s ostatními
+nezávislými zdroji (typický vzorec pro automaticky generovaný obsah).
+
+**Typografie:** globální font se nastavuje jen v `app/layout.tsx`
+(`next/font/google` — Bree Serif jako `--font-heading` / `font-serif` pro
+nadpisy, navigaci, tlačítka a karty; Inter jako `--font-body` / `font-sans`
+pro delší texty). Nepřidávej fonty ručně do jednotlivých komponent — obě
+proměnné jsou dostupné globálně přes `tailwind.config.ts`.
+
+**`/stream` — agregátor živých streamů:** `lib/streams/` obsahuje
+nezávislé providery (`twitch.ts`, `youtube.ts`, `kick.ts`) normalizující
+data do sdíleného typu `LiveStream`, a `get-live-streams.ts`, který je
+volá přes `Promise.allSettled` (chyba jednoho providera nesráží ostatní),
+slučuje a řadí podle `viewerCount`. Každý provider bez nastavených env
+proměnných se tiše přeskočí (`status: "not-configured"`), API požadavky
+jsou cachované přes `fetch(..., { next: { revalidate: 60 } })` +
+`export const revalidate = 60` na stránce — nikdy client-side polling.
+Přidání dalšího providera (např. Trovo) = nový soubor v `lib/streams/`
+se stejným návratovým typem `ProviderResult`, zapsat do pole volaného
+v `get-live-streams.ts`. Potřebné env proměnné viz `.env.example`.
 
 ---
 
