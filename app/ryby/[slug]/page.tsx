@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { fishEntries } from "../../../data/fish";
 import FishImage from "../../components/FishImage";
 import VerificationBadge from "../../components/VerificationBadge";
+import AffiliateBanner from "../../components/AffiliateBanner";
 
 export const dynamicParams = false;
 
@@ -167,6 +168,17 @@ export default async function FishDetailPage({ params }: Props) {
             ))}
           </ul>
         </section>
+
+        {/* Ukázkové umístění partnerského banneru — obrázek zatím
+            chybí (public/images/banners/), takže se zobrazuje textový
+            fallback komponenty. Stačí soubor doplnit. */}
+        <div className="mt-10">
+          <AffiliateBanner
+            imageSrc="/images/banners/example-banner.png"
+            href="https://example.com/affiliate-link"
+            title="Vybavení pro rybáře – doporučené produkty"
+          />
+        </div>
       </div>
     </div>
   );
