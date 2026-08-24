@@ -23,20 +23,29 @@ patičce na každé stránce.
 
 ## Struktura projektu
 
+Veřejná homepage (`/`) je teď jednoduchá **coming soon** stránka (spuštění
+1. 9. 2026, CTA na Steam). Celý dřívější rozpracovaný web (nav, sekce,
+karty) žije pod `/demo` — dostupný jen na přímou URL, `noindex,nofollow`,
+mimo sitemap. Až bude `/demo` hotové, přesune se zpět na `/` (viz níže).
+
 ```
 app/
-  layout.tsx            # Root layout, metadata, Header/Footer, analytics
-  page.tsx               # Homepage
-  robots.ts, sitemap.ts  # SEO
-  icon.tsx                # Dynamicky generovaný favicon
+  layout.tsx             # Root layout, jen html/body/Analytics — bez Header/Footer
+  page.tsx                # Coming soon homepage (veřejná)
+  robots.ts, sitemap.ts   # SEO — /demo je disallow a mimo sitemap
+  icon.tsx                 # Dynamicky generovaný favicon
   config/
-    site.ts               # Název, popis, doména, navigace, disclaimer
-    analytics.ts           # GoatCounter kód
+    site.ts                # Název, popis, doména, navigace, disclaimer, Steam URL
+    analytics.ts            # GoatCounter kód
   components/
-    Header.tsx, Footer.tsx, SectionPlaceholder.tsx
-  navody/ ryby/ predmety/ bossove/ lokace/ achievementy/ aktualizace/
-    page.tsx               # Placeholder stránky sekcí (zatím bez reálných dat)
-  api/og/route.tsx         # Dynamický OG image endpoint
+    Header.tsx, Footer.tsx  # Přijímají `basePath` prop (route-independent)
+    SectionPlaceholder.tsx
+  demo/
+    layout.tsx              # Header/Footer chrome + noindex,nofollow pro celý /demo strom
+    page.tsx                 # Bývalá homepage (karty sekcí)
+    navody/ ryby/ predmety/ bossove/ lokace/ achievementy/ aktualizace/
+      page.tsx                # Placeholder stránky sekcí (zatím bez reálných dat)
+  api/og/route.tsx          # Dynamický OG image endpoint
 
 content/
   guides/                # Budoucí MDX/Markdown návody
@@ -48,6 +57,14 @@ data/
 
 `content/` a `data/` zatím obsahují jen `.gitkeep` — struktura je
 připravená, aby zavedení skutečného obsahu nevyžadovalo refactoring.
+
+**Budoucí přesun `/demo` → `/`:** smaž `app/page.tsx` (coming soon),
+přesuň `app/demo/*` o úroveň výš (uprav relativní importy zpět), smaž
+`app/demo/layout.tsx` (jeho Header/Footer/noindex nahraď v root layoutu),
+a v `app/demo/page.tsx` smaž konstantu `BASE = "/demo"`. `NAV_LINKS`
+v `config/site.ts` ani `Header`/`Footer` component se měnit nemusí — cesty
+se skládají přes `basePath` prop, který při přesunu prostě přestaneš
+předávat.
 
 ---
 

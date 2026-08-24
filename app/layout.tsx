@@ -9,8 +9,6 @@ import {
   SITE_TITLE,
   SITE_URL,
 } from "./config/site";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -44,10 +42,8 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="cs">
-      <body className="flex min-h-screen flex-col bg-gray-900 text-white antialiased">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+      <body className="bg-gray-900 text-white antialiased">
+        {children}
         <Analytics />
         {GOATCOUNTER_CODE && (
           <Script
