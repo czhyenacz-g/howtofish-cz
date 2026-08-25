@@ -7,4 +7,6 @@ export { default as LocationIcon } from "./LocationIcon";
 export { default as AchievementIcon } from "./AchievementIcon";
 export { default as UpdateIcon } from "./UpdateIcon";
 export { default as GameIcon } from "./GameIcon";
+export { default as SpeakerIcon } from "./SpeakerIcon";
+export { default as SpeakerMuteIcon } from "./SpeakerMuteIcon";
 export type { IconProps } from "./types";

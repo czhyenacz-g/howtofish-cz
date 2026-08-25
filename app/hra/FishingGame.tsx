@@ -23,6 +23,19 @@ function pickFish(fish: FishEntry[], avoidSlug: string | null): FishEntry {
   return pick;
 }
 
+// Krátké herní zvuky — přehrané vždy od začátku (kvůli rychlému opakování
+// při sérii kliknutí), hlasitost nastavená přímo na elementu, protože
+// <audio> ji jako HTML atribut nepodporuje.
+function playSound(ref: React.RefObject<HTMLAudioElement | null>, volume: number) {
+  const audio = ref.current;
+  if (!audio) return;
+  audio.currentTime = 0;
+  audio.volume = volume;
+  audio.play().catch(() => {
+    // Chybějící/neplatný soubor nebo zablokované přehrání — hra běží dál i bez zvuku.
+  });
+}
+
 export default function FishingGame({ fish }: { fish: FishEntry[] }) {
   const [laneHasFish, setLaneHasFish] = useState<boolean[]>(() =>
     Array.from({ length: LANE_COUNT }, () => Math.random() < 0.5)
@@ -36,6 +49,9 @@ export default function FishingGame({ fish }: { fish: FishEntry[] }) {
   const [caught, setCaught] = useState<FishEntry | null>(null);
   const lastCaughtSlug = useRef<string | null>(null);
   const overlayHeadingRef = useRef<HTMLHeadingElement>(null);
+  const clickAudioRef = useRef<HTMLAudioElement | null>(null);
+  const successAudioRef = useRef<HTMLAudioElement | null>(null);
+  const failAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -56,6 +72,7 @@ export default function FishingGame({ fish }: { fish: FishEntry[] }) {
     (lane: number) => {
       if (hookStatus !== "idle" || caught) return;
 
+      playSound(clickAudioRef, 0.4);
       setHookLane(lane);
       setHookStatus("casting");
 
@@ -65,6 +82,7 @@ export default function FishingGame({ fish }: { fish: FishEntry[] }) {
         setHookStatus("result");
 
         if (hit) {
+          playSound(successAudioRef, 0.55);
           setLaneHasFish((prev) => prev.map((v, i) => (i === lane ? false : v)));
           setScore((s) => s + 1);
           setStreak((s) => {
@@ -76,6 +94,7 @@ export default function FishingGame({ fish }: { fish: FishEntry[] }) {
           lastCaughtSlug.current = picked.slug;
           window.setTimeout(() => setCaught(picked), RESULT_MS);
         } else {
+          playSound(failAudioRef, 0.55);
           setStreak(0);
         }
 
@@ -92,6 +111,10 @@ export default function FishingGame({ fish }: { fish: FishEntry[] }) {
 
   return (
     <div>
+      <audio ref={clickAudioRef} src="/audio/click.mp3" preload="none" />
+      <audio ref={successAudioRef} src="/audio/catch-success.mp3" preload="none" />
+      <audio ref={failAudioRef} src="/audio/catch-fail.mp3" preload="none" />
+
       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 font-serif text-lg text-amber-300">
         <span>Úlovky: {score}</span>
         <span className="text-sm text-cyan-100/60">

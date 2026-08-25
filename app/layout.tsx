@@ -3,6 +3,7 @@ import { Bree_Serif, Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
+import AmbientAudioToggle from "./components/AmbientAudioToggle";
 import { GOATCOUNTER_CODE } from "./config/analytics";
 import {
   SITE_DESCRIPTION,
@@ -61,6 +62,7 @@ export default function RootLayout({
     <html lang="cs" className={`${breeSerif.variable} ${inter.variable}`}>
       <body className="bg-gray-900 font-sans text-white antialiased">
         {children}
+        <AmbientAudioToggle />
         <Analytics />
         {GOATCOUNTER_CODE && (
           <Script

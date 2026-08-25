@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DISCLAIMER, NAV_LINKS, SITE_NAME } from "../config/site";
+import OceanWaves from "./OceanWaves";
 
 export default function Footer({ basePath = "" }: { basePath?: string }) {
   return (
@@ -20,6 +21,13 @@ export default function Footer({ basePath = "" }: { basePath?: string }) {
         <p className="mt-6 font-serif text-xs text-gray-500">
           © {new Date().getFullYear()} {SITE_NAME}
         </p>
+      </div>
+
+      {/* Stejné low-poly vlny jako na homepage — vlastní pruh s
+          oceánovým gradientem, aby seděly i na jinak neutrálním pozadí
+          patičky obsahových stránek. */}
+      <div className="relative h-14 w-full overflow-hidden bg-gradient-to-b from-[#0e4f66] to-[#146b78] sm:h-20">
+        <OceanWaves className="absolute inset-x-0 bottom-0 h-full w-full" />
       </div>
     </footer>
   );

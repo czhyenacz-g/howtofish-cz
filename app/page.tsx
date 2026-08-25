@@ -1,5 +1,5 @@
 import Image from "next/image";
-import AmbientAudioToggle from "./components/AmbientAudioToggle";
+import OceanWaves from "./components/OceanWaves";
 import { DISCLAIMER, LAUNCH_DATE_LABEL, SITE_NAME, STEAM_URL } from "./config/site";
 
 export default function Home() {
@@ -28,28 +28,7 @@ export default function Home() {
       </svg>
 
       {/* vlny — přední vrstva houpe jemně rychleji, zadní pomalý drift */}
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 1440 220"
-        preserveAspectRatio="none"
-        className="animate-wave-back pointer-events-none absolute inset-x-0 bottom-0 h-36 w-full text-[#1c8a95] opacity-60 sm:h-52"
-      >
-        <polygon
-          points="0,80 160,110 320,70 480,120 640,90 800,130 960,85 1120,115 1280,75 1440,105 1440,220 0,220"
-          fill="currentColor"
-        />
-      </svg>
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 1440 220"
-        preserveAspectRatio="none"
-        className="animate-wave-front pointer-events-none absolute inset-x-0 bottom-0 h-28 w-full text-[#0c4a56] sm:h-40"
-      >
-        <polygon
-          points="0,140 180,160 360,130 540,170 720,140 900,175 1080,135 1260,165 1440,140 1440,220 0,220"
-          fill="currentColor"
-        />
-      </svg>
+      <OceanWaves className="absolute inset-x-0 bottom-0 h-36 w-full sm:h-52" />
 
       <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-16 text-center sm:py-20">
         <h1 className="w-full max-w-[320px] sm:max-w-[420px] md:max-w-[520px]">
@@ -90,8 +69,6 @@ export default function Home() {
       <footer className="relative z-10 px-4 pb-6 text-center text-[11px] leading-relaxed text-cyan-100/40 sm:text-xs">
         {DISCLAIMER}
       </footer>
-
-      <AmbientAudioToggle />
     </div>
   );
 }
