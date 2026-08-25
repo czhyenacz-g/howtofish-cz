@@ -1,19 +1,31 @@
 import type { Metadata } from "next";
-import SectionPlaceholder from "../../components/SectionPlaceholder";
+import { getSteamAchievements } from "../../../lib/steam/achievements";
+import AchievementBrowser from "./AchievementBrowser";
 
 export const metadata: Metadata = {
   title: "Achievementy",
   description: "Seznam achievementů v How to Fish a jak je splnit.",
 };
 
-export default function AchievementyPage() {
+export default async function AchievementyPage() {
+  const achievements = await getSteamAchievements();
+
   return (
-    <SectionPlaceholder title="Achievementy">
-      <p>
-        Tady bude seznam achievementů v How to Fish a návody, jak je
-        splnit — od jednoduchých po ty nejtěžší.
+    <div className="mx-auto max-w-3xl px-4 py-16">
+      <h1 className="font-serif text-3xl">Achievementy</h1>
+      <p className="mt-3 text-gray-400">
+        Achievementy How to Fish přímo ze Steamu — řazené od nejvzácnějšího po nejběžnější.
       </p>
-      <p>Seznam achievementů zatím sestavujeme.</p>
-    </SectionPlaceholder>
+
+      {!achievements || achievements.length === 0 ? (
+        <div className="mt-10 rounded-lg border border-white/10 bg-[#0e3347]/60 p-6 text-center text-gray-400">
+          <p>Achievementy ze Steamu zatím nejsou veřejně dostupné.</p>
+        </div>
+      ) : (
+        <div className="mt-10">
+          <AchievementBrowser achievements={achievements} />
+        </div>
+      )}
+    </div>
   );
 }

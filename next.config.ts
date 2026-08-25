@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
         hostname: "content-api.darbujan.com",
         pathname: "/media/**",
       },
+      {
+        // Ikony Steam achievementů (GetSchemaForGame) — Steam je servíruje
+        // z několika CDN subdomén na steamstatic.com.
+        protocol: "https",
+        hostname: "*.steamstatic.com",
+        pathname: "/steamcommunity/public/images/apps/**",
+      },
     ],
   },
   experimental: {

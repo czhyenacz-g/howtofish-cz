@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import FeedbackCallout from "../components/FeedbackCallout";
 import { SITE_LAUNCHED } from "../config/site";
 import { getCurrentUser } from "../../lib/auth/current-user";
 
@@ -23,6 +24,7 @@ export default async function StreamLayout({
     <div className="flex min-h-screen flex-col">
       <Header user={user} />
       <main className="flex-1">{children}</main>
+      <FeedbackCallout user={user ? { nickname: user.nickname } : null} />
       <Footer />
     </div>
   );
