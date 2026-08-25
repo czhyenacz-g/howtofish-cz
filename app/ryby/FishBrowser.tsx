@@ -14,7 +14,13 @@ function normalize(value: string) {
   return value.toLocaleLowerCase("cs-CZ");
 }
 
-export default function FishBrowser({ fish }: { fish: FishEntry[] }) {
+export default function FishBrowser({
+  fish,
+  coverImages = {},
+}: {
+  fish: FishEntry[];
+  coverImages?: Record<string, string>;
+}) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | FishCategory>("all");
 
@@ -68,7 +74,7 @@ export default function FishBrowser({ fish }: { fish: FishEntry[] }) {
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((entry) => (
-            <FishCard key={entry.slug} entry={entry} />
+            <FishCard key={entry.slug} entry={entry} coverImage={coverImages[entry.slug]} />
           ))}
         </div>
       )}

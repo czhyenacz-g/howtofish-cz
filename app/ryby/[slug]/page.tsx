@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fishEntries } from "../../../data/fish";
-import FishImage from "../../components/FishImage";
+import { getCurrentUser } from "../../../lib/auth/current-user";
+import { getApprovedCatches } from "../../../lib/universal-content-api/catches";
 import VerificationBadge from "../../components/VerificationBadge";
 import AffiliateBanner from "../../components/AffiliateBanner";
+import CommunityCatchSection from "./CommunityCatchSection";
 
 export const dynamicParams = false;
 
@@ -39,6 +41,13 @@ export default async function FishDetailPage({ params }: Props) {
   if (!entry) {
     notFound();
   }
+
+  const [user, catches] = await Promise.all([
+    getCurrentUser(),
+    // Výpadek Universal Content API nesmí shodit stránku — prázdná
+    // galerie/placeholder je v pořádku, raw chyba návštěvníkovi ne.
+    getApprovedCatches(entry.slug).catch(() => []),
+  ]);
 
   const basicInfo: { label: string; value: string }[] = [
     { label: "Typ", value: CATEGORY_LABEL[entry.category] },
@@ -81,14 +90,13 @@ export default async function FishDetailPage({ params }: Props) {
           ← Zpět na encyklopedii úlovků
         </Link>
 
-        <div className="relative mt-4 aspect-[3/1] w-full overflow-hidden rounded-lg">
-          <FishImage image={entry.image} alt={entry.name} className="absolute inset-0" />
-          {entry.isBoss && (
-            <span className="absolute left-3 top-3 -rotate-2 rounded border border-amber-300 bg-amber-400 px-2.5 py-1 font-serif text-xs uppercase tracking-wide text-gray-900 shadow-sm">
-              Boss
-            </span>
-          )}
-        </div>
+        <CommunityCatchSection
+          fishSlug={entry.slug}
+          fishName={entry.name}
+          isBoss={entry.isBoss}
+          catches={catches}
+          user={user}
+        />
 
         <h1 className="mt-6 font-serif text-3xl sm:text-4xl">
           {entry.name}

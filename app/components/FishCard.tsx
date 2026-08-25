@@ -8,14 +8,14 @@ const CATEGORY_LABEL: Record<FishEntry["category"], string> = {
   tvor: "Tvor",
 };
 
-export default function FishCard({ entry }: { entry: FishEntry }) {
+export default function FishCard({ entry, coverImage }: { entry: FishEntry; coverImage?: string }) {
   return (
     <Link
       href={`/ryby/${entry.slug}`}
       className="group flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0e3347]/60 transition duration-150 hover:-translate-y-0.5 hover:border-amber-400/60 hover:bg-[#0e3347] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       <div className="relative aspect-[4/3] w-full">
-        <FishImage image={entry.image} alt={entry.name} className="absolute inset-0" />
+        <FishImage image={coverImage ?? entry.image} alt={entry.name} className="absolute inset-0" />
         {entry.isBoss && (
           <span className="absolute left-2 top-2 -rotate-2 rounded border border-amber-300 bg-amber-400 px-2 py-0.5 font-serif text-[11px] uppercase tracking-wide text-gray-900 shadow-sm">
             Boss

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fishEntries } from "../../data/fish";
+import { getApprovedCatchCovers } from "../../lib/universal-content-api/catches";
 import FishBrowser from "./FishBrowser";
 
 export const metadata: Metadata = {
@@ -8,7 +9,14 @@ export const metadata: Metadata = {
     "Česká encyklopedie ryb, tvorů a úlovků ze hry How to Fish. Zjisti, kde je najít, jak je chytit a k čemu slouží.",
 };
 
-export default function RybyPage() {
+export default async function RybyPage() {
+  // Jeden dávkový request na všechny cover obrázky (viz
+  // getApprovedCatchCovers) — ne jeden request na rybu.
+  const covers = await getApprovedCatchCovers().catch(() => new Map());
+  const coverImages = Object.fromEntries(
+    Array.from(covers.entries()).map(([slug, c]) => [slug, c.image.url])
+  );
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-[#0a2438] via-[#0e4f66] to-[#146b78] px-4 py-16 text-white">
       <svg
@@ -33,7 +41,7 @@ export default function RybyPage() {
         </div>
 
         <div className="mt-10">
-          <FishBrowser fish={fishEntries} />
+          <FishBrowser fish={fishEntries} coverImages={coverImages} />
         </div>
       </div>
     </div>
