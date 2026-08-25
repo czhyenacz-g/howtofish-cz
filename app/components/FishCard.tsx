@@ -44,8 +44,14 @@ export default function FishCard({
             </div>
           </>
         ) : (
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 pb-1.5 pt-6 text-center">
-            <span className="font-serif text-[11px] text-amber-200">Nahraj první úlovek</span>
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1.5 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-2 pb-2 pt-6 text-center">
+            <span className="inline-block max-w-full -rotate-1 rounded border border-amber-300/70 bg-[#e8cfa0] px-2 py-1 font-serif text-[11px] leading-snug text-[#0a2438] shadow-sm">
+              <span className="font-bold">Rybář:</span>{" "}
+              <span className="font-normal text-[#0a2438]/70">Ještě nikdo nenahrál fotku úlovku</span>
+            </span>
+            <span className="inline-block rounded border border-amber-300 bg-amber-400 px-2.5 py-1 font-serif text-[11px] font-semibold uppercase tracking-wide text-gray-900 shadow-sm">
+              Nahraj první úlovek
+            </span>
           </div>
         )}
       </div>
