@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { SITE_LAUNCHED } from "../config/site";
+import { getCurrentUser } from "../../lib/auth/current-user";
 
 // Dokud web není spuštěný, celý /ryby strom (včetně budoucích
 // vnořených stránek) je noindex,nofollow — potomci toto dědí, pokud
@@ -16,12 +17,13 @@ export const metadata: Metadata = SITE_LAUNCHED
       },
     };
 
-export default function RybyLayout({
+export default async function RybyLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const user = await getCurrentUser();
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      <Header user={user} />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

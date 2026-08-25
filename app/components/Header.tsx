@@ -28,7 +28,39 @@ function tabClass(active: boolean, tilt: string) {
   return `${base} ${tilt} border-white/10 bg-white/5 text-[#f4ead9]/90 hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200`;
 }
 
-export default function Header({ basePath = "" }: { basePath?: string }) {
+type HeaderUser = { nickname: string; avatarUrl: string | null } | null;
+
+function SteamAuthControl({ user, pathname }: { user: HeaderUser; pathname: string }) {
+  if (user) {
+    return (
+      <form action="/api/auth/logout" method="POST" className="flex items-center gap-2">
+        <input type="hidden" name="returnTo" value={pathname} />
+        {user.avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={user.avatarUrl} alt="" className="h-6 w-6 rounded-full" />
+        ) : null}
+        <span className="max-w-[8rem] truncate font-serif text-sm text-[#f4ead9]/90">{user.nickname}</span>
+        <button
+          type="submit"
+          className="rounded border border-white/10 bg-white/5 px-2.5 py-1 font-serif text-sm text-[#f4ead9]/90 transition hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+        >
+          Odhlásit
+        </button>
+      </form>
+    );
+  }
+
+  return (
+    <Link
+      href={`/api/auth/steam/login?returnTo=${encodeURIComponent(pathname)}`}
+      className="rounded border border-white/10 bg-white/5 px-2.5 py-1 font-serif text-sm text-[#f4ead9]/90 transition hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+    >
+      Přihlásit přes Steam
+    </Link>
+  );
+}
+
+export default function Header({ basePath = "", user = null }: { basePath?: string; user?: HeaderUser }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const links = basePath === "" ? [...NAV_LINKS, ...TOP_LEVEL_EXTRA_LINKS] : NAV_LINKS;
@@ -76,6 +108,10 @@ export default function Header({ basePath = "" }: { basePath?: string }) {
           </ul>
         </nav>
 
+        <div className="hidden md:block">
+          <SteamAuthControl user={user} pathname={pathname} />
+        </div>
+
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -119,6 +155,9 @@ export default function Header({ basePath = "" }: { basePath?: string }) {
               );
             })}
           </ul>
+          <div className="mt-3 border-t border-white/10 pt-3">
+            <SteamAuthControl user={user} pathname={pathname} />
+          </div>
         </nav>
       )}
 
