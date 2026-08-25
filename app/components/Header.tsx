@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_LINKS, SITE_NAME } from "../config/site";
 import FishSilhouette from "./FishSilhouette";
+import SteamIcon from "./SteamIcon";
 
 // "Hra" a "Živě" jsou od začátku na finálních top-level URL (/hra,
 // /stream), takže patří do navigace jen tam, kde Header běží bez
@@ -53,9 +54,13 @@ function SteamAuthControl({ user, pathname }: { user: HeaderUser; pathname: stri
   return (
     <Link
       href={`/api/auth/steam/login?returnTo=${encodeURIComponent(pathname)}`}
-      className="rounded border border-white/10 bg-white/5 px-2.5 py-1 font-serif text-sm text-[#f4ead9]/90 transition hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+      className="flex flex-col items-center gap-0.5 rounded border border-white/10 bg-white/5 px-2.5 py-1 font-serif text-sm leading-tight text-[#f4ead9]/90 transition hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
     >
-      Přihlásit přes Steam
+      <span>Přihlásit přes</span>
+      <span className="inline-flex items-center gap-1 font-semibold">
+        <SteamIcon className="h-3.5 w-3.5" />
+        Steam
+      </span>
     </Link>
   );
 }
