@@ -70,3 +70,25 @@
     animation: none;
   }
 }
+
+/* Live tečka u položky "Živě" v hlavní navigaci (Header.tsx) — jemné,
+   pomalé prosvítání, ne blikání. */
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.animate-live-pulse {
+  animation: live-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-live-pulse {
+    animation: none;
+  }
+}

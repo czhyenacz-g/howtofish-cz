@@ -11,10 +11,18 @@ import SteamIcon from "./SteamIcon";
 // /stream), takže patří do navigace jen tam, kde Header běží bez
 // basePath (skutečné stránky), ne pod /demo (kde by ukazovaly na
 // neexistující /demo/hra nebo /demo/stream).
-const TOP_LEVEL_EXTRA_LINKS = [
-  { href: "/hra", label: "Hra" },
-  { href: "/stream", label: "Živě" },
-] as const;
+const LIVE_LINK = { href: "/stream", label: "Živě" } as const;
+const HRA_LINK = { href: "/hra", label: "Hra" } as const;
+
+// /stream je jedna z nejdůležitějších dynamických funkcí webu, takže
+// "Živě" chceme hned za logem — i když v NAV_LINKS (a v patičce, kde
+// pořadí měnit nechceme) má Ryby jiné pořadové místo.
+function buildLinks(basePath: string) {
+  if (basePath !== "") return NAV_LINKS;
+  const ryby = NAV_LINKS.find((link) => link.href === "/ryby");
+  const rest = NAV_LINKS.filter((link) => link.href !== "/ryby");
+  return ryby ? [LIVE_LINK, ryby, ...rest, HRA_LINK] : [LIVE_LINK, ...NAV_LINKS, HRA_LINK];
+}
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -27,6 +35,34 @@ function tabClass(active: boolean, tilt: string) {
     return `${base} translate-y-0.5 rotate-0 border-amber-300 bg-[#e8cfa0] text-[#0a2438] shadow-[0_2px_0_0_rgba(0,0,0,0.3)]`;
   }
   return `${base} ${tilt} border-white/10 bg-white/5 text-[#f4ead9]/90 hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200`;
+}
+
+function liveTabClass(active: boolean) {
+  const base =
+    "inline-flex items-center gap-1.5 rounded border px-3 py-1.5 font-serif transition duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+  if (active) {
+    return `${base} translate-y-0.5 rotate-0 border-red-400 bg-[#e8cfa0] text-[#0a2438] shadow-[0_2px_0_0_rgba(0,0,0,0.3)]`;
+  }
+  return `${base} -rotate-1 border-red-400/70 bg-red-500/10 text-red-200 hover:border-red-300 hover:bg-red-500/20 hover:text-red-100`;
+}
+
+function liveMobileClass(active: boolean) {
+  const base =
+    "flex min-h-[44px] items-center gap-2 rounded border px-4 py-3 font-serif text-base transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 motion-reduce:transition-none";
+  if (active) {
+    return `${base} border-red-400 bg-[#e8cfa0] text-[#0a2438]`;
+  }
+  return `${base} border-red-400/70 bg-red-500/10 text-red-200 hover:border-red-300 hover:bg-red-500/20`;
+}
+
+function LiveDot({ active }: { active: boolean }) {
+  const color = active ? "bg-[#0a2438]" : "bg-red-400";
+  return (
+    <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
+      <span className={`absolute inline-flex h-full w-full animate-live-pulse rounded-full ${color} opacity-75`} />
+      <span className={`relative inline-flex h-2 w-2 rounded-full ${color}`} />
+    </span>
+  );
 }
 
 type HeaderUser = { nickname: string; avatarUrl: string | null } | null;
@@ -68,7 +104,7 @@ function SteamAuthControl({ user, pathname }: { user: HeaderUser; pathname: stri
 export default function Header({ basePath = "", user = null }: { basePath?: string; user?: HeaderUser }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const links = basePath === "" ? [...NAV_LINKS, ...TOP_LEVEL_EXTRA_LINKS] : NAV_LINKS;
+  const links = buildLinks(basePath);
 
   useEffect(() => {
     setOpen(false);
@@ -98,13 +134,17 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
             {links.map((link, i) => {
               const href = `${basePath}${link.href}`;
               const active = isActive(pathname, href);
+              const isLive = link.href === LIVE_LINK.href;
               return (
                 <li key={href}>
                   <Link
                     href={href}
                     aria-current={active ? "page" : undefined}
-                    className={tabClass(active, i % 2 === 0 ? "-rotate-1" : "rotate-1")}
+                    title={isLive ? "Sleduj, kdo právě hraje How to Fish" : undefined}
+                    aria-label={isLive ? "Živě – sleduj, kdo právě hraje How to Fish" : undefined}
+                    className={isLive ? liveTabClass(active) : tabClass(active, i % 2 === 0 ? "-rotate-1" : "rotate-1")}
                   >
+                    {isLive && <LiveDot active={active} />}
                     {link.label}
                   </Link>
                 </li>
@@ -143,6 +183,23 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
             {links.map((link) => {
               const href = `${basePath}${link.href}`;
               const active = isActive(pathname, href);
+              const isLive = link.href === LIVE_LINK.href;
+              if (isLive) {
+                return (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      aria-current={active ? "page" : undefined}
+                      title="Sleduj, kdo právě hraje How to Fish"
+                      aria-label="Živě – sleduj, kdo právě hraje How to Fish"
+                      className={liveMobileClass(active)}
+                    >
+                      <LiveDot active={active} />
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              }
               return (
                 <li key={href}>
                   <Link
