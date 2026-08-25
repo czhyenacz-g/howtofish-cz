@@ -4,6 +4,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import AmbientAudioToggle from "./components/AmbientAudioToggle";
+import CharacterCallout from "./components/CharacterCallout";
 import { GOATCOUNTER_CODE } from "./config/analytics";
 import {
   SITE_DESCRIPTION,
@@ -63,6 +64,7 @@ export default function RootLayout({
       <body className="bg-gray-900 font-sans text-white antialiased">
         {children}
         <AmbientAudioToggle />
+        <CharacterCallout />
         <Analytics />
         {GOATCOUNTER_CODE && (
           <Script
