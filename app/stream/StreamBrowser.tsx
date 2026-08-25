@@ -35,6 +35,19 @@ function formatTime(iso: string) {
   });
 }
 
+// Názvy streamů bývají jedna dlouhá věta bez interpunkce (nebo dokonce
+// bez mezer, jen emoji za sebou) — místo neomezeně dlouhého jednoho
+// řádku ho rozdělíme po pěti slovech na kratší, čitelnější řádky.
+function breakEveryNWords(text: string, n = 5): string[] {
+  const words = text.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [text];
+  const lines: string[] = [];
+  for (let i = 0; i < words.length; i += n) {
+    lines.push(words.slice(i, i + n).join(" "));
+  }
+  return lines;
+}
+
 export default function StreamBrowser({
   streams,
   totalViewers,
@@ -149,7 +162,13 @@ function StreamRow({ stream }: { stream: LiveStream }) {
         )}
         <div className="min-w-0">
           <p className="truncate font-semibold text-white">{stream.channelName}</p>
-          <p className="truncate text-sm text-cyan-100/70">{stream.title}</p>
+          <p className="break-words text-sm text-cyan-100/70">
+            {breakEveryNWords(stream.title).map((line, i) => (
+              <span key={i} className="block">
+                {line}
+              </span>
+            ))}
+          </p>
           {stream.language && (
             <p className="text-xs text-cyan-100/40">{stream.language.toUpperCase()}</p>
           )}
