@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { fishEntries } from "../../data/fish";
+import { getCurrentUser } from "../../lib/auth/current-user";
 import { getApprovedCatchCovers } from "../../lib/universal-content-api/catches";
+import { getMyPendingSuggestions } from "../../lib/universal-content-api/suggestions";
 import FishBrowser from "./FishBrowser";
 
 export const metadata: Metadata = {
@@ -10,11 +12,18 @@ export const metadata: Metadata = {
 };
 
 export default async function RybyPage() {
+  const user = await getCurrentUser();
+
   // Jeden dávkový request na všechny featured úlovky (viz
   // getApprovedCatchCovers) — ne jeden request na rybu. Předává se
   // celý CommunityCatch (ne jen URL), ať FishCard může zobrazit i
   // nickname/badge, ne jen obrázek.
-  const covers = await getApprovedCatchCovers().catch(() => new Map());
+  const [covers, mySuggestions] = await Promise.all([
+    getApprovedCatchCovers().catch(() => new Map()),
+    // Server-side filtr podle steam_id ze session — nikdy se
+    // nestahují cizí pending návrhy do browseru (viz suggestions.ts).
+    user ? getMyPendingSuggestions(user.steamId).catch(() => []) : Promise.resolve([]),
+  ]);
   const featuredCatches = Object.fromEntries(covers);
 
   return (
@@ -41,7 +50,7 @@ export default async function RybyPage() {
         </div>
 
         <div className="mt-10">
-          <FishBrowser fish={fishEntries} featuredCatches={featuredCatches} />
+          <FishBrowser fish={fishEntries} featuredCatches={featuredCatches} suggestions={mySuggestions} />
         </div>
       </div>
     </div>

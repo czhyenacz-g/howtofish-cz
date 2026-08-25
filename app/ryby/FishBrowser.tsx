@@ -2,8 +2,10 @@
 
 import { useMemo, useState } from "react";
 import type { FishCategory, FishEntry } from "../../data/fish";
-import type { CommunityCatch } from "../../lib/universal-content-api/types";
+import type { CommunityCatch, FishSuggestion } from "../../lib/universal-content-api/types";
+import AddFishSuggestionCard from "../components/AddFishSuggestionCard";
 import FishCard from "../components/FishCard";
+import FishSuggestionCard from "../components/FishSuggestionCard";
 
 const FILTERS: { key: "all" | FishCategory; label: string }[] = [
   { key: "all", label: "Vše" },
@@ -18,9 +20,11 @@ function normalize(value: string) {
 export default function FishBrowser({
   fish,
   featuredCatches = {},
+  suggestions = [],
 }: {
   fish: FishEntry[];
   featuredCatches?: Record<string, CommunityCatch>;
+  suggestions?: FishSuggestion[];
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | FishCategory>("all");
@@ -68,17 +72,23 @@ export default function FishBrowser({
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {filtered.length === 0 && (
         <p className="mt-10 text-center text-cyan-100/60">
           Nic jsme nenašli. Zkus jiné hledání.
         </p>
-      ) : (
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((entry) => (
-            <FishCard key={entry.slug} entry={entry} featuredCatch={featuredCatches[entry.slug]} />
-          ))}
-        </div>
       )}
+
+      {/* Návrhy a CTA karta nejsou předmětem hledání/filtru — grid se
+          renderuje vždy, i když textové hledání nenajde žádnou rybu. */}
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((entry) => (
+          <FishCard key={entry.slug} entry={entry} featuredCatch={featuredCatches[entry.slug]} />
+        ))}
+        {suggestions.map((suggestion) => (
+          <FishSuggestionCard key={suggestion.id} suggestion={suggestion} />
+        ))}
+        <AddFishSuggestionCard />
+      </div>
     </div>
   );
 }

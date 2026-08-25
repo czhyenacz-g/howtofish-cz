@@ -85,3 +85,32 @@ export type LeaderboardEntry = {
   round: number;
   createdAt: string;
 };
+
+export type FishSuggestionType = "fish" | "creature" | "boss" | "other";
+
+// Payload uložený do records.data pro collection "fish_suggestions" —
+// záměrně minimální, žádné rarity/cena/lokace navíc (to řeší admin/research).
+export type FishSuggestionData = {
+  name: string;
+  type: FishSuggestionType;
+  location: string;
+  steam_id: string;
+  nickname: string;
+  note?: string;
+  rights_confirmed: true;
+};
+
+// HowToFish typ pro UI — pending návrh, který vidí jen jeho autor.
+export type FishSuggestion = {
+  id: number;
+  name: string;
+  type: FishSuggestionType;
+  location: string;
+  steamId: string;
+  nickname: string;
+  note?: string;
+  // Média se nahrává jako druhý krok po vytvoření recordu — při
+  // výpadku uploadu může (vzácně) zůstat bez obrázku, viz suggestions.ts.
+  image: { id: number; url: string; width?: number; height?: number } | null;
+  createdAt: string;
+};
