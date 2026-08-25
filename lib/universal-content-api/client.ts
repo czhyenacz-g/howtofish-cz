@@ -4,7 +4,7 @@ import "server-only";
 // na top-level modulu), aby chybějící env proměnná nikdy nerozbila
 // build — jen běhový request selže kontrolovaně (viz UcaError).
 const PROJECT_SLUG = "howtofish";
-const CATCHES_COLLECTION = "catches";
+const DEFAULT_COLLECTION = "catches";
 
 export class UcaError extends Error {
   readonly status?: number;
@@ -109,8 +109,8 @@ export async function ucaUploadRequest<T>(
   });
 }
 
-export function recordsPath(suffix = ""): string {
-  return `/api/v1/projects/${PROJECT_SLUG}/collections/${CATCHES_COLLECTION}/records${suffix}`;
+export function recordsPath(suffix = "", collection: string = DEFAULT_COLLECTION): string {
+  return `/api/v1/projects/${PROJECT_SLUG}/collections/${collection}/records${suffix}`;
 }
 
 export function mediaPath(): string {

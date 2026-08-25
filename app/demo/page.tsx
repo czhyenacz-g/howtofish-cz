@@ -47,7 +47,7 @@ const SECTION_CARDS = [
     // se sem odkazuje přímo bez BASE prefixu — viz zadání pro /hra.
     href: "/hra",
     label: "Hra",
-    text: "Minihra Chyť úlovek — zkus si rychlý lov přímo v prohlížeči.",
+    text: "Minihra Krabí invaze — zastav kraby dřív, než utečou do moře.",
   },
 ] as const;
 

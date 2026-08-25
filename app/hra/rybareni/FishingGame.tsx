@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { FishEntry } from "../../data/fish";
-import FishSilhouette from "../components/FishSilhouette";
-import VerificationBadge from "../components/VerificationBadge";
+import type { FishEntry } from "../../../data/fish";
+import FishSilhouette from "../../components/FishSilhouette";
+import VerificationBadge from "../../components/VerificationBadge";
 
 const LANE_COUNT = 5;
 const CAST_MS = 550;

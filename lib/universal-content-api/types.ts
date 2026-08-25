@@ -64,3 +64,24 @@ export type CommunityCatch = {
   };
   createdAt: string;
 };
+
+// Payload uložený do records.data pro collection "game_scores" —
+// žádné osobní údaje navíc, jen co je potřeba pro žebříček.
+export type GameScoreData = {
+  game: string;
+  steam_id: string;
+  nickname: string;
+  score: number;
+  round: number;
+  kills: number;
+  best_combo: number;
+};
+
+// HowToFish typ pro žebříček — jeden řádek na hráče (viz getLeaderboard).
+export type LeaderboardEntry = {
+  steamId: string;
+  nickname: string;
+  score: number;
+  round: number;
+  createdAt: string;
+};
