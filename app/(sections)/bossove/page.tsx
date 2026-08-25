@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AdPlaceholder from "../../components/AdPlaceholder";
 import SectionPlaceholder from "../../components/SectionPlaceholder";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default function BossovePage() {
         připravit, jaké vybavení se hodí a jaké taktiky fungují nejlépe.
       </p>
       <p>Konkrétní bossy postupně doplníme.</p>
+      <AdPlaceholder />
     </SectionPlaceholder>
   );
 }

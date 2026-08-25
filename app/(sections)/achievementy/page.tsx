@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getSteamAchievements } from "../../../lib/steam/achievements";
+import AdPlaceholder from "../../components/AdPlaceholder";
 import AchievementBrowser from "./AchievementBrowser";
 
 export const metadata: Metadata = {
@@ -16,6 +17,10 @@ export default async function AchievementyPage() {
       <p className="mt-3 text-gray-400">
         Achievementy How to Fish přímo ze Steamu — řazené od nejvzácnějšího po nejběžnější.
       </p>
+
+      <div className="mt-6">
+        <AdPlaceholder />
+      </div>
 
       {!achievements || achievements.length === 0 ? (
         <div className="mt-10 rounded-lg border border-white/10 bg-[#0e3347]/60 p-6 text-center text-gray-400">

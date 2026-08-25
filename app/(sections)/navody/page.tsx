@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AdPlaceholder from "../../components/AdPlaceholder";
 import SectionPlaceholder from "../../components/SectionPlaceholder";
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export default function NavodyPage() {
         bossem a další postupy pro začátečníky i pokročilé hráče.
       </p>
       <p>Sekce se právě rozjíždí, první návody přidáme v následujících týdnech.</p>
+      <AdPlaceholder />
     </SectionPlaceholder>
   );
 }

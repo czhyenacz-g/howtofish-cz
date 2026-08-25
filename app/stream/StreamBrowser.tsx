@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { LiveStream, Platform } from "../../lib/streams/types";
+import AdPlaceholder from "../components/AdPlaceholder";
 
 const PLATFORM_LABEL: Record<Platform, string> = {
   twitch: "Twitch",
@@ -90,6 +91,10 @@ export default function StreamBrowser({
           ))}
         </div>
       )}
+
+      <div className="mx-auto mt-6 max-w-3xl">
+        <AdPlaceholder />
+      </div>
 
       <div className="mt-6 flex flex-wrap justify-center gap-2 font-serif">
         {FILTERS.map((f) => (

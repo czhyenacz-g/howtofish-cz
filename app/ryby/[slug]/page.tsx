@@ -5,7 +5,7 @@ import { fishEntries } from "../../../data/fish";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getApprovedCatches, selectFeaturedCatch } from "../../../lib/universal-content-api/catches";
 import VerificationBadge from "../../components/VerificationBadge";
-import AffiliateBanner from "../../components/AffiliateBanner";
+import AdPlaceholder from "../../components/AdPlaceholder";
 import CommunityCatchSection from "./CommunityCatchSection";
 
 export const dynamicParams = false;
@@ -163,6 +163,10 @@ export default async function FishDetailPage({ params }: Props) {
           </section>
         ) : null}
 
+        <div className="mt-10">
+          <AdPlaceholder />
+        </div>
+
         <section className="mt-10 border-t border-white/10 pt-6">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-100/50">
             Zdroje
@@ -183,15 +187,8 @@ export default async function FishDetailPage({ params }: Props) {
           </ul>
         </section>
 
-        {/* Ukázkové umístění partnerského banneru — obrázek zatím
-            chybí (public/images/banners/), takže se zobrazuje textový
-            fallback komponenty. Stačí soubor doplnit. */}
         <div className="mt-10">
-          <AffiliateBanner
-            imageSrc="/images/banners/example-banner.png"
-            href="https://example.com/affiliate-link"
-            title="Vybavení pro rybáře – doporučené produkty"
-          />
+          <AdPlaceholder />
         </div>
       </div>
     </div>

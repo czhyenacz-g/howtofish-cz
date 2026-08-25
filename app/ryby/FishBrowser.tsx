@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { FishCategory, FishEntry } from "../../data/fish";
 import type { CommunityCatch, FishSuggestion } from "../../lib/universal-content-api/types";
 import AddFishSuggestionCard from "../components/AddFishSuggestionCard";
+import AdPlaceholder from "../components/AdPlaceholder";
 import FishCard from "../components/FishCard";
 import FishSuggestionCard from "../components/FishSuggestionCard";
 
@@ -70,6 +71,10 @@ export default function FishBrowser({
             {f.label}
           </button>
         ))}
+      </div>
+
+      <div className="mt-6">
+        <AdPlaceholder />
       </div>
 
       {filtered.length === 0 && (

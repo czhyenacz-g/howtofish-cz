@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AdPlaceholder from "../../components/AdPlaceholder";
 import SectionPlaceholder from "../../components/SectionPlaceholder";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default function LokacePage() {
         chytíte, na co si dát pozor a jak se do nich dostanete.
       </p>
       <p>Mapy a popisy lokací připravujeme.</p>
+      <AdPlaceholder />
     </SectionPlaceholder>
   );
 }
