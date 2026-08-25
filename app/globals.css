@@ -17,13 +17,21 @@
 }
 
 /* Ambientní pohyb spodní scény na homepage (viz app/page.tsx) — jen
-   jemný transform, žádný layout shift, každá vrstva jinak pomalu. */
+   transform, žádný layout shift, každá vrstva jinak rychle. Výraznější
+   amplituda + víc kroků v keyframes, ať vlnění působí plynuleji, ne
+   jako prosté houpání ze strany na stranu. */
 @keyframes wave-sway-front {
   0%,
   100% {
     transform: translateX(0) translateY(0);
   }
+  25% {
+    transform: translateX(-14px) translateY(5px);
+  }
   50% {
+    transform: translateX(-24px) translateY(8px);
+  }
+  75% {
     transform: translateX(-10px) translateY(3px);
   }
 }
@@ -31,10 +39,16 @@
 @keyframes wave-sway-back {
   0%,
   100% {
-    transform: translateX(0);
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(10px) translateY(-3px);
   }
   50% {
-    transform: translateX(7px);
+    transform: translateX(18px) translateY(-6px);
+  }
+  75% {
+    transform: translateX(8px) translateY(-2px);
   }
 }
 
@@ -49,12 +63,12 @@
 }
 
 .animate-wave-front {
-  animation: wave-sway-front 9s ease-in-out infinite;
+  animation: wave-sway-front 7s ease-in-out infinite;
   will-change: transform;
 }
 
 .animate-wave-back {
-  animation: wave-sway-back 15s ease-in-out infinite;
+  animation: wave-sway-back 11s ease-in-out infinite;
   will-change: transform;
 }
 
