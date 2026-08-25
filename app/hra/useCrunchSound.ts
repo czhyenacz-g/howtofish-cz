@@ -88,6 +88,29 @@ export function useCrunchSound() {
     [enabled, ensureContext]
   );
 
+  // Krátký sestupný tón při ztrátě života — jiná barva zvuku než crunch,
+  // ať je jasně slyšet, že se stalo něco špatného (krab unikl).
+  const playLifeLost = useCallback(() => {
+    if (!enabled) return;
+    const ctx = ensureContext();
+    if (!ctx) return;
+
+    const duration = 0.28;
+    const osc = ctx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(340, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + duration);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  }, [enabled, ensureContext]);
+
   const toggle = useCallback(() => {
     setEnabled((prev) => {
       const next = !prev;
@@ -96,5 +119,5 @@ export function useCrunchSound() {
     });
   }, []);
 
-  return { enabled, toggle, playCrunch, unlock };
+  return { enabled, toggle, playCrunch, playLifeLost, unlock };
 }

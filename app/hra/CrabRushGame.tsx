@@ -103,14 +103,37 @@ function ScoreSaveSection({
 
 export default function CrabRushGame({ user }: { user: GameUser }) {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
-  const { enabled: soundEnabled, toggle: toggleSound, playCrunch, unlock } = useCrunchSound();
+  const { enabled: soundEnabled, toggle: toggleSound, playCrunch, playLifeLost, unlock } = useCrunchSound();
   const gameOverHeadingRef = useRef<HTMLHeadingElement>(null);
+  const gameOverAudioRef = useRef<HTMLAudioElement | null>(null);
+  const previousLivesRef = useRef(gameState.lives);
 
   useEffect(() => {
     if (gameState.status === "game-over" && gameOverHeadingRef.current) {
       gameOverHeadingRef.current.focus();
     }
   }, [gameState.status]);
+
+  // Zvuk při ztrátě života — porovnává s předchozí hodnotou, ať se
+  // spustí přesně v okamžiku, kdy krab unikne (ne při restartu, kdy
+  // životy naopak naskočí zpátky na plný počet).
+  useEffect(() => {
+    if (gameState.lives < previousLivesRef.current) {
+      playLifeLost();
+    }
+    previousLivesRef.current = gameState.lives;
+  }, [gameState.lives, playLifeLost]);
+
+  // Game Over — posměšný smích (stejný "pepelaugh" náhradní asset jako
+  // u minihry Chyť úlovek, viz public/audio/catch-fail.mp3).
+  useEffect(() => {
+    if (gameState.status !== "game-over") return;
+    const audio = gameOverAudioRef.current;
+    if (!audio || !soundEnabled) return;
+    audio.volume = 0.5;
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  }, [gameState.status, soundEnabled]);
 
   // Hlavní herní smyčka — běží, jen dokud je status "playing"; nové
   // kolo (jiné round číslo) restartuje časování spawnu/framu od nuly.
@@ -184,6 +207,8 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
 
   return (
     <div>
+      <audio ref={gameOverAudioRef} src="/audio/catch-fail.mp3" preload="none" />
+
       <div className="flex flex-wrap items-center justify-center gap-2">
         <Badge>Skóre: {gameState.score}</Badge>
         <Badge>Kolo: {gameState.round}</Badge>
