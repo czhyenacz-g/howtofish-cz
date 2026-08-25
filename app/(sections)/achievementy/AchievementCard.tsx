@@ -16,9 +16,19 @@ export default function AchievementCard({ achievement }: { achievement: SteamAch
       </div>
 
       <div className="min-w-0 flex-1">
-        <h2 className="font-serif text-white">{achievement.name}</h2>
-        {achievement.description && (
-          <p className="mt-1 text-sm text-cyan-100/70">{achievement.description}</p>
+        <h2 className="font-serif text-white">
+          {achievement.nameCs ?? achievement.name}
+          {achievement.nameCs && (
+            <span className="ml-1.5 font-sans text-sm font-normal text-cyan-100/40">({achievement.name})</span>
+          )}
+        </h2>
+        {(achievement.descriptionCs ?? achievement.description) && (
+          <p className="mt-1 text-sm text-cyan-100/70">
+            {achievement.descriptionCs ?? achievement.description}
+            {achievement.descriptionCs && achievement.description && (
+              <span className="ml-1.5 text-cyan-100/40">({achievement.description})</span>
+            )}
+          </p>
         )}
 
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">

@@ -132,3 +132,36 @@ test("getSteamAchievements: chybějící apiName v položce schema se přeskoč�
     }
   );
 });
+
+test("getSteamAchievements: apiName se známým překladem dostane nameCs/descriptionCs (český overlay, ne ze Steamu)", async () => {
+  await withMockedFetch(
+    mockFetchFor({ schema: { status: 200, body: SCHEMA_BODY }, percentages: { status: 200, body: PERCENTAGES_BODY } }),
+    async () => {
+      const achievements = await getSteamAchievements();
+      const translated = achievements!.find((a) => a.apiName === "A01_FirstCreature");
+      assert.equal(translated?.nameCs, "Začínáme");
+      assert.equal(translated?.descriptionCs, "Zabij svého prvního tvora.");
+      // Anglický originál z schématu zůstává nedotčený vedle překladu.
+      assert.equal(translated?.name, "First Catch");
+    }
+  );
+});
+
+test("getSteamAchievements: apiName bez známého překladu má nameCs/descriptionCs undefined, ne pád", async () => {
+  await withMockedFetch(
+    mockFetchFor({
+      schema: {
+        status: 200,
+        body: { game: { availableGameStats: { achievements: [{ name: "A99_Neznamy", displayName: "Unknown One", description: "Do something unknown." }] } } },
+      },
+      percentages: { status: 200, body: { achievementpercentages: { achievements: [] } } },
+    }),
+    async () => {
+      const achievements = await getSteamAchievements();
+      assert.equal(achievements!.length, 1);
+      assert.equal(achievements![0].nameCs, undefined);
+      assert.equal(achievements![0].descriptionCs, undefined);
+      assert.equal(achievements![0].name, "Unknown One");
+    }
+  );
+});

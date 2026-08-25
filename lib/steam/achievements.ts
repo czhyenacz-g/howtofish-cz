@@ -1,4 +1,5 @@
 import "server-only";
+import { ACHIEVEMENT_TRANSLATIONS } from "./achievement-translations.ts";
 
 // Achievementy pro How to Fish (Steam App ID 4001890) — dva veřejné
 // Steam Web API endpointy:
@@ -14,6 +15,11 @@ export type SteamAchievement = {
   apiName: string;
   name: string;
   description?: string;
+  // Ruční český overlay (viz achievement-translations.ts) — Steam sám
+  // pro tuhle hru češtinu nemá. Chybí, když pro apiName ještě neexistuje
+  // překlad; UI pak ukáže jen anglický originál.
+  nameCs?: string;
+  descriptionCs?: string;
   iconUrl?: string;
   hidden: boolean;
   globalPercent?: number;
@@ -115,13 +121,18 @@ export async function getSteamAchievements(): Promise<SteamAchievement[] | null>
 
   return schema
     .filter((a): a is SchemaAchievement & { name: string } => typeof a.name === "string" && a.name.length > 0)
-    .map((a) => ({
-      apiName: a.name,
-      name: typeof a.displayName === "string" && a.displayName.trim() ? a.displayName.trim() : a.name,
-      description:
-        typeof a.description === "string" && a.description.trim() ? a.description.trim() : undefined,
-      iconUrl: typeof a.icon === "string" && a.icon ? a.icon : undefined,
-      hidden: a.hidden === 1,
-      globalPercent: percentages.get(a.name),
-    }));
+    .map((a) => {
+      const translation = ACHIEVEMENT_TRANSLATIONS[a.name];
+      return {
+        apiName: a.name,
+        name: typeof a.displayName === "string" && a.displayName.trim() ? a.displayName.trim() : a.name,
+        description:
+          typeof a.description === "string" && a.description.trim() ? a.description.trim() : undefined,
+        nameCs: translation?.name,
+        descriptionCs: translation?.description,
+        iconUrl: typeof a.icon === "string" && a.icon ? a.icon : undefined,
+        hidden: a.hidden === 1,
+        globalPercent: percentages.get(a.name),
+      };
+    });
 }
