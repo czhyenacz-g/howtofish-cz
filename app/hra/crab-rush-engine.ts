@@ -11,6 +11,8 @@ export type CrabState = {
   slowUntil: number; // timestamp (ms), do kdy je krab zpomalený
   hitAt: number | null; // timestamp posledního zásahu (pro hit/die animaci)
   dying: boolean;
+  escaping: boolean; // krab dosáhl moře — mizí (potápí se), ne okamžitě
+  escapedAt: number | null; // timestamp, kdy začalo potápění (pro submerge animaci)
 };
 
 export type GameStatus = "idle" | "playing" | "round-transition" | "game-over";
@@ -35,6 +37,10 @@ export const TRACK_END_X = 100;
 export const HIT_SLOW_MS = 400;
 export const HIT_SLOW_FACTOR = 0.5;
 export const DEATH_ANIM_MS = 450;
+export const SUBMERGE_ANIM_MS = 550;
+// Krab se "potápí" o kousek před koncem trati, ať zůstane viditelný,
+// dokud nezmizí (na TRACK_END_X by byl hned za okrajem ořezané plochy).
+const SUBMERGE_X = TRACK_END_X - 6;
 export const ROUND_TRANSITION_MS = 1800;
 
 const BASE_SPEED = 9; // % trati za sekundu v kole 1
@@ -99,11 +105,18 @@ export function spawnCrab(state: GameState, now: number, rand: () => number = Ma
     slowUntil: 0,
     hitAt: null,
     dying: false,
+    escaping: false,
+    escapedAt: null,
   };
   return { ...state, crabs: [...state.crabs, crab], nextCrabId: state.nextCrabId + 1 };
 }
 
-/** Posune kraby, detekuje úniky do moře (x >= TRACK_END_X) -> odebere život. */
+/**
+ * Posune kraby, detekuje úniky do moře (x >= TRACK_END_X) -> odebere
+ * život hned (herní důsledek), ale krab sám nezmizí okamžitě — přejde
+ * do "escaping" a doběhne (tickDeaths) až po SUBMERGE_ANIM_MS, ať je
+ * vidět, jak se potápí, ne že zmizí ze scény ze zlomku vteřiny na nulu.
+ */
 export function tickMovement(state: GameState, now: number, deltaSeconds: number): GameState {
   if (state.status !== "playing") return state;
 
@@ -112,7 +125,7 @@ export function tickMovement(state: GameState, now: number, deltaSeconds: number
   const survivors: CrabState[] = [];
 
   for (const crab of state.crabs) {
-    if (crab.dying) {
+    if (crab.dying || crab.escaping) {
       survivors.push(crab);
       continue;
     }
@@ -122,6 +135,7 @@ export function tickMovement(state: GameState, now: number, deltaSeconds: number
     if (nextX >= TRACK_END_X) {
       lives -= 1;
       escapesThisRound += 1;
+      survivors.push({ ...crab, x: SUBMERGE_X, escaping: true, escapedAt: now });
       continue;
     }
     survivors.push({ ...crab, x: nextX });
@@ -137,11 +151,13 @@ export function tickMovement(state: GameState, now: number, deltaSeconds: number
   };
 }
 
-/** Odstraní kraby, jejichž "die" animace už doběhla. */
+/** Odstraní kraby, jejichž "die" nebo "escaping" (potápění) animace už doběhla. */
 export function tickDeaths(state: GameState, now: number): GameState {
-  const remaining = state.crabs.filter(
-    (c) => !(c.dying && c.hitAt !== null && now - c.hitAt > DEATH_ANIM_MS)
-  );
+  const remaining = state.crabs.filter((c) => {
+    if (c.dying && c.hitAt !== null && now - c.hitAt > DEATH_ANIM_MS) return false;
+    if (c.escaping && c.escapedAt !== null && now - c.escapedAt > SUBMERGE_ANIM_MS) return false;
+    return true;
+  });
   if (remaining.length === state.crabs.length) return state;
   return { ...state, crabs: remaining };
 }
@@ -159,7 +175,7 @@ export function tickRoundTimer(state: GameState, deltaSeconds: number): GameStat
 export function applyHit(state: GameState, crabId: number, now: number): GameState {
   if (state.status !== "playing") return state;
   const crab = state.crabs.find((c) => c.id === crabId);
-  if (!crab || crab.dying) return state;
+  if (!crab || crab.dying || crab.escaping) return state;
 
   const hp = crab.hp - 1;
 

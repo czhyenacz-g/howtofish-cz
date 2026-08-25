@@ -168,7 +168,7 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
     unlock();
     if (gameState.status !== "playing") return;
     const crab = gameState.crabs.find((c) => c.id === crabId);
-    if (!crab || crab.dying) return;
+    if (!crab || crab.dying || crab.escaping) return;
     playCrunch(crab.hp - 1 <= 0);
     const now = performance.now();
     setGameState((prev) => applyHit(prev, crabId, now));
@@ -228,23 +228,35 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
           onClick={handleTrackMiss}
           className="absolute inset-0"
         >
-          {gameState.crabs.map((crab) => (
-            <button
-              key={crab.id}
-              type="button"
-              onClick={(event) => handleCrabClick(crab.id, event)}
-              aria-label={`Krab, zbývá ${crab.hp} z ${crab.maxHp} zásahů`}
-              style={{ left: `${crab.x}%`, top: `${laneY(crab.id)}%` }}
-              className="absolute flex h-11 w-16 -translate-y-1/2 touch-manipulation items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-            >
-              <CrabIcon
-                className="h-10 w-14"
-                walking={!crab.dying}
-                hit={!crab.dying && crab.hitAt !== null && performance.now() - crab.hitAt < 220}
-                dying={crab.dying}
-              />
-            </button>
-          ))}
+          {gameState.crabs.map((crab) => {
+            const isHit =
+              !crab.dying && !crab.escaping && crab.hitAt !== null && performance.now() - crab.hitAt < 350;
+            return (
+              <button
+                key={crab.id}
+                type="button"
+                onClick={(event) => handleCrabClick(crab.id, event)}
+                aria-label={`Krab, zbývá ${crab.hp} z ${crab.maxHp} zásahů`}
+                style={{ left: `${crab.x}%`, top: `${laneY(crab.id)}%` }}
+                className={`absolute flex h-11 w-16 -translate-y-1/2 touch-manipulation items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+                  crab.escaping ? "pointer-events-none animate-crab-submerge" : ""
+                }`}
+              >
+                {isHit && (
+                  <span
+                    aria-hidden="true"
+                    className="animate-crab-hit-splat absolute bottom-0.5 left-1/2 h-3 w-7 -translate-x-1/2 translate-y-1 rounded-full bg-red-600/70 blur-[1px]"
+                  />
+                )}
+                <CrabIcon
+                  className="h-10 w-14"
+                  walking={!crab.dying && !crab.escaping}
+                  hit={!crab.dying && !crab.escaping && crab.hitAt !== null && performance.now() - crab.hitAt < 220}
+                  dying={crab.dying}
+                />
+              </button>
+            );
+          })}
         </div>
 
         {gameState.status === "idle" && (
