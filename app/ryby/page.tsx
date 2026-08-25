@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 };
 
 export default async function RybyPage() {
-  // Jeden dávkový request na všechny cover obrázky (viz
-  // getApprovedCatchCovers) — ne jeden request na rybu.
+  // Jeden dávkový request na všechny featured úlovky (viz
+  // getApprovedCatchCovers) — ne jeden request na rybu. Předává se
+  // celý CommunityCatch (ne jen URL), ať FishCard může zobrazit i
+  // nickname/badge, ne jen obrázek.
   const covers = await getApprovedCatchCovers().catch(() => new Map());
-  const coverImages = Object.fromEntries(
-    Array.from(covers.entries()).map(([slug, c]) => [slug, c.image.url])
-  );
+  const featuredCatches = Object.fromEntries(covers);
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-[#0a2438] via-[#0e4f66] to-[#146b78] px-4 py-16 text-white">
@@ -41,7 +41,7 @@ export default async function RybyPage() {
         </div>
 
         <div className="mt-10">
-          <FishBrowser fish={fishEntries} coverImages={coverImages} />
+          <FishBrowser fish={fishEntries} featuredCatches={featuredCatches} />
         </div>
       </div>
     </div>

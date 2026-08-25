@@ -25,20 +25,20 @@ export default function CommunityCatchSection({
   fishSlug,
   fishName,
   isBoss,
-  catches,
+  featuredCatch,
+  otherCatches,
   user,
 }: {
   fishSlug: string;
   fishName: string;
   isBoss?: boolean;
-  catches: CommunityCatch[];
+  featuredCatch: CommunityCatch | null;
+  otherCatches: CommunityCatch[];
   user: SectionUser;
 }) {
   const [formOpen, setFormOpen] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
-  const first = catches[0] ?? null;
-  const rest = catches.slice(1);
   const returnTo = `/ryby/${fishSlug}`;
 
   function UploadCta({ label }: { label: string }) {
@@ -71,15 +71,19 @@ export default function CommunityCatchSection({
   return (
     <>
       <div className="relative mt-4 aspect-video w-full overflow-hidden rounded-lg bg-[#0a2438]">
-        {first ? (
+        {featuredCatch ? (
           <button
             type="button"
-            onClick={() => setLightboxUrl(first.image.url)}
+            onClick={() => setLightboxUrl(featuredCatch.image.url)}
             className="absolute inset-0 h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
             aria-label="Zobrazit úlovek na celou obrazovku"
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- uživatelský screenshot s volným poměrem stran, next/image by tu vyžadoval pevné rozměry */}
-            <img src={first.image.url} alt={`Úlovek – ${fishName}`} className="h-full w-full object-contain" />
+            <img
+              src={featuredCatch.image.url}
+              alt={`Úlovek – ${fishName}`}
+              className="h-full w-full object-contain"
+            />
           </button>
         ) : (
           <FishImage alt={fishName} className="absolute inset-0" />
@@ -89,22 +93,22 @@ export default function CommunityCatchSection({
             Boss
           </span>
         )}
-        {first && (
+        {featuredCatch && (
           <span className="absolute right-3 top-3 rotate-2 rounded border border-amber-300 bg-amber-400 px-2.5 py-1 font-serif text-xs uppercase tracking-wide text-gray-900 shadow-sm">
             První úlovek
           </span>
         )}
       </div>
 
-      {first ? (
+      {featuredCatch ? (
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm">
           <div>
             <p className="font-serif text-amber-300">První úlovek na HowToFish.cz</p>
             <p className="text-cyan-100/70">
-              Rybář: <span className="font-medium text-white">{first.nickname}</span> · chytil{" "}
-              {formatCaughtAt(first.caughtAt)}
+              Rybář: <span className="font-medium text-white">{featuredCatch.nickname}</span> · chytil{" "}
+              {formatCaughtAt(featuredCatch.caughtAt)}
             </p>
-            {first.note && <p className="mt-1 italic text-cyan-100/60">„{first.note}“</p>}
+            {featuredCatch.note && <p className="mt-1 italic text-cyan-100/60">„{featuredCatch.note}“</p>}
           </div>
           <UploadCta label="Nahraj svůj úlovek" />
         </div>
@@ -147,18 +151,18 @@ export default function CommunityCatchSection({
         </div>
       )}
 
-      {catches.length > 0 && (
+      {featuredCatch !== null && (
         <section className="mt-8">
           <h2 className="font-serif text-xl text-amber-300">Nejlepší úlovek</h2>
           <p className="mt-2 text-sm text-cyan-100/50">Hodnocení komunity připravujeme.</p>
         </section>
       )}
 
-      {rest.length > 0 && (
+      {otherCatches.length > 0 && (
         <section className="mt-8">
           <h2 className="font-serif text-xl text-amber-300">Další úlovky rybářů</h2>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {rest.map((c) => (
+            {otherCatches.map((c) => (
               <button
                 key={c.id}
                 type="button"

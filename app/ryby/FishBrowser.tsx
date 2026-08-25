@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { FishCategory, FishEntry } from "../../data/fish";
+import type { CommunityCatch } from "../../lib/universal-content-api/types";
 import FishCard from "../components/FishCard";
 
 const FILTERS: { key: "all" | FishCategory; label: string }[] = [
@@ -16,10 +17,10 @@ function normalize(value: string) {
 
 export default function FishBrowser({
   fish,
-  coverImages = {},
+  featuredCatches = {},
 }: {
   fish: FishEntry[];
-  coverImages?: Record<string, string>;
+  featuredCatches?: Record<string, CommunityCatch>;
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | FishCategory>("all");
@@ -74,7 +75,7 @@ export default function FishBrowser({
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((entry) => (
-            <FishCard key={entry.slug} entry={entry} coverImage={coverImages[entry.slug]} />
+            <FishCard key={entry.slug} entry={entry} featuredCatch={featuredCatches[entry.slug]} />
           ))}
         </div>
       )}

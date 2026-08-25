@@ -84,8 +84,24 @@ export async function getApprovedCatches(fishSlug: string, perPage = 30): Promis
 }
 
 /**
+ * Vybere "featured" úlovek ze schválených úlovků JEDNÉ ryby — použito
+ * jak pro cover na /ryby, tak pro hero na /ryby/[slug], ať mají stejnou
+ * logiku pod stejným pojmem (ne zvlášť "first catch" na dvou místech).
+ *
+ * Dnes: nejstarší schválený (očekává vstup seřazený vzestupně podle
+ * createdAt, jak vrací getApprovedCatches). Až bude hlasování, tohle je
+ * JEDINÉ místo, které se přepne na "nejvyšší vote score, při shodě
+ * starší" — zbytek (FishCard, CommunityCatchSection) zůstává beze změny,
+ * protože pracuje jen s výsledkem, ne s výběrovou logikou.
+ */
+export function selectFeaturedCatch(catches: CommunityCatch[]): CommunityCatch | null {
+  return catches[0] ?? null;
+}
+
+/**
  * Jeden dávkový request pro cover obrázky na /ryby — NE jeden request
- * na rybu (N+1). Vrací mapu fish_slug -> nejstarší approved úlovek.
+ * na rybu (N+1). Vrací mapu fish_slug -> featured úlovek (viz
+ * selectFeaturedCatch).
  */
 export async function getApprovedCatchCovers(): Promise<Map<string, CommunityCatch>> {
   const query = new URLSearchParams({ status: "approved", per_page: "100" });
@@ -101,9 +117,20 @@ export async function getApprovedCatchCovers(): Promise<Map<string, CommunityCat
     .filter((c): c is CommunityCatch => c !== null)
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 
-  const covers = new Map<string, CommunityCatch>();
+  const byFish = new Map<string, CommunityCatch[]>();
   for (const c of catches) {
-    if (!covers.has(c.fishSlug)) covers.set(c.fishSlug, c);
+    const bucket = byFish.get(c.fishSlug);
+    if (bucket) {
+      bucket.push(c);
+    } else {
+      byFish.set(c.fishSlug, [c]);
+    }
+  }
+
+  const covers = new Map<string, CommunityCatch>();
+  for (const [fishSlug, group] of byFish) {
+    const featured = selectFeaturedCatch(group);
+    if (featured) covers.set(fishSlug, featured);
   }
   return covers;
 }

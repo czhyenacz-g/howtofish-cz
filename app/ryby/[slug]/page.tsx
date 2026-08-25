@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fishEntries } from "../../../data/fish";
 import { getCurrentUser } from "../../../lib/auth/current-user";
-import { getApprovedCatches } from "../../../lib/universal-content-api/catches";
+import { getApprovedCatches, selectFeaturedCatch } from "../../../lib/universal-content-api/catches";
 import VerificationBadge from "../../components/VerificationBadge";
 import AffiliateBanner from "../../components/AffiliateBanner";
 import CommunityCatchSection from "./CommunityCatchSection";
@@ -48,6 +48,11 @@ export default async function FishDetailPage({ params }: Props) {
     // galerie/placeholder je v pořádku, raw chyba návštěvníkovi ne.
     getApprovedCatches(entry.slug).catch(() => []),
   ]);
+
+  // Stejná funkce jako pro cover na /ryby — až bude hlasování, mění se
+  // jen selectFeaturedCatch, tahle stránka i FishCard zůstávají beze změny.
+  const featuredCatch = selectFeaturedCatch(catches);
+  const otherCatches = catches.filter((c) => c.id !== featuredCatch?.id);
 
   const basicInfo: { label: string; value: string }[] = [
     { label: "Typ", value: CATEGORY_LABEL[entry.category] },
@@ -94,7 +99,8 @@ export default async function FishDetailPage({ params }: Props) {
           fishSlug={entry.slug}
           fishName={entry.name}
           isBoss={entry.isBoss}
-          catches={catches}
+          featuredCatch={featuredCatch}
+          otherCatches={otherCatches}
           user={user}
         />
 
