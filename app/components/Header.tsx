@@ -1,22 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_LINKS, SITE_NAME } from "../config/site";
-import FishSilhouette from "./FishSilhouette";
+import { NAV_LINKS } from "../config/site";
+import HeaderLogo from "./HeaderLogo";
 import SteamIcon from "./SteamIcon";
+import {
+  AchievementIcon,
+  BossIcon,
+  FishIcon,
+  GameIcon,
+  GuideIcon,
+  ItemIcon,
+  LiveIcon,
+  LocationIcon,
+  UpdateIcon,
+  type IconProps,
+} from "./icons";
 
-// "Hra" a "Živě" jsou od začátku na finálních top-level URL (/hra,
-// /stream), takže patří do navigace jen tam, kde Header běží bez
-// basePath (skutečné stránky), ne pod /demo (kde by ukazovaly na
-// neexistující /demo/hra nebo /demo/stream).
+const ICON_BY_HREF: Record<string, (props: IconProps) => React.ReactElement> = {
+  "/stream": LiveIcon,
+  "/ryby": FishIcon,
+  "/navody": GuideIcon,
+  "/predmety": ItemIcon,
+  "/bossove": BossIcon,
+  "/lokace": LocationIcon,
+  "/achievementy": AchievementIcon,
+  "/aktualizace": UpdateIcon,
+  "/hra": GameIcon,
+};
+
 const LIVE_LINK = { href: "/stream", label: "Živě" } as const;
 const HRA_LINK = { href: "/hra", label: "Hra" } as const;
 
 // /stream je jedna z nejdůležitějších dynamických funkcí webu, takže
 // "Živě" chceme hned za logem — i když v NAV_LINKS (a v patičce, kde
-// pořadí měnit nechceme) má Ryby jiné pořadové místo.
+// pořadí měnit nechceme) má Ryby jiné pořadové místo. "Hra" a "Živě"
+// jsou od začátku na finálních top-level URL (/hra, /stream), takže
+// patří do navigace jen tam, kde Header běží bez basePath (skutečné
+// stránky), ne pod /demo (kde by ukazovaly na neexistující
+// /demo/hra nebo /demo/stream).
 function buildLinks(basePath: string) {
   if (basePath !== "") return NAV_LINKS;
   const ryby = NAV_LINKS.find((link) => link.href === "/ryby");
@@ -28,39 +52,41 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function tabClass(active: boolean, tilt: string) {
+function tabClass(active: boolean) {
   const base =
-    "inline-block rounded border px-3 py-1.5 transition duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+    "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 font-serif text-sm transition duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
   if (active) {
-    return `${base} translate-y-0.5 rotate-0 border-amber-300 bg-[#e8cfa0] text-[#0a2438] shadow-[0_2px_0_0_rgba(0,0,0,0.3)]`;
+    return `${base} translate-y-0.5 border-amber-300 bg-gradient-to-b from-[#f3dfb0] to-[#e8cfa0] text-[#0a2438] shadow-[0_2px_0_0_rgba(0,0,0,0.3)]`;
   }
-  return `${base} ${tilt} border-white/10 bg-white/5 text-[#f4ead9]/90 hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200`;
+  return `${base} border-white/15 bg-gradient-to-b from-white/10 to-white/[0.03] text-[#f4ead9]/90 shadow-sm hover:border-amber-300/60 hover:text-amber-100`;
 }
 
+// "Živě" zůstává vždy v teplé korálové rodině barev (nikdy nepřepíná
+// na pískovou kartu jako ostatní položky) — na /stream je jen
+// výraznější verze téhož, ne jiná paleta.
 function liveTabClass(active: boolean) {
   const base =
-    "inline-flex items-center gap-1.5 rounded border px-3 py-1.5 font-serif transition duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+    "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 font-serif text-sm transition duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
   if (active) {
-    return `${base} translate-y-0.5 rotate-0 border-red-400 bg-[#e8cfa0] text-[#0a2438] shadow-[0_2px_0_0_rgba(0,0,0,0.3)]`;
+    return `${base} translate-y-0.5 border-[#ffb199] bg-gradient-to-b from-[#e8583f] to-[#b8402c] text-[#fff3ec] shadow-[0_0_10px_1px_rgba(255,107,82,0.45)]`;
   }
-  return `${base} -rotate-1 border-red-400/70 bg-red-500/10 text-red-200 hover:border-red-300 hover:bg-red-500/20 hover:text-red-100`;
+  return `${base} border-[#ff6b52]/50 bg-gradient-to-b from-[#5c2318] to-[#3a140d] text-[#f7ded3] shadow-sm hover:border-[#ff8a75]/80 hover:from-[#6b2a1c] hover:to-[#45180f]`;
 }
 
 function liveMobileClass(active: boolean) {
   const base =
-    "flex min-h-[44px] items-center gap-2 rounded border px-4 py-3 font-serif text-base transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 motion-reduce:transition-none";
+    "flex min-h-[44px] items-center gap-2.5 rounded-md border px-4 py-3 font-serif text-base transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200 motion-reduce:transition-none";
   if (active) {
-    return `${base} border-red-400 bg-[#e8cfa0] text-[#0a2438]`;
+    return `${base} border-[#ffb199] bg-gradient-to-b from-[#e8583f] to-[#b8402c] text-[#fff3ec] shadow-[0_0_10px_1px_rgba(255,107,82,0.4)]`;
   }
-  return `${base} border-red-400/70 bg-red-500/10 text-red-200 hover:border-red-300 hover:bg-red-500/20`;
+  return `${base} border-[#ff6b52]/50 bg-gradient-to-b from-[#5c2318] to-[#3a140d] text-[#f7ded3]`;
 }
 
-function LiveDot({ active }: { active: boolean }) {
-  const color = active ? "bg-[#0a2438]" : "bg-red-400";
+function LivePulseDot() {
   return (
-    <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-      <span className={`absolute inline-flex h-full w-full animate-live-pulse rounded-full ${color} opacity-75`} />
-      <span className={`relative inline-flex h-2 w-2 rounded-full ${color}`} />
+    <span className="relative flex h-1.5 w-1.5 shrink-0" aria-hidden="true">
+      <span className="absolute inline-flex h-full w-full animate-live-pulse rounded-full bg-current opacity-75" />
+      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-current" />
     </span>
   );
 }
@@ -68,19 +94,19 @@ function LiveDot({ active }: { active: boolean }) {
 type HeaderUser = { nickname: string; avatarUrl: string | null } | null;
 
 function SteamAuthControl({ user, pathname }: { user: HeaderUser; pathname: string }) {
+  const base =
+    "inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-gradient-to-b from-white/10 to-white/[0.03] px-2.5 py-1.5 font-serif text-sm text-[#f4ead9]/90 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:border-amber-300/60 hover:text-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+
   if (user) {
     return (
       <form action="/api/auth/logout" method="POST" className="flex items-center gap-2">
         <input type="hidden" name="returnTo" value={pathname} />
         {user.avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={user.avatarUrl} alt="" className="h-6 w-6 rounded-full" />
+          <img src={user.avatarUrl} alt="" className="h-6 w-6 shrink-0 rounded-full border border-white/20" />
         ) : null}
-        <span className="max-w-[8rem] truncate font-serif text-sm text-[#f4ead9]/90">{user.nickname}</span>
-        <button
-          type="submit"
-          className="rounded border border-white/10 bg-white/5 px-2.5 py-1 font-serif text-sm text-[#f4ead9]/90 transition hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-        >
+        <span className="max-w-[7rem] truncate font-serif text-sm text-[#f4ead9]/90">{user.nickname}</span>
+        <button type="submit" className={base}>
           Odhlásit
         </button>
       </form>
@@ -88,15 +114,10 @@ function SteamAuthControl({ user, pathname }: { user: HeaderUser; pathname: stri
   }
 
   return (
-    <Link
-      href={`/api/auth/steam/login?returnTo=${encodeURIComponent(pathname)}`}
-      className="flex flex-col items-center gap-0.5 rounded border border-white/10 bg-white/5 px-2.5 py-1 font-serif text-sm leading-tight text-[#f4ead9]/90 transition hover:border-amber-300/50 hover:bg-white/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-    >
-      <span>Přihlásit přes</span>
-      <span className="inline-flex items-center gap-1 font-semibold">
-        <SteamIcon className="h-3.5 w-3.5" />
-        Steam
-      </span>
+    <Link href={`/api/auth/steam/login?returnTo=${encodeURIComponent(pathname)}`} className={base}>
+      <SteamIcon className="h-4 w-4 shrink-0" />
+      <span className="hidden sm:inline">Přihlásit přes Steam</span>
+      <span className="sm:hidden">Přihlásit</span>
     </Link>
   );
 }
@@ -105,6 +126,8 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const links = buildLinks(basePath);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const openButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     setOpen(false);
@@ -118,23 +141,57 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  return (
-    <header className="relative overflow-hidden bg-gradient-to-r from-[#0a2438] via-[#0e3347] to-[#0a2438] shadow-sm shadow-black/20">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-        <Link
-          href={basePath || "/"}
-          className="flex items-center gap-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-        >
-          <FishSilhouette className="h-6 w-6 shrink-0 text-amber-400" />
-          <span className="font-serif text-lg text-[#f4ead9]">{SITE_NAME}</span>
-        </Link>
+  // Body scroll lock + jednoduchý focus trap, dokud je mobilní panel otevřený.
+  useEffect(() => {
+    if (!open) return;
 
-        <nav aria-label="Hlavní navigace" className="hidden md:block">
-          <ul className="flex flex-wrap items-center gap-1.5 font-serif text-sm">
-            {links.map((link, i) => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const panel = panelRef.current;
+    const focusable = panel?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    focusable?.[0]?.focus();
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Tab" || !focusable || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+    panel?.addEventListener("keydown", onKeyDown);
+    const openButton = openButtonRef.current;
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      panel?.removeEventListener("keydown", onKeyDown);
+      openButton?.focus();
+    };
+  }, [open]);
+
+  return (
+    <header className="relative overflow-hidden bg-gradient-to-b from-[#0e3347] via-[#0a2438] to-[#081c2c] shadow-sm shadow-black/20">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e8cfa0]/25 to-transparent"
+      />
+      <div inert={open} className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2.5 sm:px-4">
+        <HeaderLogo basePath={basePath} />
+
+        <nav aria-label="Hlavní navigace" className="hidden xl:block">
+          <ul className="flex items-center gap-1 font-serif text-sm">
+            {links.map((link) => {
               const href = `${basePath}${link.href}`;
               const active = isActive(pathname, href);
               const isLive = link.href === LIVE_LINK.href;
+              const Icon = ICON_BY_HREF[link.href];
               return (
                 <li key={href}>
                   <Link
@@ -142,9 +199,10 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
                     aria-current={active ? "page" : undefined}
                     title={isLive ? "Sleduj, kdo právě hraje How to Fish" : undefined}
                     aria-label={isLive ? "Živě – sleduj, kdo právě hraje How to Fish" : undefined}
-                    className={isLive ? liveTabClass(active) : tabClass(active, i % 2 === 0 ? "-rotate-1" : "rotate-1")}
+                    className={isLive ? liveTabClass(active) : tabClass(active)}
                   >
-                    {isLive && <LiveDot active={active} />}
+                    {isLive && <LivePulseDot />}
+                    {Icon && <Icon className="h-4 w-4 shrink-0" />}
                     {link.label}
                   </Link>
                 </li>
@@ -153,16 +211,17 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
           </ul>
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden xl:block">
           <SteamAuthControl user={user} pathname={pathname} />
         </div>
 
         <button
+          ref={openButtonRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-nav"
-          className="flex min-h-[44px] items-center gap-2 rounded border border-white/15 px-3 py-2 font-serif text-sm text-[#f4ead9] transition hover:border-amber-300/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 md:hidden"
+          className="flex min-h-[44px] items-center gap-2 rounded-md border border-white/15 bg-white/5 px-3 py-2 font-serif text-sm text-[#f4ead9] transition hover:border-amber-300/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 xl:hidden"
         >
           <span aria-hidden="true" className="flex flex-col gap-[3px]">
             <span className="block h-0.5 w-5 bg-current" />
@@ -174,63 +233,89 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
       </div>
 
       {open && (
-        <nav
-          id="mobile-nav"
-          aria-label="Mobilní navigace"
-          className="border-t border-white/10 bg-[#0a2438] px-4 py-3 md:hidden"
-        >
-          <ul className="flex flex-col gap-2 font-serif text-base">
-            {links.map((link) => {
-              const href = `${basePath}${link.href}`;
-              const active = isActive(pathname, href);
-              const isLive = link.href === LIVE_LINK.href;
-              if (isLive) {
+        <>
+          <div
+            aria-hidden="true"
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-30 bg-black/50 xl:hidden"
+          />
+          <nav
+            id="mobile-nav"
+            ref={panelRef}
+            aria-label="Mobilní navigace"
+            className="fixed inset-x-0 top-0 z-40 max-h-screen overflow-y-auto border-b border-white/10 bg-gradient-to-b from-[#0e3347] to-[#081c2c] px-4 pb-4 pt-3 shadow-xl xl:hidden"
+          >
+            <div className="flex items-center justify-between gap-3 pb-3">
+              <HeaderLogo basePath={basePath} />
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Zavřít menu"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-white/15 bg-white/5 text-[#f4ead9] transition hover:border-amber-300/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+              >
+                <span aria-hidden="true" className="text-lg leading-none">
+                  ✕
+                </span>
+              </button>
+            </div>
+
+            <ul className="flex flex-col gap-2 font-serif text-base">
+              {links.map((link) => {
+                const href = `${basePath}${link.href}`;
+                const active = isActive(pathname, href);
+                const isLive = link.href === LIVE_LINK.href;
+                const Icon = ICON_BY_HREF[link.href];
+                if (isLive) {
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        aria-current={active ? "page" : undefined}
+                        title="Sleduj, kdo právě hraje How to Fish"
+                        aria-label="Živě – sleduj, kdo právě hraje How to Fish"
+                        className={liveMobileClass(active)}
+                      >
+                        <LivePulseDot />
+                        {Icon && <Icon className="h-5 w-5 shrink-0" />}
+                        {link.label}
+                      </Link>
+                    </li>
+                  );
+                }
                 return (
                   <li key={href}>
                     <Link
                       href={href}
                       aria-current={active ? "page" : undefined}
-                      title="Sleduj, kdo právě hraje How to Fish"
-                      aria-label="Živě – sleduj, kdo právě hraje How to Fish"
-                      className={liveMobileClass(active)}
+                      className={`flex min-h-[44px] items-center gap-2.5 rounded-md border px-4 py-3 transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none ${
+                        active
+                          ? "border-amber-300 bg-gradient-to-b from-[#f3dfb0] to-[#e8cfa0] text-[#0a2438]"
+                          : "border-white/10 bg-white/5 text-[#f4ead9] hover:border-amber-300/50 hover:bg-white/10"
+                      }`}
                     >
-                      <LiveDot active={active} />
+                      {Icon && <Icon className="h-5 w-5 shrink-0" />}
                       {link.label}
                     </Link>
                   </li>
                 );
-              }
-              return (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    aria-current={active ? "page" : undefined}
-                    className={`block min-h-[44px] rounded border px-4 py-3 transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none ${
-                      active
-                        ? "border-amber-300 bg-[#e8cfa0] text-[#0a2438]"
-                        : "border-white/10 bg-white/5 text-[#f4ead9] hover:border-amber-300/50 hover:bg-white/10"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="mt-3 border-t border-white/10 pt-3">
-            <SteamAuthControl user={user} pathname={pathname} />
-          </div>
-        </nav>
+              })}
+            </ul>
+
+            <div className="mt-3 border-t border-white/10 pt-3">
+              <SteamAuthControl user={user} pathname={pathname} />
+            </div>
+          </nav>
+        </>
       )}
 
       <svg
         aria-hidden="true"
         viewBox="0 0 1440 24"
         preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-2 w-full text-[#e8cfa0]/25 sm:h-3"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-2 w-full text-[#1c8a95]/30 sm:h-3"
       >
         <polygon
-          points="0,12 120,18 240,8 360,16 480,10 600,18 720,8 840,16 960,10 1080,18 1200,8 1320,14 1440,10 1440,24 0,24"
+          points="0,14 90,10 180,16 270,9 360,15 450,8 540,14 630,10 720,16 810,9 900,15 990,8 1080,14 1170,10 1260,16 1350,9 1440,14 1440,24 0,24"
           fill="currentColor"
         />
       </svg>
