@@ -1,4 +1,5 @@
 import Image from "next/image";
+import AmbientAudioToggle from "./components/AmbientAudioToggle";
 import { DISCLAIMER, LAUNCH_DATE_LABEL, SITE_NAME, STEAM_URL } from "./config/site";
 
 export default function Home() {
@@ -14,24 +15,24 @@ export default function Home() {
         className="pointer-events-none absolute left-1/2 top-14 h-16 w-16 -translate-x-1/2 rounded-full bg-amber-200 sm:top-20 sm:h-24 sm:w-24"
       />
 
-      {/* ostrůvek v pozadí */}
+      {/* ostrůvek v pozadí — skoro neznatelný drift */}
       <svg
         aria-hidden="true"
         viewBox="0 0 1440 220"
         preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 w-full opacity-40 sm:h-56"
+        className="animate-island-drift pointer-events-none absolute inset-x-0 bottom-0 h-40 w-full opacity-40 sm:h-56"
       >
         <polygon points="1000,140 1090,55 1180,140" fill="#e8cfa0" />
         <polygon points="1075,90 1090,55 1095,90" fill="#2f6b4f" />
         <polygon points="1085,80 1090,55 1105,85" fill="#2f6b4f" />
       </svg>
 
-      {/* vlny */}
+      {/* vlny — přední vrstva houpe jemně rychleji, zadní pomalý drift */}
       <svg
         aria-hidden="true"
         viewBox="0 0 1440 220"
         preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-36 w-full text-[#1c8a95] opacity-60 sm:h-52"
+        className="animate-wave-back pointer-events-none absolute inset-x-0 bottom-0 h-36 w-full text-[#1c8a95] opacity-60 sm:h-52"
       >
         <polygon
           points="0,80 160,110 320,70 480,120 640,90 800,130 960,85 1120,115 1280,75 1440,105 1440,220 0,220"
@@ -42,7 +43,7 @@ export default function Home() {
         aria-hidden="true"
         viewBox="0 0 1440 220"
         preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-28 w-full text-[#0c4a56] sm:h-40"
+        className="animate-wave-front pointer-events-none absolute inset-x-0 bottom-0 h-28 w-full text-[#0c4a56] sm:h-40"
       >
         <polygon
           points="0,140 180,160 360,130 540,170 720,140 900,175 1080,135 1260,165 1440,140 1440,220 0,220"
@@ -89,6 +90,8 @@ export default function Home() {
       <footer className="relative z-10 px-4 pb-6 text-center text-[11px] leading-relaxed text-cyan-100/40 sm:text-xs">
         {DISCLAIMER}
       </footer>
+
+      <AmbientAudioToggle />
     </div>
   );
 }

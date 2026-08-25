@@ -15,3 +15,58 @@
 .animate-swim {
   animation: swim 1.6s ease-in-out infinite;
 }
+
+/* Ambientní pohyb spodní scény na homepage (viz app/page.tsx) — jen
+   jemný transform, žádný layout shift, každá vrstva jinak pomalu. */
+@keyframes wave-sway-front {
+  0%,
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(-10px) translateY(3px);
+  }
+}
+
+@keyframes wave-sway-back {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(7px);
+  }
+}
+
+@keyframes island-drift {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+.animate-wave-front {
+  animation: wave-sway-front 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-wave-back {
+  animation: wave-sway-back 15s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-island-drift {
+  animation: island-drift 22s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-wave-front,
+  .animate-wave-back,
+  .animate-island-drift {
+    animation: none;
+  }
+}
