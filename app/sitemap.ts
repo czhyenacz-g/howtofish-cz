@@ -35,6 +35,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.4,
     });
 
+    for (const path of ["/predmety", "/bossove", "/lokace", "/navody"]) {
+      entries.push({
+        url: `${SITE_URL}${path}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.6,
+      });
+    }
+
     for (const fish of fishEntries) {
       entries.push({
         url: `${SITE_URL}/ryby/${fish.slug}`,

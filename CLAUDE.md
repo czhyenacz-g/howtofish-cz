@@ -64,11 +64,12 @@ app/
   api/og/route.tsx          # Dynamický OG image endpoint
 
 data/
-  fish.ts                # Jeden zdroj dat pro /ryby i /ryby/[slug] — typ FishEntry
-  items/ bosses/ locations/  # Budoucí JSON data pro další sekce (zatím jen .gitkeep)
+  fish.ts                     # Jeden zdroj dat pro /ryby i /ryby/[slug] — typ FishEntry
+  items.ts bosses.ts locations.ts guides.ts  # Kurátorovaný základ pro /predmety,
+                               # /bossove, /lokace, /navody — viz "Komunitní content
+                               # pattern" níže.
 
 content/
-  guides/                # Budoucí MDX/Markdown návody
   updates/                # Budoucí přehledy aktualizací hry
 
 public/images/
@@ -109,6 +110,38 @@ jsou cachované přes `fetch(..., { next: { revalidate: 60 } })` +
 Přidání dalšího providera (např. Trovo) = nový soubor v `lib/streams/`
 se stejným návratovým typem `ProviderResult`, zapsat do pole volaného
 v `get-live-streams.ts`. Potřebné env proměnné viz `.env.example`.
+
+**Komunitní content pattern (`/predmety`, `/bossove`, `/lokace`,
+`/navody`):** jeden reusable základ nad Universal Content API (UCA),
+`lib/universal-content-api/community.ts` — create record, media upload,
+čtení `status=approved` (cache ~60s) a vlastních `status=pending` (server-side
+`filter[steam_id]`, bez cache). Nad tím čtyři tenké doménové moduly
+(`lib/universal-content-api/items.ts` / `bosses.ts` / `locations.ts` /
+`guides.ts`) — každý mapuje syrový `UcaRecord` na svůj vlastní jednoduchý
+typ (`ItemEntry`, `BossEntry`, ...; společný základ `CommunityContentBase`
+v `lib/universal-content-api/types.ts`) a skládá kurátorovaná data
+(`data/{items,bosses,locations,guides}.ts`, autor `HowToFish.cz`) s
+komunitními `approved` záznamy (autor = Steam nickname). UI je složené z
+`app/components/community/` (`CommunityDataTable` — tabulka na desktopu,
+karty na mobilu; `CommunityThumbnail` s lightboxem; `AuthorBadge`;
+`CorrectionForm` pro "Navrhnout opravu"). Sdílená validace formulářů žije
+v `lib/community/validation.ts` (rights checkbox, screenshot, duplicate
+check přes `isDuplicateTitle` — porovnává curated + approved + vlastní
+pending). Nová sekce podle tohoto vzoru = nový `data/x.ts` + nový
+`lib/universal-content-api/x.ts` + nová UCA collection `x_suggestions`
+(jen DB řádek přes tinker, ne kód) + `app/(sections)/x/` s `page.tsx`,
+`XBrowser.tsx` a `navrhnout/` (evaluate + actions + formulář).
+
+**Content workflow (kurátorovaný vs. komunitní):**
+- Kurátorovaný obsah: 1) research, 2) ověření (2+ nezávislé zdroje, viz
+  `sources`/`verification` v `data/fish.ts`), 3) přidání do `data/*.ts`,
+  4) `npm test` + `tsc --noEmit`, 5) commit.
+- Komunitní obsah: 1) přihlášený Steam uživatel odešle návrh, 2) UCA ho
+  uloží jako `pending` (server-side vynucené, nikdy z formData), 3) admin
+  (případně později AI-assisted review) ho ve Filamentu schválí/zamítne,
+  4) `approved` záznam je z UCA rovnou veřejný — **žádné ruční přepisování
+  do Gitu**, to je hlavní výhoda tohoto patternu oproti kurátorovanému
+  obsahu.
 
 ---
 

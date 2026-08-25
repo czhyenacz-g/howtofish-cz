@@ -114,3 +114,115 @@ export type FishSuggestion = {
   image: { id: number; url: string; width?: number; height?: number } | null;
   createdAt: string;
 };
+
+// ---------------------------------------------------------------------
+// Jednotný komunitní content pattern pro /predmety, /bossove, /lokace,
+// /navody — společná infrastruktura (viz lib/universal-content-api/
+// community.ts), ale jednoduché domain-specific typy, žádný jeden obří
+// generický typ pro všechno. Každá sekce skládá veřejnou tabulku ze dvou
+// zdrojů: `source: "curated"` (data/*.ts, autor "HowToFish.cz") a
+// `source: "community"` (UCA approved records, autor Steam nickname).
+export type ContentSource = "curated" | "community";
+
+export type CommunityContentBase = {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  authorName: string;
+  source: ContentSource;
+  // true jen pro soukromý řádek "tvůj vlastní pending návrh" — nikdy pro
+  // curated/approved. Viz getMyPendingX() v jednotlivých domain modulech.
+  pending?: boolean;
+};
+
+export type ItemEntry = CommunityContentBase & {
+  itemType?: string;
+  obtainedAt?: string;
+  use?: string;
+};
+
+export type BossEntry = CommunityContentBase & {
+  location?: string;
+  howToFind?: string;
+  tip?: string;
+  // Curated bossové mají detail na /ryby/[slug] (fish.ts) — u community
+  // návrhů detail zatím neexistuje.
+  detailHref?: string;
+};
+
+export type LocationEntry = CommunityContentBase & {
+  island?: string;
+  notableThings?: string;
+  note?: string;
+};
+
+export type GuideEntry = CommunityContentBase & {
+  slug: string;
+  category?: string;
+  summary?: string;
+  content?: string;
+};
+
+// Payloady ukládané do records.data pro *_suggestions collections.
+// `kind: "new"` = návrh nového záznamu, `kind: "correction"` = návrh
+// opravy existujícího (curated i community) záznamu — obě varianty žijí
+// ve STEJNÉ collection dané domény, admin je rozliší podle `kind` ve
+// Filamentu. Correction záznamy se nikdy nemapují do veřejné/pending
+// tabulky (nemají vlastní "title" ve stejném smyslu), viz komentáře u
+// jednotlivých mapRecordToX funkcí.
+export type CorrectionSuggestionData = {
+  kind: "correction";
+  target: string;
+  proposed_changes: string;
+  steam_id: string;
+  nickname: string;
+  note?: string;
+  rights_confirmed: true;
+};
+
+export type ItemSuggestionData = {
+  kind: "new";
+  name: string;
+  item_type?: string;
+  obtained_at?: string;
+  use?: string;
+  steam_id: string;
+  nickname: string;
+  note?: string;
+  rights_confirmed: true;
+};
+
+export type BossSuggestionData = {
+  kind: "new";
+  name: string;
+  location?: string;
+  how_to_find?: string;
+  tip?: string;
+  steam_id: string;
+  nickname: string;
+  note?: string;
+  rights_confirmed: true;
+};
+
+export type LocationSuggestionData = {
+  kind: "new";
+  name: string;
+  island?: string;
+  notable_things?: string;
+  note?: string;
+  steam_id: string;
+  nickname: string;
+  rights_confirmed: true;
+};
+
+export type GuideSuggestionData = {
+  kind: "new";
+  title: string;
+  category?: string;
+  summary: string;
+  content: string;
+  steam_id: string;
+  nickname: string;
+  note?: string;
+  rights_confirmed: true;
+};
