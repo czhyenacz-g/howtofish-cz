@@ -28,29 +28,27 @@ export default function OHrePage() {
     <div className="mx-auto max-w-3xl px-4 py-16 text-white">
       <h1 className="font-serif text-3xl sm:text-4xl">How to Fish – o hře</h1>
       <p className="mt-4 text-lg text-cyan-100/80">
-        How to Fish je stylizovaná rybářská adventura, ve které se hráč vydává na ostrovy plné ryb, podivných
-        tvorů a absurdní fyziky. Důraz je na průzkum, samotné rybaření a objevování — spíš než na realistickou
-        simulaci.
+        How to Fish je stylizovaná fyzikální rybářská hra pro jednoho až čtyři hráče. Začínáš po ztroskotání na
+        malém ostrově — a abys se dostal dál, musíš se naučit rybařit.
       </p>
 
       <section className="mt-10">
         <h2 className="font-serif text-xl text-amber-300">Co je How to Fish</h2>
-        <p className="mt-3 text-cyan-100/80">
-          Jde o hru od studia Dazed Games dostupnou na Steamu, ve které hráč prozkoumává souostroví, chytá ryby a
-          další tvory a postupně se dostává na nové ostrovy a k novému vybavení. Tón hry je odlehčený, humorný a
-          místy záměrně přehnaný.
-        </p>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="font-serif text-xl text-amber-300">Co ve hře děláte</h2>
         <ul className="mt-3 list-disc space-y-1.5 pl-5 text-cyan-100/80">
-          <li>lovíte ryby a další tvory prutem a různými návnadami,</li>
-          <li>prozkoumáváte jednotlivé ostrovy a jejich lokace,</li>
-          <li>sháníte a vylepšujete vybavení,</li>
-          <li>utkáváte se s bossy,</li>
-          <li>plníte questy a achievementy.</li>
+          <li>Chytáš ryby a další tvory.</li>
+          <li>Úlovky můžeš prodávat a získávat za ně peníze.</li>
+          <li>Za peníze kupuješ lepší vybavení, zbraně a další věci.</li>
+          <li>Plníš questy a postupuješ přes další ostrovy.</li>
+          <li>Na jednotlivých ostrovech potkáváš bossy a nebezpečnější tvory.</li>
+          <li>Postupně hledáš vzácnější a zajímavější úlovky.</li>
         </ul>
+        <p className="mt-4 rounded-lg border border-amber-300/20 bg-white/5 px-4 py-3 text-cyan-100/90">
+          <strong className="text-amber-300">Zjednodušeně:</strong> ztroskotáš → lovíš → prodáváš → kupuješ vybavení
+          → plníš questy → porážíš bossy → postupuješ na další ostrovy → hledáš stále vzácnější úlovky.
+        </p>
+        <p className="mt-4 text-cyan-100/80">
+          Hra kombinuje rybaření, fyziku, akci, FPS prvky a absurdní humor — hrát lze sólo i v online kooperaci.
+        </p>
       </section>
 
       <section className="mt-8">
@@ -66,11 +64,12 @@ export default function OHrePage() {
       </section>
 
       <section className="mt-8">
-        <h2 className="font-serif text-xl text-amber-300">Česká komunita HowToFish.cz</h2>
+        <h2 className="font-serif text-xl text-amber-300">Proč vzniká HowToFish.cz</h2>
         <p className="mt-3 text-cyan-100/80">
-          HowToFish.cz je česká komunitní encyklopedie ke hře How to Fish. Najdeš tu přehled ryb a úlovků,
-          předmětů, bossů, lokací, návody, seznam achievementů, přehled živých streamů a komunitní screenshoty
-          úlovků od ostatních hráčů.
+          HowToFish.cz je neoficiální český komunitní web pro hráče How to Fish. Cílem je nabídnout na jednom místě
+          českou encyklopedii ryb a tvorů, informace o úlovcích, předmětech, bossech a lokacích, praktické návody,
+          živé streamy, komunitní screenshoty úlovků, přehled změn a novinek ve hře a jednoduché herní a komunitní
+          funkce.
         </p>
         <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2 font-serif text-sm">
           {SECTION_LINKS.map((link) => (
@@ -95,8 +94,7 @@ export default function OHrePage() {
       <section className="mt-8 border-t border-white/10 pt-6">
         <h2 className="font-serif text-xl text-amber-300">Neoficiální fan web</h2>
         <p className="mt-3 text-cyan-100/80">
-          HowToFish.cz je neoficiální komunitní/fanouškovský web a není spojený s vývojářem ani vydavatelem hry How
-          to Fish. Víc o tom najdeš na stránce{" "}
+          HowToFish.cz není spojený s vývojářem ani vydavatelem hry How to Fish. Víc o tom najdeš na stránce{" "}
           <Link href="/pravni-informace" className="underline hover:text-amber-300">
             Právní informace
           </Link>

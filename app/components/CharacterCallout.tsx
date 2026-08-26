@@ -221,7 +221,10 @@ export default function CharacterCallout({
           // vstup, proto je dangerouslySetInnerHTML tady přijatelné.
           <p dangerouslySetInnerHTML={{ __html: callout.message }} />
         ) : (
-          <p>{callout.message}</p>
+          // whitespace-pre-line: \n\n v datech (config.ts) se má vykreslit
+          // jako odstavcová mezera — texty postav mají mít max 2-3 věty za
+          // sebou, delší zprávy se rozdělují na kratší odstavce.
+          <p className="whitespace-pre-line">{callout.message}</p>
         )}
         {callout.isSponsored && (
           <p className="mt-2 text-[10px] font-sans uppercase tracking-wide text-[#8a6d4a]">Partnerský tip</p>

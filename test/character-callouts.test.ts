@@ -325,3 +325,18 @@ test("PROFESSOR_MESSAGES['/o-hre']: obsahuje představení (jméno Profesor, nen
   assert.equal(callout.href, undefined);
   assert.equal(callout.linkLabel, undefined);
 });
+
+test("PROFESSOR_MESSAGES['/o-hre']: rozdělené na odstavce po max 2-3 větách, 'S tím ale potřebuju...' začíná novým odstavcem", () => {
+  const callout = resolveCharacterCallout("/o-hre", "professor");
+  const paragraphs = callout.message.split("\n\n");
+  assert.equal(paragraphs.length, 2, "očekávány přesně 2 odstavce");
+  for (const paragraph of paragraphs) {
+    const sentenceCount = (paragraph.match(/[.!?]+(?=\s|$)/g) ?? []).length;
+    assert.ok(sentenceCount <= 3, `odstavec má ${sentenceCount} vět, čekáno max 3: "${paragraph}"`);
+  }
+  assert.match(paragraphs[1], /^S tím ale potřebuju tvoji pomoc\./);
+});
+
+test("CharacterCallout.tsx: plain-text zprávy se renderují s whitespace-pre-line (\\n\\n v datech = odstavcová mezera)", () => {
+  assert.match(componentSource, /<p className="whitespace-pre-line">\{callout\.message\}<\/p>/);
+});

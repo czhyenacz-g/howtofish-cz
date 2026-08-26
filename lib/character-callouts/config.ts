@@ -45,9 +45,11 @@ export const PROFESSOR_MESSAGES: Record<string, CharacterMessage> = {
   // zadání zachované beze změny: jmenuje se Profesor, není profesor Oak
   // (lehký vtip), taky tu uvízl, katalogizuje ryby/předměty/bossy/lokace/
   // návody, a chce k tomu pomoc hráče.
+  // \n\n odděluje dva odstavce (max 2-3 věty za sebou, viz zadání) —
+  // CharacterCallout.tsx renderuje plain-text zprávy s whitespace-pre-line.
   "/o-hre": {
     message:
-      "Říkej mi Profesore. Ne, nejsem profesor Oak — to je z úplně jiné hry (a jiného rybníka). Taky jsem tu uvízl, na těchhle ostrovech, a snažím se dát dohromady katalog všeho, co tu najdeme — ryby, předměty, bossy, lokace i návody. S tím ale potřebuju tvoji pomoc. Čím víc toho spolu zapíšeme, tím větší šanci budou mít další hráči, co sem teprve dorazí.",
+      "Říkej mi Profesore. Ne, nejsem profesor Oak — to je z úplně jiné hry (a jiného rybníka). Taky jsem tu uvízl, na těchhle ostrovech, a snažím se dát dohromady katalog všeho, co tu najdeme — ryby, předměty, bossy, lokace i návody.\n\nS tím ale potřebuju tvoji pomoc. Čím víc toho spolu zapíšeme, tím větší šanci budou mít další hráči, co sem teprve dorazí.",
   },
 };
 
