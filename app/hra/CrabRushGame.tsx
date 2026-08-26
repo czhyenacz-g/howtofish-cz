@@ -41,12 +41,12 @@ function laneY(id: number): number {
   return 12 + ((id * 37) % 5) * 17;
 }
 
-// Krab začíná průsvitnět, jakmile vkročí do vody (kousek za středem
-// trati, ne až těsně před únikem) — čistě kosmetické, proto (jako
-// laneY výše) mimo crab-rush-engine.ts. Nikdy neklesne pod
-// WATER_FADE_MIN_OPACITY, ať zůstane viditelný a klikatelný — na 0
-// ho až dotáhne .animate-crab-submerge při skutečném úniku.
-const WATER_FADE_START_X = 55;
+// Krab začíná průsvitnět mnohem dřív, hned po startu trati (ne až u
+// vody v polovině) — čistě kosmetické, proto (jako laneY výše) mimo
+// crab-rush-engine.ts. Nikdy neklesne pod WATER_FADE_MIN_OPACITY, ať
+// zůstane viditelný a klikatelný — na 0 ho až dotáhne
+// .animate-crab-submerge při skutečném úniku.
+const WATER_FADE_START_X = 10;
 const WATER_FADE_MIN_OPACITY = 0.4;
 
 function waterOpacity(x: number): number {
