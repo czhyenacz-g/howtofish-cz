@@ -8,14 +8,15 @@ import {
   resolveCharacterCallout,
   resolvePromotionCallout,
 } from "../lib/character-callouts/resolve-callout.ts";
+import { SELLER_COOLDOWN_MS, shouldShowSeller, type ShouldShowSellerInput } from "../lib/character-callouts/seller-rules.ts";
 import { pickPromotion } from "../lib/promotions/match-route.ts";
 import type { PromotionEntry } from "../lib/universal-content-api/types.ts";
 
-test("resolveCharacterCallout: profesor na /ryby má správnou zprávu a CTA na /ryby/navrhnout", () => {
+test("resolveCharacterCallout: profesor na /ryby má správnou zprávu a ŽÁDNÉ CTA (duplicitní vůči navigaci/obsahu, viz zadání)", () => {
   const callout = resolveCharacterCallout("/ryby", "professor");
   assert.match(callout.message, /encyklopedii už máme první úlovky/);
-  assert.equal(callout.href, "/ryby/navrhnout");
-  assert.equal(callout.linkLabel, "Přidat nový úlovek");
+  assert.equal(callout.href, undefined);
+  assert.equal(callout.linkLabel, undefined);
   assert.equal(callout.isSponsored, false);
 });
 
@@ -25,12 +26,21 @@ test("resolveCharacterCallout: profesor na detailu ryby (/ryby/spider-crab) dost
   assert.equal(callout.href, undefined);
 });
 
-test("resolveCharacterCallout: profesor na /predmety má vlastní zprávu odlišnou od /ryby", () => {
+test("resolveCharacterCallout: profesor na /predmety má vlastní zprávu odlišnou od /ryby, bez CTA", () => {
   const predmety = resolveCharacterCallout("/predmety", "professor");
   const ryby = resolveCharacterCallout("/ryby", "professor");
   assert.match(predmety.message, /Výbavu ještě nemám zmapovanou/);
   assert.notEqual(predmety.message, ryby.message);
-  assert.equal(predmety.href, "/predmety/navrhnout");
+  assert.equal(predmety.href, undefined);
+  assert.equal(predmety.linkLabel, undefined);
+});
+
+test("resolveCharacterCallout: žádná profesorská zpráva (PROFESSOR_MESSAGES) nemá href/linkLabel — CTA je jen pro sellera", () => {
+  for (const pathname of ["/ryby", "/predmety", "/bossove", "/lokace", "/navody", "/achievementy", "/stream", "/hra", "/o-hre"]) {
+    const callout = resolveCharacterCallout(pathname, "professor");
+    assert.equal(callout.href, undefined, `${pathname}: profesor by neměl mít href`);
+    assert.equal(callout.linkLabel, undefined, `${pathname}: profesor by neměl mít linkLabel`);
+  }
 });
 
 test("resolveCharacterCallout: prodejce má vždy stejnou obecnou hlášku bez ohledu na route", () => {
@@ -60,8 +70,9 @@ test("isCharacterCalloutRoute: /demo je vyloučené", () => {
   assert.equal(isCharacterCalloutRoute("/demo/ryby"), false);
 });
 
-test("isSellerAllowedOnRoute: prodejce je vyloučený na /hra, jinde povolený", () => {
+test("isSellerAllowedOnRoute: prodejce je vyloučený na /hra a /o-hre, jinde povolený", () => {
   assert.equal(isSellerAllowedOnRoute("/hra"), false);
+  assert.equal(isSellerAllowedOnRoute("/o-hre"), false);
   assert.equal(isSellerAllowedOnRoute("/ryby"), true);
   assert.equal(isSellerAllowedOnRoute("/ryby/spider-crab"), true);
   assert.equal(isSellerAllowedOnRoute("/stream"), true);
@@ -72,8 +83,23 @@ test("isCharacterCalloutRoute: homepage a utility routes jsou vyloučené", () =
   assert.equal(isCharacterCalloutRoute("/api/auth/steam/callback"), false);
 });
 
-test("isCharacterCalloutRoute: všech 9 povolených sekcí + detail ryby jsou povolené", () => {
-  for (const path of ["/ryby", "/predmety", "/bossove", "/lokace", "/navody", "/achievementy", "/stream", "/hra", "/ryby/spider-crab"]) {
+test("isCharacterCalloutRoute: /o-hre je povolené (profesor jako úvodní průvodce)", () => {
+  assert.equal(isCharacterCalloutRoute("/o-hre"), true);
+});
+
+test("isCharacterCalloutRoute: všech 10 povolených sekcí + detail ryby jsou povolené", () => {
+  for (const path of [
+    "/ryby",
+    "/predmety",
+    "/bossove",
+    "/lokace",
+    "/navody",
+    "/achievementy",
+    "/stream",
+    "/hra",
+    "/o-hre",
+    "/ryby/spider-crab",
+  ]) {
     assert.equal(isCharacterCalloutRoute(path), true, `${path} should be allowed`);
   }
 });
@@ -244,4 +270,58 @@ test("CharacterCallout.tsx: žádný polling (setInterval) v komponentě — jen
 
 test("CharacterCallout.tsx: importuje useBannerVisible (IntersectionObserver koordinace s bannerem), ne vlastní DOM dotazování", () => {
   assert.match(componentSource, /import \{ useBannerVisible \} from "\.\/useBannerVisible"/);
+});
+
+// --- /o-hre: profesor vždy, seller nikdy ---------------------------------
+
+test("shouldShowSeller: false na /o-hre za všech okolností (route-check má přednost, žádný delay/chance/cooldown ho nezachrání)", () => {
+  const alwaysFavorable: ShouldShowSellerInput = {
+    pathname: "/o-hre",
+    now: 10_000_000,
+    lastShownAt: null,
+    shownRoutes: [],
+    bannerVisible: false,
+    professorVisibility: "hidden",
+    chanceRoll: 0,
+  };
+  assert.equal(shouldShowSeller(alwaysFavorable), false);
+  // I s "vyhrálým" cooldownem (uplynulo dost dlouho) a nulovým losem.
+  assert.equal(
+    shouldShowSeller({ ...alwaysFavorable, lastShownAt: 10_000_000 - SELLER_COOLDOWN_MS - 1 }),
+    false
+  );
+});
+
+test("CharacterCallout.tsx: pro /o-hre se seller-rozhodování (shouldShowSeller) vůbec nevolá — vlastní explicitní větev před ním", () => {
+  const oHreBranch = /if \(pathname === O_HRE_PATHNAME\) \{([\s\S]*?)\n {4}\}\n\n {4}\/\/ Jediný slot/.exec(
+    componentSource
+  )?.[1];
+  assert.ok(oHreBranch, "nepodařilo se najít větev 'if (pathname === O_HRE_PATHNAME)'");
+  assert.match(oHreBranch, /setCharacter\("professor"\)/);
+  assert.doesNotMatch(oHreBranch, /shouldShowSeller/);
+  assert.doesNotMatch(oHreBranch, /setCharacter\("seller"\)/);
+});
+
+test("CharacterCallout.tsx: /o-hre větev běží až po kontrole isProfessorMinimizedForRoute (respektuje zavření v rámci stejné návštěvy)", () => {
+  const minimizedIndex = componentSource.indexOf("isProfessorMinimizedForRoute(pathname)");
+  const oHreIndex = componentSource.indexOf("pathname === O_HRE_PATHNAME");
+  assert.ok(minimizedIndex !== -1 && oHreIndex !== -1);
+  assert.ok(minimizedIndex < oHreIndex);
+});
+
+test("CharacterCallout.tsx: O_HRE_PATHNAME je '/o-hre' a používá kratší PROFESSOR_INTRO_DELAY_MS, ne standardní DELAY_MS", () => {
+  assert.match(componentSource, /const O_HRE_PATHNAME = "\/o-hre";/);
+  assert.match(componentSource, /const PROFESSOR_INTRO_DELAY_MS = \d+;/);
+  assert.match(componentSource, /}, PROFESSOR_INTRO_DELAY_MS\);/);
+});
+
+test("PROFESSOR_MESSAGES['/o-hre']: obsahuje představení (jméno Profesor, není Oak, uvízl, katalogizuje, chce pomoc)", () => {
+  const callout = resolveCharacterCallout("/o-hre", "professor");
+  assert.match(callout.message, /Profesor/);
+  assert.match(callout.message, /Oak/);
+  assert.match(callout.message, /uvízl/);
+  assert.match(callout.message, /ryby, předměty, bossy, lokace i návody|katalog/);
+  assert.match(callout.message, /pomoc/);
+  assert.equal(callout.href, undefined);
+  assert.equal(callout.linkLabel, undefined);
 });

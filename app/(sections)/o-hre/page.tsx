@@ -81,6 +81,15 @@ export default function OHrePage() {
             </li>
           ))}
         </ul>
+
+        {/* Výraznější, samostatné CTA na konkrétní minihru — odlišené od
+            obyčejných textových odkazů výše, viz zadání. */}
+        <Link
+          href="/hra"
+          className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-amber-500 px-8 py-3 font-serif text-base text-gray-900 shadow-lg shadow-amber-900/20 transition hover:bg-amber-400"
+        >
+          Zahrát Krabí invazi
+        </Link>
       </section>
 
       <section className="mt-8 border-t border-white/10 pt-6">

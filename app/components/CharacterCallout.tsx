@@ -22,6 +22,12 @@ import { useBannerVisible } from "./useBannerVisible";
 
 const DELAY_MS = 6000;
 const EXIT_MS = 300;
+// /o-hre: profesor je úvodní průvodce stránky, ne náhodný event — objeví
+// se prakticky hned (ne po standardním 6s DELAY_MS), viz zadání "profesor
+// je defaultně otevřený". Malé nenulové zpoždění jen kvůli plynulému
+// najetí animace po vykreslení stránky.
+const O_HRE_PATHNAME = "/o-hre";
+const PROFESSOR_INTRO_DELAY_MS = 300;
 
 const CHARACTER_IMAGE: Record<CharacterId, { src: string; width: number; height: number }> = {
   professor: { src: "/images/characters/professor.png", width: 750, height: 1000 },
@@ -90,6 +96,22 @@ export default function CharacterCallout({
       setCharacter("professor");
       setPhase("minimized");
       return;
+    }
+
+    if (pathname === O_HRE_PATHNAME) {
+      // Hard rule ze zadání: na /o-hre má profesor absolutní prioritu a
+      // seller se tu nesmí objevit vůbec — proto se sem rozhodovací
+      // funkce pro sellera ani nevolá (druhá, nezávislá pojistka je
+      // isSellerAllowedOnRoute v resolve-callout.ts, které tuhle route
+      // taky blokuje). Profesor se navíc neřídí náhodou/cooldownem jako
+      // jinde — je to úvodní průvodce stránky, zobrazí se vždy.
+      setCharacter("professor");
+      const introTimer = window.setTimeout(() => {
+        setPhase("entering");
+        requestAnimationFrame(() => requestAnimationFrame(() => setPhase("open")));
+      }, PROFESSOR_INTRO_DELAY_MS);
+      timers.current.push(introTimer);
+      return () => timers.current.forEach((id) => clearTimeout(id));
     }
 
     // Jediný slot pro postavu (viz Phase/character výše) dělá "profesor
@@ -204,7 +226,11 @@ export default function CharacterCallout({
         {callout.isSponsored && (
           <p className="mt-2 text-[10px] font-sans uppercase tracking-wide text-[#8a6d4a]">Partnerský tip</p>
         )}
-        {callout.href && callout.linkLabel && callout.isSponsored && (
+        {/* CTA je strukturálně omezené na sellera (character === "seller")
+            — navigace i obsah stránky už mají vlastní tlačítka/odkazy,
+            CTA v profesorově dialogu by bylo duplicitní (viz zadání).
+            Seller CTA (reklama) zůstává beze změny funkční. */}
+        {character === "seller" && callout.href && callout.linkLabel && callout.isSponsored && (
           <a
             href={callout.href}
             target="_blank"
@@ -214,7 +240,7 @@ export default function CharacterCallout({
             {callout.linkLabel}
           </a>
         )}
-        {callout.href && callout.linkLabel && !callout.isSponsored && (
+        {character === "seller" && callout.href && callout.linkLabel && !callout.isSponsored && (
           <Link
             href={callout.href}
             className="mt-3 inline-flex min-h-[36px] items-center justify-center rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-amber-400"

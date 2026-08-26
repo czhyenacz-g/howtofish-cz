@@ -15,7 +15,17 @@ export type ResolvedCallout = CharacterMessage & {
   isHtml?: boolean;
 };
 
-const EXACT_ROUTES = new Set(["/ryby", "/predmety", "/bossove", "/lokace", "/navody", "/achievementy", "/stream", "/hra"]);
+const EXACT_ROUTES = new Set([
+  "/ryby",
+  "/predmety",
+  "/bossove",
+  "/lokace",
+  "/navody",
+  "/achievementy",
+  "/stream",
+  "/hra",
+  "/o-hre",
+]);
 
 // /ryby/[slug] je povolená dynamická detail stránka, ale NE její
 // /ryby/navrhnout sourozenec (formulářová stránka, viz zadání "Ne").
@@ -25,10 +35,14 @@ export function isCharacterCalloutRoute(pathname: string): boolean {
   return EXACT_ROUTES.has(pathname) || FISH_DETAIL_PATTERN.test(pathname);
 }
 
-// Prodejce (komerční callout) se na /hra nikdy nezobrazuje — během
-// hraní minihry by rušil. Profesor tam zůstává povolený.
+// Prodejce (komerční callout) se nikdy nezobrazuje na /hra (během hraní
+// minihry by rušil) ani na /o-hre (hard rule ze zadání — profesor tam má
+// absolutní prioritu jako úvodní průvodce, žádná komerční postava). Tohle
+// je JEDNO ze dvou nezávislých míst, která seller na /o-hre blokují — viz
+// i CharacterCallout.tsx, kde se pro tuhle route seller rozhodování vůbec
+// nespouští.
 export function isSellerAllowedOnRoute(pathname: string): boolean {
-  return pathname !== "/hra";
+  return pathname !== "/hra" && pathname !== "/o-hre";
 }
 
 function resolveProfessorMessage(pathname: string): CharacterMessage {

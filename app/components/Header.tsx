@@ -9,9 +9,10 @@ import SteamIcon from "./SteamIcon";
 import {
   AchievementIcon,
   BossIcon,
+  CrabIcon,
   FishIcon,
-  GameIcon,
   GuideIcon,
+  InfoIcon,
   ItemIcon,
   LiveIcon,
   LocationIcon,
@@ -28,21 +29,37 @@ const ICON_BY_HREF: Record<string, (props: IconProps) => React.ReactElement> = {
   "/lokace": LocationIcon,
   "/achievementy": AchievementIcon,
   "/aktualizace": UpdateIcon,
-  "/hra": GameIcon,
+  "/hra": CrabIcon,
+  "/o-hre": InfoIcon,
 };
 
 const LIVE_LINK = { href: "/stream", label: "Živě" } as const;
-const HRA_LINK = { href: "/hra", label: "Hra" } as const;
+// Krabí invaze je konkrétní minihra (dřív jen obecný label "Hra") —
+// odlišená vlastním jménem a krabí ikonou místo gamepadu, viz zadání.
+const HRA_LINK = { href: "/hra", label: "Krabí invaze" } as const;
+// "O hře" je informační stránka o samotné hře, ne o minihře — v hlavním
+// pill menu by přidala 9. položku a riskovala dvouřádkový header (viz
+// zadání "nechci dvouřádkové menu"), proto je v desktop headeru jen jako
+// menší sekundární odkaz (viz JSX níž) a v mobilním panelu vložená do
+// hlavního seznamu, ne v téhle desktop pill sadě.
+const O_HRE_LINK = { href: "/o-hre", label: "O hře" } as const;
 
 // /stream je jedna z nejdůležitějších dynamických funkcí webu, takže
 // "Živě" chceme hned za logem — i když v NAV_LINKS (a v patičce, kde
-// pořadí měnit nechceme) má Ryby jiné pořadové místo. "Hra" se pro
-// stejný důvod přidává na konec.
+// pořadí měnit nechceme) má Ryby jiné pořadové místo. "Krabí invaze" se
+// pro stejný důvod přidává na konec.
 function buildLinks(basePath: string) {
   if (basePath !== "") return NAV_LINKS;
   const ryby = NAV_LINKS.find((link) => link.href === "/ryby");
   const rest = NAV_LINKS.filter((link) => link.href !== "/ryby");
   return ryby ? [LIVE_LINK, ryby, ...rest, HRA_LINK] : [LIVE_LINK, ...NAV_LINKS, HRA_LINK];
+}
+
+// Jen pro mobilní panel — "O hře" vložené před "Krabí invaze" (preferované
+// pořadí ze zadání). Desktop pill row ji z prostorových důvodů nemá, viz
+// O_HRE_LINK výše.
+function buildMobileLinks(links: readonly { href: string; label: string }[]) {
+  return [...links.slice(0, -1), O_HRE_LINK, links[links.length - 1]];
 }
 
 function isActive(pathname: string, href: string) {
@@ -123,6 +140,7 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const links = buildLinks(basePath);
+  const mobileLinks = buildMobileLinks(links);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const openButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -208,6 +226,19 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
           </ul>
         </nav>
 
+        {/* "O hře" jako méně výrazný sekundární odkaz (obyčejný podtržený
+            text, ne pill) — viz O_HRE_LINK výše, proč není v hlavní
+            navigaci. */}
+        <Link
+          href={`${basePath}${O_HRE_LINK.href}`}
+          aria-current={isActive(pathname, `${basePath}${O_HRE_LINK.href}`) ? "page" : undefined}
+          className={`hidden font-serif text-sm underline-offset-2 transition hover:text-amber-300 hover:underline xl:inline ${
+            isActive(pathname, `${basePath}${O_HRE_LINK.href}`) ? "text-amber-300 underline" : "text-[#f4ead9]/70"
+          }`}
+        >
+          {O_HRE_LINK.label}
+        </Link>
+
         <div className="hidden xl:block">
           <SteamAuthControl user={user} pathname={pathname} />
         </div>
@@ -257,7 +288,7 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
             </div>
 
             <ul className="flex flex-col gap-2 font-serif text-base">
-              {links.map((link) => {
+              {mobileLinks.map((link) => {
                 const href = `${basePath}${link.href}`;
                 const active = isActive(pathname, href);
                 const isLive = link.href === LIVE_LINK.href;

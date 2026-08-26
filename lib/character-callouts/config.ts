@@ -3,6 +3,10 @@
 // stránku ryby (viz resolve-callout.ts), ne skutečná URL.
 export type CharacterMessage = {
   message: string;
+  // href/linkLabel jsou teď výhradně pro sellera (reklamní CTA) — profesor
+  // je nikdy nevyplňuje, viz PROFESSOR_MESSAGES níž a CharacterCallout.tsx,
+  // kde je CTA rendering strukturálně omezený na character === "seller".
+  // Duplicitní by bylo vůči navigaci a obsahu stránky (viz zadání).
   href?: string;
   linkLabel?: string;
 };
@@ -10,31 +14,21 @@ export type CharacterMessage = {
 export const PROFESSOR_MESSAGES: Record<string, CharacterMessage> = {
   "/ryby": {
     message: "V encyklopedii už máme první úlovky, ale pořád nám spousta ryb chybí. Pomůžeš mi ji doplnit?",
-    href: "/ryby/navrhnout",
-    linkLabel: "Přidat nový úlovek",
   },
   "/ryby/[slug]": {
     message: "Každý úlovek má svůj příběh. Máš vlastní screenshot téhle ryby? Pomoz mi doplnit její záznam.",
   },
   "/predmety": {
     message: "Výbavu ještě nemám zmapovanou úplně celou. Narazil jsi na předmět, který tu chybí?",
-    href: "/predmety/navrhnout",
-    linkLabel: "Přidat předmět",
   },
   "/bossove": {
     message: "Bossové skrývají spoustu tajemství. Pokud víš, jak některého vyvolat nebo porazit, pomoz mi to zapsat.",
-    href: "/bossove/navrhnout",
-    linkLabel: "Přidat bosse",
   },
   "/lokace": {
     message: "Ostrovy ještě nejsou celé prozkoumané. Znáš místo, které nám v mapování chybí?",
-    href: "/lokace/navrhnout",
-    linkLabel: "Přidat lokaci",
   },
   "/navody": {
     message: "Některé věci hra nevysvětlí. Jestli znáš dobrý trik, pomoz mi ho přidat do návodů.",
-    href: "/navody/navrhnout",
-    linkLabel: "Přidat návod",
   },
   "/achievementy": {
     message: "Achievementy umí být záludné. Pokud znáš postup k některému z nich, dej nám vědět.",
@@ -44,8 +38,16 @@ export const PROFESSOR_MESSAGES: Record<string, CharacterMessage> = {
   },
   "/hra": {
     message: "Výzkum je důležitý, ale občas je potřeba si taky zahrát.",
-    href: "/ryby",
-    linkLabel: "Prozkoumat ryby",
+  },
+  // Úvodní představení na informační stránce O hře — na rozdíl od
+  // ostatních routes se tu profesor zobrazuje vždy a hned (viz
+  // CharacterCallout.tsx), ne jako náhodný event. Hlavní myšlenky ze
+  // zadání zachované beze změny: jmenuje se Profesor, není profesor Oak
+  // (lehký vtip), taky tu uvízl, katalogizuje ryby/předměty/bossy/lokace/
+  // návody, a chce k tomu pomoc hráče.
+  "/o-hre": {
+    message:
+      "Říkej mi Profesore. Ne, nejsem profesor Oak — to je z úplně jiné hry (a jiného rybníka). Taky jsem tu uvízl, na těchhle ostrovech, a snažím se dát dohromady katalog všeho, co tu najdeme — ryby, předměty, bossy, lokace i návody. S tím ale potřebuju tvoji pomoc. Čím víc toho spolu zapíšeme, tím větší šanci budou mít další hráči, co sem teprve dorazí.",
   },
 };
 
