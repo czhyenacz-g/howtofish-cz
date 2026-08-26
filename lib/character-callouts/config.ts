@@ -13,13 +13,13 @@ export type CharacterMessage = {
 
 export const PROFESSOR_MESSAGES: Record<string, CharacterMessage> = {
   "/ryby": {
-    message: "V encyklopedii už máme první úlovky, ale pořád nám spousta ryb chybí. Pomůžeš mi ji doplnit?",
+    message: "V encyklopedii už máme první úlovky, ale pořád nám spousta ryb chybí.\n\nPomůžeš mi ji doplnit?",
   },
   "/ryby/[slug]": {
-    message: "Každý úlovek má svůj příběh. Máš vlastní screenshot téhle ryby? Pomoz mi doplnit její záznam.",
+    message: "Každý úlovek má svůj příběh.\n\nMáš vlastní screenshot téhle ryby?\n\nPomoz mi doplnit její záznam.",
   },
   "/predmety": {
-    message: "Výbavu ještě nemám zmapovanou úplně celou. Narazil jsi na předmět, který tu chybí?",
+    message: "Výbavu ještě nemám zmapovanou úplně celou.\n\nNarazil jsi na předmět, který tu chybí?",
   },
   "/bossove": {
     message: "Bossové skrývají spoustu tajemství. Pokud víš, jak některého vyvolat nebo porazit, pomoz mi to zapsat.",

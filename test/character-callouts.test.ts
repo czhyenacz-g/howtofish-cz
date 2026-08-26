@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { PROFESSOR_MESSAGES, SELLER_MESSAGE } from "../lib/character-callouts/config.ts";
 import {
   isCharacterCalloutRoute,
   isSellerAllowedOnRoute,
@@ -343,4 +344,17 @@ test("CharacterCallout.tsx: plain-text zprávy se renderují s whitespace-pre-li
 
 test("CharacterCallout.tsx: vysunutý stav (entering/open/closing) má data-character-callout-open=\"true\" — jiné fixed prvky (MultiplayerIslandTab) na něj reagují", () => {
   assert.match(componentSource, /data-character-callout-open="true"/);
+});
+
+test("PROFESSOR_MESSAGES a SELLER_MESSAGE: otázka (věta končící '?') je vždy ve vlastním odstavci, ne slepená s dalším textem", () => {
+  const allMessages = [...Object.values(PROFESSOR_MESSAGES), SELLER_MESSAGE].map((m) => m.message);
+  for (const message of allMessages) {
+    for (const paragraph of message.split("\n\n")) {
+      if (!paragraph.includes("?")) continue;
+      const trimmed = paragraph.trim();
+      assert.ok(trimmed.endsWith("?"), `otázka musí končit svůj odstavec: "${paragraph}"`);
+      const questionMarks = (trimmed.match(/\?/g) ?? []).length;
+      assert.equal(questionMarks, 1, `odstavec s otázkou má mít přesně jednu otázku: "${paragraph}"`);
+    }
+  }
 });
