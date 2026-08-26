@@ -246,3 +246,66 @@ export type PromotionEntry = {
   imageUrl?: string;
   weight: number;
 };
+
+// ---------------------------------------------------------------------
+// Multiplayer ostrov — dobrovolná, časově omezená "jsem tu a hledám
+// spoluhráče" presence + jednoduché "zamávat" (žádný chat, žádné volné
+// texty). Presence je "jeden aktuální stav na steam_id" record — viz
+// lib/universal-content-api/presence.ts (update/upsert stejného
+// recordu, ne nová řádka při každém heartbeatu).
+
+// Config žije tady (ne server-only), protože ho potřebuje i "use
+// client" status selector — stejný vzor jako PromotionEntry výš.
+export const PRESENCE_STATUSES = [
+  { key: "play", label: "Jen si chci zahrát", emoji: "🎣" },
+  { key: "explore", label: "Hledám parťáka na průzkum", emoji: "🏝️" },
+  { key: "bosses", label: "Jdu na bossy", emoji: "🦀" },
+  { key: "achievements", label: "Sbírám achievementy", emoji: "🏆" },
+  { key: "help", label: "Můžu pomoct nováčkům", emoji: "💡" },
+  { key: "need_help", label: "Potřebuju poradit", emoji: "❓" },
+] as const;
+
+export type PresenceStatusKey = (typeof PRESENCE_STATUSES)[number]["key"];
+
+const PRESENCE_STATUS_KEYS = new Set<string>(PRESENCE_STATUSES.map((s) => s.key));
+
+export function isPresenceStatusKey(value: unknown): value is PresenceStatusKey {
+  return typeof value === "string" && PRESENCE_STATUS_KEYS.has(value);
+}
+
+// Payload uložený do records.data pro collection "multiplayer_presence".
+// Žádný věk/pohlaví/lokalita/bio/email/Discord/volný text — viz zadání.
+export type PresenceRecordData = {
+  steam_id: string;
+  nickname: string;
+  avatar_url: string | null;
+  status: PresenceStatusKey;
+  visible: boolean;
+  last_seen_at: string;
+};
+
+// HowToFish typ pro UI — jeden aktivní hráč na multiplayer ostrově.
+export type PresenceEntry = {
+  recordId: number;
+  steamId: string;
+  nickname: string;
+  avatarUrl: string | null;
+  status: PresenceStatusKey;
+  lastSeenAt: string;
+};
+
+// Payload uložený do records.data pro collection "multiplayer_waves" —
+// `created_at` dodává Record sám, neduplikuje se do data (viz zadání).
+export type WaveRecordData = {
+  from_steam_id: string;
+  from_nickname: string;
+  to_steam_id: string;
+};
+
+// HowToFish typ pro UI — jedno "zamávání".
+export type WaveEntry = {
+  fromSteamId: string;
+  fromNickname: string;
+  toSteamId: string;
+  createdAt: string;
+};

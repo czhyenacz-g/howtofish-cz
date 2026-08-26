@@ -30,6 +30,27 @@ export async function createCommunityRecord(
   return { id: response.data.id };
 }
 
+/**
+ * Nahrazuje `data` existujícího recordu (UCA `PATCH`, ne merge — viz
+ * docs/API.md v universal-content-api). Používá se pro "jeden aktuální
+ * stav" collections (např. multiplayer presence): najdi vlastní record
+ * přes `filter[steam_id]=...` (viz getMyPendingCommunityRecords/
+ * getApprovedCommunityRecords), a pokud existuje, zavolej tohle místo
+ * vytváření nového řádku při každém heartbeatu.
+ */
+export async function updateCommunityRecord(
+  collection: string,
+  recordId: number,
+  data: Record<string, unknown>
+): Promise<{ id: number }> {
+  const response = await ucaJsonRequest<{ data: UcaRecord }>(recordsPath(`/${recordId}`, collection), {
+    method: "PATCH",
+    body: { data },
+    timeoutMs: CREATE_TIMEOUT_MS,
+  });
+  return { id: response.data.id };
+}
+
 export async function uploadCommunityImage(recordId: number, file: File): Promise<void> {
   const formData = new FormData();
   formData.append("file", file);

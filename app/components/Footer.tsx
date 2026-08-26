@@ -14,6 +14,15 @@ export default function Footer({ basePath = "" }: { basePath?: string }) {
     <footer className="border-t border-gray-800 bg-gray-900">
       <div className="mx-auto max-w-5xl px-4 py-8 text-sm text-gray-400">
         <p className="max-w-2xl">{DISCLAIMER}</p>
+        {/* Vlastní, výraznější místo pro Multiplayer ostrov — do hlavní
+            xl:block pill-navigace v Headeru se už nevejde (9 položek bez
+            flex-wrap), ale funkce má být dobře viditelná, viz zadání. */}
+        <Link
+          href={`${basePath}/multiplayer`}
+          className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 font-serif text-amber-300 transition hover:bg-amber-400/20"
+        >
+          🏝️ Multiplayer ostrov — najdi spoluhráče
+        </Link>
         <nav aria-label="Navigace v patičce" className="mt-4">
           <ul className="flex flex-wrap gap-x-4 gap-y-2 font-serif">
             {NAV_LINKS.map((link) => (

@@ -44,6 +44,21 @@ export default function OchranaSoukromiPage() {
       </section>
 
       <section className="mt-8">
+        <h2 className="font-serif text-xl text-amber-300">Multiplayer ostrov</h2>
+        <p className="mt-3 text-cyan-100/80">
+          Zobrazení na multiplayer ostrově (<em>/multiplayer</em>) je vždy dobrovolné — aktivuješ ho tlačítkem
+          &bdquo;Hledám spoluhráče&ldquo;. Po aktivaci vidí ostatní přihlášení uživatelé tvůj Steam nickname, avatar,
+          odkaz na tvůj Steam profil a tebou zvolený herní status. Zobrazení automaticky vyprší nejpozději po
+          hodině neaktivity a kdykoliv se můžeš sám skrýt tlačítkem &bdquo;Skrýt mě&ldquo;.
+        </p>
+        <p className="mt-3 text-cyan-100/80">
+          Přes tlačítko &bdquo;Zamávat&ldquo; si ukládáme, kdo komu zamával (Steam ID a přezdívka odesílatele,
+          Steam ID příjemce a čas) — slouží jen ke krátkodobému zobrazení &bdquo;kdo ti zamával&ldquo; po dobu
+          hodiny, ne jako chat ani zpráva s vlastním textem.
+        </p>
+      </section>
+
+      <section className="mt-8">
         <h2 className="font-serif text-xl text-amber-300">Universal Content API</h2>
         <p className="mt-3 text-cyan-100/80">
           Obsah webu a komunitní příspěvky (viz výše) jsou uložené v backendu Universal Content API, který

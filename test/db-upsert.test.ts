@@ -30,3 +30,8 @@ test("upsertSteamUser: INSERT nastavuje is_blocked jen implicitně (přes DEFAUL
     "INSERT sloupce by neměly explicitně zmiňovat is_blocked — spoléhá se na DEFAULT FALSE ve schématu",
   );
 });
+
+test("getBlockedSteamIds: dotaz čte steam_id jen tam, kde is_blocked = true (žádný per-uživatel lookup)", () => {
+  const match = /SELECT steam_id FROM users WHERE is_blocked = true/.exec(source);
+  assert.ok(match, "očekávaný dávkový dotaz 'SELECT steam_id FROM users WHERE is_blocked = true' nebyl v db.ts nalezen");
+});

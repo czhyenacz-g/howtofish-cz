@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/o-hre`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/hra`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/stream`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.4 },
+    { url: `${SITE_URL}/multiplayer`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.5 },
   ];
 
   for (const path of ["/predmety", "/bossove", "/lokace", "/navody", "/achievementy"]) {

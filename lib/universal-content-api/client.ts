@@ -54,7 +54,7 @@ async function parseErrorBody(response: Response): Promise<string> {
 /** JSON request (create record, read) — no-store, volitelný Next cache revalidate pro čtení. */
 export async function ucaJsonRequest<T>(
   path: string,
-  init: { method: "GET" | "POST"; body?: unknown; timeoutMs: number; revalidateSeconds?: number }
+  init: { method: "GET" | "POST" | "PATCH"; body?: unknown; timeoutMs: number; revalidateSeconds?: number }
 ): Promise<T> {
   const { baseUrl, token } = getConfig();
 

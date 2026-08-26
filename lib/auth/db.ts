@@ -50,6 +50,19 @@ export async function upsertSteamUser(params: {
   return mapRow(rows[0]);
 }
 
+/**
+ * Steam ID všech blokovaných uživatelů — jeden dávkový dotaz (ne
+ * per-uživatel lookup), použito při čtení veřejně zobrazovaných seznamů
+ * (např. multiplayer presence), aby blokovaný uživatel nikdy nebyl
+ * vidět, i kdyby ho zablokovali až po jeho posledním heartbeatu.
+ */
+export async function getBlockedSteamIds(): Promise<Set<string>> {
+  const { rows } = await sql<{ steam_id: string }>`
+    SELECT steam_id FROM users WHERE is_blocked = true
+  `;
+  return new Set(rows.map((row) => row.steam_id));
+}
+
 export async function getUserBySteamId(steamId: string): Promise<DbUser | null> {
   const { rows } = await sql<{
     id: number;
