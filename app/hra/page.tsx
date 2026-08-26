@@ -34,11 +34,13 @@ export default async function HraPage() {
       </div>
 
       <div className="mx-auto mt-8 max-w-3xl">
-        <CrabRushGame user={user} />
+        <Leaderboard entries={leaderboard} />
         <div className="mt-8">
           <AdSlot pathname="/hra" />
         </div>
-        <Leaderboard entries={leaderboard} />
+        <div className="mt-8">
+          <CrabRushGame user={user} />
+        </div>
       </div>
     </div>
   );
