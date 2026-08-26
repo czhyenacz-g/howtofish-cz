@@ -37,7 +37,7 @@ export const TRACK_END_X = 100;
 export const HIT_SLOW_MS = 400;
 export const HIT_SLOW_FACTOR = 0.5;
 export const DEATH_ANIM_MS = 450;
-export const SUBMERGE_ANIM_MS = 550;
+export const SUBMERGE_ANIM_MS = 750;
 // Krab se "potápí" o kousek před koncem trati, ať zůstane viditelný,
 // dokud nezmizí (na TRACK_END_X by byl hned za okrajem ořezané plochy).
 const SUBMERGE_X = TRACK_END_X - 6;

@@ -166,26 +166,36 @@
 }
 
 /* Krab, který doběhl do moře — postupně se potápí (menší, níž, míň
-   vidět), ne že zmizí okamžitě. */
+   vidět), ne že zmizí okamžitě. Prostřední krok drží krátce viditelnost,
+   ať je postupné mizení zřetelné, ne skoro okamžité. */
 @keyframes crab-submerge {
   0% {
     transform: translateY(0) scale(1);
     opacity: 1;
   }
+  35% {
+    transform: translateY(8px) scale(0.92);
+    opacity: 0.85;
+  }
   100% {
-    transform: translateY(14px) scale(0.75);
+    transform: translateY(26px) scale(0.6);
     opacity: 0;
   }
 }
 
-/* Malá "krvavá" skvrna pod krabem při zásahu — jen náznak, žádné gore. */
+/* Výraznější "krvavá" skvrna pod krabem při zásahu — chvíli plně
+   viditelná, pak zmizí. */
 @keyframes crab-hit-splat {
   0% {
-    transform: scale(0.4);
-    opacity: 0.75;
+    transform: scale(0.5);
+    opacity: 0.95;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 0.9;
   }
   100% {
-    transform: scale(1.3);
+    transform: scale(1.4);
     opacity: 0;
   }
 }
@@ -213,11 +223,11 @@
 }
 
 .animate-crab-submerge {
-  animation: crab-submerge 550ms ease-in forwards;
+  animation: crab-submerge 750ms ease-in forwards;
 }
 
 .animate-crab-hit-splat {
-  animation: crab-hit-splat 350ms ease-out forwards;
+  animation: crab-hit-splat 450ms ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -25,6 +25,9 @@ import {
 
 type GameUser = { nickname: string; avatarUrl: string | null; isBlocked: boolean } | null;
 
+// Musí odpovídat době trvání .animate-crab-hit-splat v app/globals.css.
+const HIT_SPLAT_MS = 450;
+
 function formatTime(seconds: number): string {
   const s = Math.max(0, Math.ceil(seconds));
   const m = Math.floor(s / 60);
@@ -255,7 +258,7 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
         >
           {gameState.crabs.map((crab) => {
             const isHit =
-              !crab.dying && !crab.escaping && crab.hitAt !== null && performance.now() - crab.hitAt < 350;
+              !crab.dying && !crab.escaping && crab.hitAt !== null && performance.now() - crab.hitAt < HIT_SPLAT_MS;
             return (
               <button
                 key={crab.id}
@@ -268,10 +271,11 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
                 }`}
               >
                 {isHit && (
-                  <span
-                    aria-hidden="true"
-                    className="animate-crab-hit-splat absolute bottom-0.5 left-1/2 h-3 w-7 -translate-x-1/2 translate-y-1 rounded-full bg-red-600/70 blur-[1px]"
-                  />
+                  <span aria-hidden="true" className="pointer-events-none absolute inset-0">
+                    <span className="animate-crab-hit-splat absolute bottom-0 left-1/2 h-4 w-9 -translate-x-1/2 translate-y-2 rounded-full bg-red-700/90" />
+                    <span className="animate-crab-hit-splat absolute bottom-0 left-[38%] h-1.5 w-1.5 -translate-x-1/2 translate-y-3.5 rounded-full bg-red-700/85" />
+                    <span className="animate-crab-hit-splat absolute bottom-0 left-[62%] h-2 w-2 -translate-x-1/2 translate-y-3 rounded-full bg-red-700/85" />
+                  </span>
                 )}
                 <CrabIcon
                   className="h-10 w-14"
