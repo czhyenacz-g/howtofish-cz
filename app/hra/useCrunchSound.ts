@@ -3,6 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "howtofish-crabrush-sound-enabled";
+// CC0 (public domain, žádná atribuce potřeba) — freesound.org/people/
+// SammygoodTunes/sounds/844811/. Jediný externí audio asset v projektu
+// (vyžádáno explicitně místo syntetického crunche níž) — playLifeLost
+// zůstává syntetický, ten se netýkal.
+const CRUNCH_SOUND_URL = "/audio/crab-crunch.wav";
 
 function readStoredPreference(): boolean {
   try {
@@ -22,13 +27,18 @@ function writeStoredPreference(enabled: boolean) {
 }
 
 /**
- * Krátký syntetický "crunch" (křupnutí chipsu) přes Web Audio API —
- * žádný externí audio asset, žádná licence k řešení. AudioContext se
- * vytváří/probouzí až při první interakci (viz `unlock`), nikdy sám od
- * sebe při načtení stránky — respektuje autoplay policy.
+ * Krátký "crunch" (skutečná nahrávka křupnutí, viz CRUNCH_SOUND_URL)
+ * přehrávaný přes Web Audio API — dekóduje se jednou a cachuje
+ * (ensureCrunchBuffer), další přehrání jen spustí nový
+ * AudioBufferSourceNode ze stejných dat, ať jde přehrát vícekrát rychle
+ * za sebou bez přerušení. AudioContext se vytváří/probouzí až při první
+ * interakci (viz `unlock`), nikdy sám od sebe při načtení stránky —
+ * respektuje autoplay policy.
  */
 export function useCrunchSound() {
   const ctxRef = useRef<AudioContext | null>(null);
+  const bufferRef = useRef<AudioBuffer | null>(null);
+  const bufferPromiseRef = useRef<Promise<AudioBuffer | null> | null>(null);
   const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
@@ -48,9 +58,32 @@ export function useCrunchSound() {
     return ctxRef.current;
   }, []);
 
+  // Stáhne a jednou dekóduje CRUNCH_SOUND_URL — výsledek se cachuje v
+  // bufferRef, souběžná volání (např. rychle za sebou zasažení krabi)
+  // sdílí stejný rozpracovaný Promise (bufferPromiseRef), ať se soubor
+  // nestahuje/nedekóduje vícekrát zbytečně. `null` při chybě (chybějící
+  // soubor, decode selže) — volající pak jen nic nepřehraje, nikdy nespadne.
+  const ensureCrunchBuffer = useCallback((ctx: AudioContext): Promise<AudioBuffer | null> => {
+    if (bufferRef.current) return Promise.resolve(bufferRef.current);
+    if (!bufferPromiseRef.current) {
+      bufferPromiseRef.current = fetch(CRUNCH_SOUND_URL)
+        .then((res) => res.arrayBuffer())
+        .then((data) => ctx.decodeAudioData(data))
+        .then((decoded) => {
+          bufferRef.current = decoded;
+          return decoded;
+        })
+        .catch(() => null);
+    }
+    return bufferPromiseRef.current;
+  }, []);
+
   const unlock = useCallback(() => {
-    ensureContext();
-  }, [ensureContext]);
+    const ctx = ensureContext();
+    // Rovnou začne stahovat/dekódovat crunch.wav, ať je hotový dřív, než
+    // padne první zásah (unlock se volá při prvním kliknutí do hry).
+    if (ctx) ensureCrunchBuffer(ctx);
+  }, [ensureContext, ensureCrunchBuffer]);
 
   const playCrunch = useCallback(
     (strong = false) => {
@@ -58,34 +91,26 @@ export function useCrunchSound() {
       const ctx = ensureContext();
       if (!ctx) return;
 
-      const duration = strong ? 0.14 : 0.09;
-      const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * duration));
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        const decay = 1 - i / bufferSize;
-        data[i] = (Math.random() * 2 - 1) * decay * decay;
-      }
+      ensureCrunchBuffer(ctx).then((buffer) => {
+        if (!buffer) return;
 
-      const noise = ctx.createBufferSource();
-      noise.buffer = buffer;
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        // Smrtelná rána zní o něco hlouběji a hlasitěji než obyčejný
+        // zásah — stejné rozlišení jako mělo dřívější syntetické řešení
+        // (jiná frekvence/gain), teď přes playbackRate/gain nad reálnou
+        // nahrávkou.
+        source.playbackRate.value = strong ? 0.92 : 1.06;
 
-      const bandpass = ctx.createBiquadFilter();
-      bandpass.type = "bandpass";
-      bandpass.frequency.value = strong ? 1400 : 2200;
-      bandpass.Q.value = 0.7;
+        const gain = ctx.createGain();
+        gain.gain.value = strong ? 0.85 : 0.55;
 
-      const gain = ctx.createGain();
-      gain.gain.value = strong ? 0.35 : 0.22;
-
-      noise.connect(bandpass);
-      bandpass.connect(gain);
-      gain.connect(ctx.destination);
-
-      noise.start();
-      noise.stop(ctx.currentTime + duration);
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        source.start();
+      });
     },
-    [enabled, ensureContext]
+    [enabled, ensureContext, ensureCrunchBuffer]
   );
 
   // Krátký sestupný tón při ztrátě života — jiná barva zvuku než crunch,
