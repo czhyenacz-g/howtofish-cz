@@ -97,7 +97,7 @@ export default function StreamBrowser({
       )}
 
       <div className="mx-auto mt-6 max-w-3xl">
-        {bannerPromotion?.imageUrl && bannerPromotion.href ? (
+        {bannerPromotion?.imageUrl ? (
           <AffiliateBanner imageSrc={bannerPromotion.imageUrl} href={bannerPromotion.href} title={bannerPromotion.title} />
         ) : (
           <AdPlaceholder />

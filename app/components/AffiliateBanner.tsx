@@ -33,7 +33,9 @@ export default function AffiliateBanner({ imageSrc, href, title, className = "" 
           onError={() => setImageFailed(true)}
         />
       </div>
-      <p className="mt-2 text-center font-serif text-sm text-amber-300 group-hover:text-amber-200">{title}</p>
+      {/* title je pořád v alt/aria-label výše — vizuální popisek pod
+          bannerem je záměrně skrytý (viz zadání), ne odstraněný. */}
+      <p className="sr-only">{title}</p>
     </>
   );
 

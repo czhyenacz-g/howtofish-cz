@@ -77,7 +77,7 @@ export default function FishBrowser({
       </div>
 
       <div className="mt-6">
-        {bannerPromotion?.imageUrl && bannerPromotion.href ? (
+        {bannerPromotion?.imageUrl ? (
           <AffiliateBanner imageSrc={bannerPromotion.imageUrl} href={bannerPromotion.href} title={bannerPromotion.title} />
         ) : (
           <AdPlaceholder />
