@@ -204,3 +204,44 @@ test("CharacterCallout.tsx: nikdy neimportuje universal-content-api/promotions.t
     .some((line) => /universal-content-api\/(client|catches|community|promotions)(\.ts)?["']/.test(line) && !/^\s*import\s+type\b/.test(line));
   assert.equal(hasUnsafeImport, false);
 });
+
+// --- Prodejce: frekvence/kolize s bannerem a profesorem -----------------
+
+test("CharacterCallout.tsx: rozhodnutí seller-vs-professor jde přes shouldShowSeller (jediné místo pravidel), ne přes vlastní Math.random() coinflip", () => {
+  assert.match(componentSource, /shouldShowSeller\(\{/);
+  assert.doesNotMatch(componentSource, /Math\.random\(\)\s*<\s*0\.5/);
+});
+
+test("CharacterCallout.tsx: professorVisibility je vždy 'hidden' — jediný slot pro postavu dělá 'profesor open' a 'seller' současně strukturálně nemožné", () => {
+  assert.match(componentSource, /professorVisibility:\s*"hidden"/);
+});
+
+test("CharacterCallout.tsx: prodejce používá SELLER_DELAY_MS, profesor (fallback větev) DELAY_MS beze změny", () => {
+  assert.match(componentSource, /}, SELLER_DELAY_MS\);/);
+  assert.match(componentSource, /}, DELAY_MS\);/);
+});
+
+test("CharacterCallout.tsx: prodejce se teprve po timeru ověří proti ŽIVÉ (ref) viditelnosti banneru, ne proti hodnotě z okamžiku naplánování", () => {
+  const sellerTimerBody = /const sellerTimer = window\.setTimeout\(\(\) => \{([\s\S]*?)\}, SELLER_DELAY_MS\);/.exec(
+    componentSource
+  )?.[1];
+  assert.ok(sellerTimerBody, "nepodařilo se najít tělo sellerTimer callbacku");
+  assert.match(sellerTimerBody, /bannerVisibleRef\.current/);
+});
+
+test("CharacterCallout.tsx: prodejce se skutečně 'zapamatuje' (rememberSellerShown) až při reálném zobrazení, ne při pouhém naplánování", () => {
+  const beforeSellerTimer = componentSource.split("const sellerTimer = window.setTimeout")[0];
+  const sellerTimerBody = /const sellerTimer = window\.setTimeout\(\(\) => \{([\s\S]*?)\}, SELLER_DELAY_MS\);/.exec(
+    componentSource
+  )?.[1];
+  assert.doesNotMatch(beforeSellerTimer.split("wantsSeller")[1] ?? "", /rememberSellerShown/);
+  assert.match(sellerTimerBody ?? "", /rememberSellerShown\(pathname, Date\.now\(\)\)/);
+});
+
+test("CharacterCallout.tsx: žádný polling (setInterval) v komponentě — jen event-driven timery/observer", () => {
+  assert.doesNotMatch(componentSource, /setInterval/);
+});
+
+test("CharacterCallout.tsx: importuje useBannerVisible (IntersectionObserver koordinace s bannerem), ne vlastní DOM dotazování", () => {
+  assert.match(componentSource, /import \{ useBannerVisible \} from "\.\/useBannerVisible"/);
+});

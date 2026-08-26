@@ -10,13 +10,15 @@ import {
 } from "../../lib/character-callouts/professor-state";
 import {
   isCharacterCalloutRoute,
-  isSellerAllowedOnRoute,
   resolveCharacterCallout,
   resolvePromotionCallout,
   type CharacterId,
 } from "../../lib/character-callouts/resolve-callout";
+import { getSellerLastShownAt, getSellerShownRoutes, rememberSellerShown } from "../../lib/character-callouts/seller-state";
+import { SELLER_DELAY_MS, shouldShowSeller } from "../../lib/character-callouts/seller-rules";
 import { pickPromotion } from "../../lib/promotions/match-route";
 import type { PromotionEntry } from "../../lib/universal-content-api/types";
+import { useBannerVisible } from "./useBannerVisible";
 
 const DELAY_MS = 6000;
 const EXIT_MS = 300;
@@ -56,6 +58,16 @@ export default function CharacterCallout({
   const [phase, setPhase] = useState<Phase>("idle");
   const timers = useRef<number[]>([]);
 
+  // Prodejce nesmí naskočit přes viditelný banner (viz seller-rules.ts).
+  // Event-driven přes IntersectionObserver, žádný polling. `bannerVisible`
+  // se čte přes ref v setTimeout callbacku, aby zůstala aktuální i po 25s
+  // čekání (closure by jinak zamrzla na hodnotě z okamžiku naplánování).
+  const bannerVisible = useBannerVisible(pathname);
+  const bannerVisibleRef = useRef(bannerVisible);
+  useEffect(() => {
+    bannerVisibleRef.current = bannerVisible;
+  }, [bannerVisible]);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -66,12 +78,13 @@ export default function CharacterCallout({
     timers.current.forEach((id) => clearTimeout(id));
     timers.current = [];
     setPhase("idle");
+    setCharacter(null);
 
     if (!isCharacterCalloutRoute(pathname)) return;
 
     // Jednodušší varianta z zadání: pokud je profesor na téhle route
     // zapamatovaný jako minimalizovaný, rovnou ukaž "?" a vůbec
-    // neprováděj náhodný auto-callout (žádný nový 6s timer, žádný los
+    // neprováděj náhodný auto-callout (žádný nový timer, žádný los
     // prodejce) — uživatel si ho může kdykoliv ručně znovu otevřít.
     if (isProfessorMinimizedForRoute(pathname)) {
       setCharacter("professor");
@@ -79,19 +92,50 @@ export default function CharacterCallout({
       return;
     }
 
-    const picked: CharacterId =
-      isSellerAllowedOnRoute(pathname) && Math.random() < 0.5 ? "seller" : "professor";
-    setCharacter(picked);
+    // Jediný slot pro postavu (viz Phase/character výše) dělá "profesor
+    // otevřený blokuje prodejce" strukturálně nemožné — obě postavy nikdy
+    // nemůžou být "open" současně. `professorVisibility` je tu proto vždy
+    // "hidden": prodejce se rozhoduje nezávisle na profesorovi, ne o něj
+    // koliduje (viz report k téhle části zadání).
+    const chanceRoll = Math.random();
+    const wantsSeller = shouldShowSeller({
+      pathname,
+      now: Date.now(),
+      lastShownAt: getSellerLastShownAt(),
+      shownRoutes: getSellerShownRoutes(),
+      bannerVisible,
+      professorVisibility: "hidden",
+      chanceRoll,
+    });
 
-    const showTimer = window.setTimeout(() => {
+    if (!wantsSeller) {
+      setCharacter("professor");
+      const showTimer = window.setTimeout(() => {
+        setPhase("entering");
+        requestAnimationFrame(() => requestAnimationFrame(() => setPhase("open")));
+      }, DELAY_MS);
+      timers.current.push(showTimer);
+      return () => timers.current.forEach((id) => clearTimeout(id));
+    }
+
+    // Prodejce má vlastní, delší delay (má působit jako vzácný event, ne
+    // druhá reklama hned vedle profesora) — a těsně před zobrazením se
+    // ještě jednou ověří živá viditelnost banneru (mohl se objevit
+    // v mezičase). Pokud ano, tenhle pokus se tiše zahodí — žádný fallback
+    // na profesora, žádné opakování na téhle route.
+    setCharacter("seller");
+    const sellerTimer = window.setTimeout(() => {
+      if (bannerVisibleRef.current) return;
+      rememberSellerShown(pathname, Date.now());
       setPhase("entering");
       requestAnimationFrame(() => requestAnimationFrame(() => setPhase("open")));
-    }, DELAY_MS);
-    timers.current.push(showTimer);
+    }, SELLER_DELAY_MS);
+    timers.current.push(sellerTimer);
 
     return () => {
       timers.current.forEach((id) => clearTimeout(id));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- bannerVisible se čte přes bannerVisibleRef, aby se rozhodnutí "seller vs. professor" nepřepočítávalo při každé změně viditelnosti banneru mezi routami.
   }, [mounted, pathname]);
 
   function handleClose() {

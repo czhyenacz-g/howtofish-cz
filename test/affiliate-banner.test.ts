@@ -28,3 +28,10 @@ describe("AffiliateBanner — href je volitelný (affiliate odkazy zatím nemus�
     assert.doesNotMatch(divBranch[1], /rel="noopener noreferrer sponsored"/);
   });
 });
+
+describe("AffiliateBanner — data-promotion-banner atribut (seller callout koordinace)", () => {
+  test("obě varianty (s href i bez) mají data-promotion-banner=\"true\"", () => {
+    const matches = source.match(/data-promotion-banner="true"/g) ?? [];
+    assert.equal(matches.length, 2, "očekávány přesně 2 výskyty (<div> i <a> větev)");
+  });
+});

@@ -29,3 +29,11 @@ test("AdSlot.tsx: AdPlaceholder je fallback jen pro chybějící obrázek, ne pr
 test("AdSlot.tsx: nepadá, když je UCA nedostupné (graceful fallback)", () => {
   assert.match(source, /\.catch\(\(\) => null\)/);
 });
+
+test("AdPlaceholder.tsx: nemá data-promotion-banner (není to skutečná reklama, seller ho nemá blokovat)", () => {
+  const placeholderSource = readFileSync(
+    fileURLToPath(new URL("../app/components/AdPlaceholder.tsx", import.meta.url)),
+    "utf8"
+  );
+  assert.doesNotMatch(placeholderSource, /data-promotion-banner/);
+});

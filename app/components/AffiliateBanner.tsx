@@ -39,9 +39,13 @@ export default function AffiliateBanner({ imageSrc, href, title, className = "" 
     </>
   );
 
+  // Značka pro seller-callout koordinaci (viz useBannerVisible.ts) — seller
+  // se nesmí zobrazit přes viditelný banner. AdPlaceholder tenhle atribut
+  // záměrně nemá (není to skutečná reklama).
   if (!href) {
     return (
       <div
+        data-promotion-banner="true"
         className={`block overflow-hidden rounded-lg border border-amber-300/20 bg-gradient-to-br from-[#0e4f66] via-[#146b78] to-[#1c8a95] p-3 ${className}`}
       >
         {content}
@@ -55,6 +59,7 @@ export default function AffiliateBanner({ imageSrc, href, title, className = "" 
       target="_blank"
       rel="noopener noreferrer sponsored"
       aria-label={title}
+      data-promotion-banner="true"
       className={`group block overflow-hidden rounded-lg border border-amber-300/20 bg-gradient-to-br from-[#0e4f66] via-[#146b78] to-[#1c8a95] p-3 transition duration-150 hover:-translate-y-0.5 hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${className}`}
     >
       {content}
