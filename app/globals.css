@@ -166,16 +166,16 @@
 }
 
 /* Krab, který doběhl do moře — postupně se potápí (menší, níž, míň
-   vidět), ne že zmizí okamžitě. Prostřední krok drží krátce viditelnost,
-   ať je postupné mizení zřetelné, ne skoro okamžité. */
+   vidět), ne že zmizí okamžitě. Opacity na 0 % záměrně chybí — krab už
+   je díky waterOpacity() v CrabRushGame.tsx částečně průhledný dřív
+   (ve vodě, kousek za středem trati), takže animace pokračuje odsud
+   plynule k 0, místo aby na začátku skočila zpátky na plnou viditelnost. */
 @keyframes crab-submerge {
   0% {
     transform: translateY(0) scale(1);
-    opacity: 1;
   }
   35% {
     transform: translateY(8px) scale(0.92);
-    opacity: 0.85;
   }
   100% {
     transform: translateY(26px) scale(0.6);

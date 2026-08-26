@@ -41,6 +41,20 @@ function laneY(id: number): number {
   return 12 + ((id * 37) % 5) * 17;
 }
 
+// Krab začíná průsvitnět, jakmile vkročí do vody (kousek za středem
+// trati, ne až těsně před únikem) — čistě kosmetické, proto (jako
+// laneY výše) mimo crab-rush-engine.ts. Nikdy neklesne pod
+// WATER_FADE_MIN_OPACITY, ať zůstane viditelný a klikatelný — na 0
+// ho až dotáhne .animate-crab-submerge při skutečném úniku.
+const WATER_FADE_START_X = 55;
+const WATER_FADE_MIN_OPACITY = 0.4;
+
+function waterOpacity(x: number): number {
+  if (x <= WATER_FADE_START_X) return 1;
+  const progress = Math.min(1, (x - WATER_FADE_START_X) / (100 - WATER_FADE_START_X));
+  return 1 - progress * (1 - WATER_FADE_MIN_OPACITY);
+}
+
 function Badge({ children }: { children: React.ReactNode }) {
   return (
     <span className="rounded border border-amber-300/40 bg-[#0e3347]/80 px-2.5 py-1 font-serif text-xs text-cyan-100/90 shadow-sm sm:text-sm">
@@ -265,7 +279,7 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
                 type="button"
                 onClick={(event) => handleCrabClick(crab.id, event)}
                 aria-label={`Krab, zbývá ${crab.hp} z ${crab.maxHp} zásahů`}
-                style={{ left: `${crab.x}%`, top: `${laneY(crab.id)}%` }}
+                style={{ left: `${crab.x}%`, top: `${laneY(crab.id)}%`, opacity: waterOpacity(crab.x) }}
                 className={`absolute flex h-11 w-16 -translate-y-1/2 touch-manipulation items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
                   crab.escaping ? "pointer-events-none animate-crab-submerge" : ""
                 }`}
