@@ -84,11 +84,46 @@ const componentSource = readFileSync(
   "utf8"
 );
 
-test("CharacterCallout.tsx: nikde neukládá dismiss stav do localStorage/sessionStorage", () => {
+test("CharacterCallout.tsx: nesahá na sessionStorage přímo — perzistence žije jen v professor-state.ts", () => {
   assert.doesNotMatch(componentSource, /(local|session)Storage\s*\.\s*(set|get|remove)Item/);
 });
 
 test("CharacterCallout.tsx: sponsored odkaz má rel='noopener noreferrer sponsored' a target='_blank'", () => {
   assert.match(componentSource, /rel="noopener noreferrer sponsored"/);
   assert.match(componentSource, /target="_blank"/);
+});
+
+test("CharacterCallout.tsx: zavření profesora zavolá rememberProfessorMinimized a přejde do 'minimized'", () => {
+  const closeHandler = /function handleClose\(\)[\s\S]*?\n  \}/.exec(componentSource)?.[0] ?? "";
+  assert.match(closeHandler, /character === "professor"/);
+  assert.match(closeHandler, /rememberProfessorMinimized\(pathname\)/);
+  assert.match(closeHandler, /setPhase\("minimized"\)/);
+});
+
+test("CharacterCallout.tsx: zavření prodejce NEvolá rememberProfessorMinimized (žádné '?' u prodejce)", () => {
+  const closeHandler = /function handleClose\(\)[\s\S]*?\n  \}/.exec(componentSource)?.[0] ?? "";
+  // Větev pro "else" (prodejce) končí `setPhase("idle")`, ne "minimized".
+  const sellerBranch = closeHandler.split("return;")[1] ?? "";
+  assert.doesNotMatch(sellerBranch, /rememberProfessorMinimized/);
+  assert.match(sellerBranch, /setPhase\("idle"\)/);
+});
+
+test("CharacterCallout.tsx: minimalizovaný stav vykreslí tlačítko '?' s accessibility labelem", () => {
+  const minimizedBranch = /if \(phase === "minimized"\)[\s\S]*?\n  \}/.exec(componentSource)?.[0] ?? "";
+  assert.match(minimizedBranch, /aria-label="Otevřít profesora"/);
+  assert.match(minimizedBranch, />\s*\?\s*</);
+});
+
+test("CharacterCallout.tsx: klik na '?' (handleReopen) rovnou nastaví 'entering'/'open', bez čekání na DELAY_MS", () => {
+  const reopenHandler = /function handleReopen\(\)[\s\S]*?\n  \}/.exec(componentSource)?.[0] ?? "";
+  assert.match(reopenHandler, /setPhase\("entering"\)/);
+  assert.doesNotMatch(reopenHandler, /setTimeout/);
+});
+
+test("CharacterCallout.tsx: mount efekt kontroluje isProfessorMinimizedForRoute PŘED naplánováním auto-show timeru (refresh respektuje minimized)", () => {
+  const mountEffect = componentSource.split("if (!isCharacterCalloutRoute(pathname)) return;")[1]?.split("[mounted, pathname]")[0] ?? "";
+  const minimizedCheckIndex = mountEffect.indexOf("isProfessorMinimizedForRoute(pathname)");
+  const timerIndex = mountEffect.indexOf("window.setTimeout");
+  assert.ok(minimizedCheckIndex !== -1 && timerIndex !== -1, "expected both minimized check and timer scheduling in mount effect");
+  assert.ok(minimizedCheckIndex < timerIndex, "minimized check must run before the auto-show timer is scheduled");
 });
