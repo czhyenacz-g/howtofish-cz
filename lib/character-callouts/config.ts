@@ -25,7 +25,7 @@ export const PROFESSOR_MESSAGES: Record<string, CharacterMessage> = {
     message: "Bossové skrývají spoustu tajemství. Pokud víš, jak některého vyvolat nebo porazit, pomoz mi to zapsat.",
   },
   "/lokace": {
-    message: "Ostrovy ještě nejsou celé prozkoumané. Znáš místo, které nám v mapování chybí?",
+    message: "Ostrovy ještě nejsou celé prozkoumané.\n\nZnáš místo, které nám v mapování chybí?",
   },
   "/navody": {
     message: "Některé věci hra nevysvětlí. Jestli znáš dobrý trik, pomoz mi ho přidat do návodů.",
