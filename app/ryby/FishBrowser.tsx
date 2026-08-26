@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import type { FishCategory, FishEntry } from "../../data/fish";
 import type { CommunityCatch, FishSuggestion, PromotionEntry } from "../../lib/universal-content-api/types";
 import AddFishSuggestionCard from "../components/AddFishSuggestionCard";
-import AdPlaceholder from "../components/AdPlaceholder";
 import AffiliateBanner from "../components/AffiliateBanner";
 import FishCard from "../components/FishCard";
 import FishSuggestionCard from "../components/FishSuggestionCard";
@@ -76,13 +75,13 @@ export default function FishBrowser({
         ))}
       </div>
 
-      <div className="mt-6">
-        {bannerPromotion?.imageUrl ? (
+      {/* Bez aktivní banner promotion se tu nic nezobrazuje — žádný
+          "Reklamní prostor" placeholder, viz zadání. */}
+      {bannerPromotion?.imageUrl && (
+        <div className="mt-6">
           <AffiliateBanner imageSrc={bannerPromotion.imageUrl} href={bannerPromotion.href} title={bannerPromotion.title} />
-        ) : (
-          <AdPlaceholder />
-        )}
-      </div>
+        </div>
+      )}
 
       {filtered.length === 0 && (
         <p className="mt-10 text-center text-cyan-100/60">
