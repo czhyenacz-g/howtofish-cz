@@ -63,6 +63,11 @@ export const MAX_VERTICAL_SHIFTS = VERTICAL_SHIFT_CHECKPOINTS.length;
 export const VERTICAL_SHIFT_MAX_DELTA = 15;
 export const VERTICAL_LERP_SPEED = 40; // % výšky trati za sekundu, jak rychle se y blíží k yTarget
 
+// Malá šance, že se krab "uhne" nahoru/dolů hned po najetí myší — navíc
+// k pravidelným posunům na checkpointech výše (viz applyHoverDodge),
+// nepočítá se do verticalShiftsUsed ani ho neomezuje.
+export const HOVER_DODGE_CHANCE = 0.05;
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -267,6 +272,34 @@ export function applyMiss(state: GameState): GameState {
   if (state.status !== "playing") return state;
   if (state.combo === 0) return state;
   return { ...state, combo: 0 };
+}
+
+/**
+ * Najetí myší na kraba — s malou šancí (HOVER_DODGE_CHANCE) se krab
+ * "uhne" na nový vertikální cíl, v omezené výchylce od aktuální dráhy
+ * (stejný rozsah jako VERTICAL_SHIFT_MAX_DELTA), ořezaný na povolené
+ * pásmo. Nastaví jen `yTarget` — samotné plynulé přiblížení (lerp) dál
+ * řeší tickMovement stejně jako u posunů na checkpointech, žádný
+ * teleport. Nepočítá se do verticalShiftsUsed (nezávislý mechanismus,
+ * neomezuje ani nevyčerpává pravidelné posuny).
+ */
+export function applyHoverDodge(
+  state: GameState,
+  crabId: number,
+  rand: () => number = Math.random
+): GameState {
+  if (state.status !== "playing") return state;
+  const crab = state.crabs.find((c) => c.id === crabId);
+  if (!crab || crab.dying || crab.escaping) return state;
+  if (rand() >= HOVER_DODGE_CHANCE) return state;
+
+  const delta = (rand() * 2 - 1) * VERTICAL_SHIFT_MAX_DELTA;
+  const yTarget = clamp(crab.y + delta, CRAB_Y_MIN, CRAB_Y_MAX);
+
+  return {
+    ...state,
+    crabs: state.crabs.map((c) => (c.id === crabId ? { ...c, yTarget } : c)),
+  };
 }
 
 export function roundCompleteBonus(escapesThisRound: number): number {

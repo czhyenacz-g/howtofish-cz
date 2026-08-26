@@ -8,6 +8,7 @@ import { useCrunchSound } from "./useCrunchSound";
 import { saveScoreAction, type SaveScoreState } from "./save-score-action";
 import {
   applyHit,
+  applyHoverDodge,
   applyMiss,
   comboMultiplier,
   MAX_LIVES,
@@ -214,6 +215,11 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
     setGameState((prev) => applyMiss(prev));
   }
 
+  function handleCrabHover(crabId: number) {
+    if (gameState.status !== "playing") return;
+    setGameState((prev) => applyHoverDodge(prev, crabId));
+  }
+
   const multiplier = comboMultiplier(gameState.combo);
 
   return (
@@ -272,6 +278,7 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
                 key={crab.id}
                 type="button"
                 onClick={(event) => handleCrabClick(crab.id, event)}
+                onMouseEnter={() => handleCrabHover(crab.id)}
                 aria-label={`Krab, zbývá ${crab.hp} z ${crab.maxHp} zásahů`}
                 style={{ left: `${crab.x}%`, top: `${crab.y}%`, opacity: waterOpacity(crab.x) }}
                 className={`absolute flex h-11 w-16 -translate-y-1/2 touch-manipulation items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${

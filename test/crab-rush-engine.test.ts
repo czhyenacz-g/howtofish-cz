@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   applyHit,
+  applyHoverDodge,
   applyMiss,
   comboMultiplier,
   completeRound,
@@ -124,6 +125,53 @@ test("applyMiss: resetuje combo, nic jiného neovlivní", () => {
   state = applyMiss(state);
   assert.equal(state.combo, 0);
   assert.equal(state.score, 50);
+});
+
+test("applyHoverDodge: pod HOVER_DODGE_CHANCE (rand nižší) nastaví nový yTarget v omezené výchylce", () => {
+  let state = startGame();
+  state = { ...state, crabs: [crabAt({ id: 1, y: 50, yTarget: 50, verticalShiftsUsed: 1 })] };
+  const rolls = [0, 1]; // 1. volání: šance (0 < 0.05 -> triggeruje), 2. volání: směr výchylky (1 -> max kladná)
+  state = applyHoverDodge(state, 1, () => rolls.shift()!);
+  const crab = state.crabs[0];
+  assert.equal(crab.yTarget, Math.min(CRAB_Y_MAX, 50 + VERTICAL_SHIFT_MAX_DELTA));
+  // Nezávislý mechanismus — nekonzumuje/neomezuje pravidelné posuny.
+  assert.equal(crab.verticalShiftsUsed, 1);
+});
+
+test("applyHoverDodge: nad HOVER_DODGE_CHANCE nic nezmění (krab se neuhne)", () => {
+  let state = startGame();
+  state = { ...state, crabs: [crabAt({ id: 1, y: 50, yTarget: 50 })] };
+  const after = applyHoverDodge(state, 1, () => 0.99); // 0.99 >= HOVER_DODGE_CHANCE (0.05)
+  assert.equal(after.crabs[0].yTarget, 50);
+});
+
+test("applyHoverDodge: nový cíl je vždy ořezaný na CRAB_Y_MIN/CRAB_Y_MAX", () => {
+  let state = startGame();
+  state = { ...state, crabs: [crabAt({ id: 1, y: CRAB_Y_MIN + 2, yTarget: CRAB_Y_MIN + 2 })] };
+  const rolls = [0, 0]; // triggeruje, max záporná výchylka
+  state = applyHoverDodge(state, 1, () => rolls.shift()!);
+  assert.equal(state.crabs[0].yTarget, CRAB_Y_MIN);
+});
+
+test("applyHoverDodge: na umírajícího/potápějícího se/neexistujícího kraba nic nedělá", () => {
+  let state = startGame();
+  state = {
+    ...state,
+    crabs: [crabAt({ id: 1, dying: true, yTarget: 50 }), crabAt({ id: 2, escaping: true, yTarget: 50 })],
+  };
+  const before = state;
+  const afterDying = applyHoverDodge(state, 1, () => 0);
+  const afterEscaping = applyHoverDodge(state, 2, () => 0);
+  const afterMissing = applyHoverDodge(state, 999, () => 0);
+  assert.equal(afterDying, before);
+  assert.equal(afterEscaping, before);
+  assert.equal(afterMissing, before);
+});
+
+test("applyHoverDodge: mimo hru (status !== playing) nic nedělá", () => {
+  let state = { ...startGame(), status: "round-transition" as const, crabs: [crabAt({ id: 1, yTarget: 50 })] };
+  const after = applyHoverDodge(state, 1, () => 0);
+  assert.equal(after, state);
 });
 
 test("comboMultiplier: 0-4 => x1, 5-9 => x2, 10+ => x3", () => {
