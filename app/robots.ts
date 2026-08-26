@@ -1,19 +1,16 @@
 import type { MetadataRoute } from "next";
-import { SITE_LAUNCHED, SITE_URL } from "./config/site";
+import { SITE_URL } from "./config/site.ts";
 
+// Web je teď plně indexovatelný — jednotlivé technické/utilitní stránky
+// (Steam auth callbacky, "/*/navrhnout" formuláře) se z indexu drží pryč
+// přes vlastní `robots` meta na dané stránce (viz jejich page.tsx), ne
+// přes Disallow tady, ať je crawler i tak může navštívit a uvidí ten
+// meta tag. API routes nejsou SEO dokumenty, řešit netřeba.
 export default function robots(): MetadataRoute.Robots {
-  const disallow = ["/demo"];
-
-  // /ryby, /hra a /stream jsou disallow, dokud web není spuštěný — viz SITE_LAUNCHED.
-  if (!SITE_LAUNCHED) {
-    disallow.push("/ryby", "/hra", "/stream");
-  }
-
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow,
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

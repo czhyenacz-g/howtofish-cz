@@ -37,7 +37,9 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
-  alternates: { canonical: "/" },
+  // Žádný sitewide canonical default tady — každá stránka, která ho
+  // potřebuje jinak než "sama na sebe" (typicky jen `/`, viz
+  // app/page.tsx -> canonical "/ryby"), si ho nastavuje sama.
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
@@ -45,11 +47,14 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     locale: "cs_CZ",
     type: "website",
+    // Existující dynamický OG generátor (app/api/og), žádný nový
+    // statický obrázek — jednotlivé stránky si přebijí jen `images`
+    // (title/description se pro OG i Twitter automaticky doplní z
+    // vlastního title/description dané stránky).
+    images: [{ url: `/api/og?title=${encodeURIComponent(SITE_NAME)}`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
   },
   robots: {
     index: true,

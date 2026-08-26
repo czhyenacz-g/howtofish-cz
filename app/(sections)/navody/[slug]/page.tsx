@@ -21,6 +21,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: guide.title,
     description: guide.summary,
+    alternates: { canonical: `/navody/${guide.slug}` },
+    openGraph: {
+      description: guide.summary,
+      images: [{ url: `/api/og?title=${encodeURIComponent(guide.title)}`, width: 1200, height: 630 }],
+    },
   };
 }
 

@@ -4,9 +4,14 @@ import { getGuideEntries, getMyPendingGuides } from "../../../lib/universal-cont
 import AdSlot from "../../components/AdSlot";
 import NavodyBrowser from "./NavodyBrowser";
 
+const TITLE = "Návody";
+const DESCRIPTION = "České návody pro How to Fish — pro začátečníky i pokročilé, kurátorované i komunitní.";
+
 export const metadata: Metadata = {
-  title: "Návody",
-  description: "České návody pro How to Fish — pro začátečníky i pokročilé, kurátorované i komunitní.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/navody" },
+  openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
 };
 
 export default async function NavodyPage() {

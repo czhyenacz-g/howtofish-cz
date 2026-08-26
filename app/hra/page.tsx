@@ -6,10 +6,14 @@ import CrabRushGame from "./CrabRushGame";
 import Leaderboard from "./Leaderboard";
 import { GAME_SLUG } from "./evaluate-score-submission";
 
+const TITLE = "Krabí invaze";
+const DESCRIPTION = "Rychlá arkádová minihra Krabí invaze — zastav kraby dřív, než utečou do moře, a dostaň se do žebříčku.";
+
 export const metadata: Metadata = {
-  title: "Krabí invaze",
-  description:
-    "Rychlá arkádová minihra Krabí invaze — zastav kraby dřív, než utečou do moře, a dostaň se do žebříčku.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/hra" },
+  openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
 };
 
 export default async function HraPage() {

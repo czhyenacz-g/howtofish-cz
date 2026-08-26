@@ -4,9 +4,14 @@ import { getBossEntries, getMyPendingBosses } from "../../../lib/universal-conte
 import AdSlot from "../../components/AdSlot";
 import BossoveBrowser from "./BossoveBrowser";
 
+const TITLE = "Bossové";
+const DESCRIPTION = "Přehled bossů v How to Fish a taktiky na jejich poražení — kurátorovaný přehled i komunitní doplňky.";
+
 export const metadata: Metadata = {
-  title: "Bossové",
-  description: "Přehled bossů v How to Fish a taktiky na jejich poražení — kurátorovaný přehled i komunitní doplňky.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/bossove" },
+  openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
 };
 
 export default async function BossovePage() {

@@ -1,74 +1,28 @@
-import Image from "next/image";
-import OceanWaves from "./components/OceanWaves";
-import { DISCLAIMER, LAUNCH_DATE_LABEL, SITE_NAME, STEAM_URL } from "./config/site";
+import type { Metadata } from "next";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import FeedbackCallout from "./components/FeedbackCallout";
+import RybyPageContent from "./ryby/RybyPageContent";
+import { getCurrentUser } from "../lib/auth/current-user";
 
-export default function Home() {
+// Homepage zobrazuje stejný obsah jako `/ryby` (jeden zdroj, viz
+// RybyPageContent) — SEO canonical vždy míří na `/ryby`, `/` je jen
+// alternativní vstupní bod na stejnou stránku. Title/description/OG se
+// jinak dědí z root layoutu (SITE_TITLE/SITE_DESCRIPTION).
+export const metadata: Metadata = {
+  alternates: { canonical: "/ryby" },
+};
+
+export default async function Home() {
+  const user = await getCurrentUser();
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-b from-[#0a2438] via-[#0e4f66] to-[#146b78] text-white">
-      {/* sluníčko */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-10 h-32 w-32 -translate-x-1/2 rounded-full bg-amber-300/70 blur-2xl sm:top-14 sm:h-44 sm:w-44"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-14 h-16 w-16 -translate-x-1/2 rounded-full bg-amber-200 sm:top-20 sm:h-24 sm:w-24"
-      />
-
-      {/* ostrůvek v pozadí — skoro neznatelný drift */}
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 1440 220"
-        preserveAspectRatio="none"
-        className="animate-island-drift pointer-events-none absolute inset-x-0 bottom-0 h-40 w-full opacity-40 sm:h-56"
-      >
-        <polygon points="1000,140 1090,55 1180,140" fill="#e8cfa0" />
-        <polygon points="1075,90 1090,55 1095,90" fill="#2f6b4f" />
-        <polygon points="1085,80 1090,55 1105,85" fill="#2f6b4f" />
-      </svg>
-
-      {/* vlny — přední vrstva houpe jemně rychleji, zadní pomalý drift */}
-      <OceanWaves className="absolute inset-x-0 bottom-0 h-36 w-full sm:h-52" />
-
-      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-16 text-center sm:py-20">
-        <h1 className="w-full max-w-[320px] sm:max-w-[420px] md:max-w-[520px]">
-          <Image
-            src="/images/howtofish-main-logo.png"
-            alt={SITE_NAME}
-            width={1536}
-            height={1024}
-            priority
-            sizes="(max-width: 640px) 320px, (max-width: 768px) 420px, 520px"
-            className="h-auto w-full rounded-2xl shadow-2xl shadow-black/40"
-          />
-        </h1>
-
-        <p className="mt-6 max-w-md text-lg text-cyan-100/90 sm:text-xl">
-          Česká encyklopedie ryb a úlovků ze hry How to Fish.
-        </p>
-
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-amber-400/60 bg-amber-400/10 px-4 py-2 font-serif text-sm uppercase tracking-wide text-amber-300 sm:text-base">
-          Spouštíme {LAUNCH_DATE_LABEL}
-        </div>
-
-        <p className="mt-6 max-w-sm text-sm text-cyan-100/70 sm:text-base">
-          Připravujeme české návody, přehled ryb, úlovků, lokací a dalších
-          informací ze hry How to Fish.
-        </p>
-
-        <a
-          href={STEAM_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-10 inline-flex items-center gap-2 rounded-full bg-amber-400 px-8 py-4 font-serif text-base text-gray-900 shadow-lg shadow-amber-400/30 transition hover:bg-amber-300 sm:text-lg"
-        >
-          How to Fish na Steamu
-        </a>
+    <div className="flex min-h-screen flex-col">
+      <Header user={user} />
+      <main className="flex-1">
+        <RybyPageContent />
       </main>
-
-      <footer className="relative z-10 px-4 pb-6 text-center text-[11px] leading-relaxed text-cyan-100/40 sm:text-xs">
-        {DISCLAIMER}
-      </footer>
+      <FeedbackCallout user={user ? { nickname: user.nickname } : null} />
+      <Footer />
     </div>
   );
 }

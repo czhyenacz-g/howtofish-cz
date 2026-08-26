@@ -3,9 +3,8 @@ import Link from "next/link";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import FishSuggestionForm from "./FishSuggestionForm";
 
-// Utilitní stránka bez SEO hodnoty — noindex natrvalo, bez ohledu na
-// SITE_LAUNCHED (na rozdíl od zbytku /ryby, kde noindex platí jen
-// před spuštěním webu).
+// Utilitní stránka bez SEO hodnoty — noindex natrvalo (stejně jako
+// ostatní "/navrhnout" formuláře).
 export const metadata: Metadata = {
   title: "Navrhnout nový úlovek",
   robots: {

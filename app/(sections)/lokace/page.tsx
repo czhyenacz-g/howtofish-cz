@@ -4,9 +4,14 @@ import { getLocationEntries, getMyPendingLocations } from "../../../lib/universa
 import AdSlot from "../../components/AdSlot";
 import LokaceBrowser from "./LokaceBrowser";
 
+const TITLE = "Lokace";
+const DESCRIPTION = "Mapy a popisy lovišť v How to Fish — kurátorovaný přehled i komunitní doplňky.";
+
 export const metadata: Metadata = {
-  title: "Lokace",
-  description: "Mapy a popisy lovišť v How to Fish — kurátorovaný přehled i komunitní doplňky.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/lokace" },
+  openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
 };
 
 export default async function LokacePage() {

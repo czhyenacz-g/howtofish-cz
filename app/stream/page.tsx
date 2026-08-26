@@ -3,9 +3,14 @@ import { getLiveStreams } from "../../lib/streams/get-live-streams";
 import { getActivePromotionForRoute } from "../../lib/universal-content-api/promotions";
 import StreamBrowser from "./StreamBrowser";
 
+const TITLE = "Kdo právě hraje How to Fish?";
+const DESCRIPTION = "Živé streamy How to Fish z Twitch, YouTube a Kick na jednom místě.";
+
 export const metadata: Metadata = {
-  title: "Kdo právě hraje How to Fish?",
-  description: "Živé streamy How to Fish z Twitch, YouTube a Kick na jednom místě.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/stream" },
+  openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
 };
 
 // Stránka je ISR cachovaná stejně jako jednotlivé fetch() v provider

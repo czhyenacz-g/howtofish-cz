@@ -3,9 +3,14 @@ import { getSteamAchievements } from "../../../lib/steam/achievements";
 import AdSlot from "../../components/AdSlot";
 import AchievementBrowser from "./AchievementBrowser";
 
+const TITLE = "Achievementy";
+const DESCRIPTION = "Seznam achievementů v How to Fish a jak je splnit.";
+
 export const metadata: Metadata = {
-  title: "Achievementy",
-  description: "Seznam achievementů v How to Fish a jak je splnit.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/achievementy" },
+  openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
 };
 
 export default async function AchievementyPage() {

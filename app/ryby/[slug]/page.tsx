@@ -23,9 +23,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const entry = fishEntries.find((f) => f.slug === slug);
   if (!entry) return {};
 
+  const title = `${entry.name} – kde ho najít a jak ho chytit`;
+
   return {
-    title: `${entry.name} – kde ho najít a jak ho chytit`,
+    title,
     description: entry.shortDescription,
+    alternates: { canonical: `/ryby/${entry.slug}` },
+    openGraph: {
+      description: entry.shortDescription,
+      images: [{ url: `/api/og?title=${encodeURIComponent(entry.name)}&sub=${encodeURIComponent("How to Fish CZ")}`, width: 1200, height: 630 }],
+    },
   };
 }
 

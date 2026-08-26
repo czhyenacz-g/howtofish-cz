@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { DISCLAIMER, NAV_LINKS, SITE_NAME } from "../config/site";
+import { buildFeedbackEmail } from "./feedback-email";
 import OceanWaves from "./OceanWaves";
+
+const SECONDARY_LINKS = [
+  { href: "/o-hre", label: "O hře" },
+  { href: "/pravni-informace", label: "Právní informace" },
+  { href: "/ochrana-soukromi", label: "Ochrana soukromí" },
+] as const;
 
 export default function Footer({ basePath = "" }: { basePath?: string }) {
   return (
@@ -16,6 +23,22 @@ export default function Footer({ basePath = "" }: { basePath?: string }) {
                 </Link>
               </li>
             ))}
+          </ul>
+        </nav>
+        <nav aria-label="Doplňkové odkazy v patičce" className="mt-3">
+          <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
+            {SECONDARY_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link href={`${basePath}${link.href}`} className="underline hover:text-amber-400">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <a href={`mailto:${buildFeedbackEmail()}`} className="underline hover:text-amber-400">
+                Kontakt
+              </a>
+            </li>
           </ul>
         </nav>
         <p className="mt-6 font-serif text-xs text-gray-500">

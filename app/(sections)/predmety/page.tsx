@@ -4,9 +4,14 @@ import { getItemEntries, getMyPendingItems } from "../../../lib/universal-conten
 import AdSlot from "../../components/AdSlot";
 import PredmetyBrowser from "./PredmetyBrowser";
 
+const TITLE = "Předměty";
+const DESCRIPTION = "Vybavení, návnady a upgrady v How to Fish — kurátorovaný přehled i komunitní doplňky.";
+
 export const metadata: Metadata = {
-  title: "Předměty",
-  description: "Vybavení, návnady a upgrady v How to Fish — kurátorovaný přehled i komunitní doplňky.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/predmety" },
+  openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
 };
 
 export default async function PredmetyPage() {

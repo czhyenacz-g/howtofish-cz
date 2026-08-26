@@ -1,23 +1,12 @@
-import type { Metadata } from "next";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import FeedbackCallout from "../components/FeedbackCallout";
-import { SITE_LAUNCHED } from "../config/site";
 import { getCurrentUser } from "../../lib/auth/current-user";
 
-// Sdílený layout pro zatím prázdné sekce navigace (Návody, Předměty,
-// Bossové, Lokace, Achievementy, Aktualizace) — route group, aby se
-// Header/Footer/SITE_LAUNCHED gating nekopírovaly do šesti skoro
-// identických layout.tsx souborů. Stejný mechanismus jako /ryby.
-export const metadata: Metadata = SITE_LAUNCHED
-  ? {}
-  : {
-      robots: {
-        index: false,
-        follow: false,
-      },
-    };
-
+// Sdílený layout pro sekce navigace (Návody, Předměty, Bossové, Lokace,
+// Achievementy, Aktualizace) i pro /o-hre a právní stránky — route
+// group, aby se Header/Footer nekopírovaly do skoro identických
+// layout.tsx souborů. Stejný mechanismus jako /ryby.
 export default async function SectionsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {

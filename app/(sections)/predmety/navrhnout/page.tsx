@@ -5,8 +5,8 @@ import CorrectionForm from "../../../components/community/CorrectionForm";
 import { submitItemCorrectionAction } from "./actions";
 import ItemSuggestionForm from "./ItemSuggestionForm";
 
-// Utilitní stránka bez SEO hodnoty — noindex natrvalo, bez ohledu na
-// SITE_LAUNCHED (stejně jako /ryby/navrhnout).
+// Utilitní stránka bez SEO hodnoty — noindex natrvalo (stejně jako
+// ostatní "/navrhnout" formuláře a /ryby/navrhnout).
 export const metadata: Metadata = {
   title: "Navrhnout nový předmět",
   robots: { index: false, follow: false },

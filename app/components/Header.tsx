@@ -36,11 +36,8 @@ const HRA_LINK = { href: "/hra", label: "Hra" } as const;
 
 // /stream je jedna z nejdůležitějších dynamických funkcí webu, takže
 // "Živě" chceme hned za logem — i když v NAV_LINKS (a v patičce, kde
-// pořadí měnit nechceme) má Ryby jiné pořadové místo. "Hra" a "Živě"
-// jsou od začátku na finálních top-level URL (/hra, /stream), takže
-// patří do navigace jen tam, kde Header běží bez basePath (skutečné
-// stránky), ne pod /demo (kde by ukazovaly na neexistující
-// /demo/hra nebo /demo/stream).
+// pořadí měnit nechceme) má Ryby jiné pořadové místo. "Hra" se pro
+// stejný důvod přidává na konec.
 function buildLinks(basePath: string) {
   if (basePath !== "") return NAV_LINKS;
   const ryby = NAV_LINKS.find((link) => link.href === "/ryby");

@@ -1,20 +1,7 @@
-import type { Metadata } from "next";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import FeedbackCallout from "../components/FeedbackCallout";
-import { SITE_LAUNCHED } from "../config/site";
 import { getCurrentUser } from "../../lib/auth/current-user";
-
-// Stejný mechanismus jako /ryby a /hra — dokud web není spuštěný,
-// /stream je noindex,nofollow. Viz SITE_LAUNCHED v app/config/site.ts.
-export const metadata: Metadata = SITE_LAUNCHED
-  ? {}
-  : {
-      robots: {
-        index: false,
-        follow: false,
-      },
-    };
 
 export default async function StreamLayout({
   children,

@@ -34,6 +34,18 @@ const nextConfig: NextConfig = {
         destination: "https://howtofish.cz/:path*",
         permanent: true,
       },
+      // Bývalý pre-release /demo prostor byl smazán (viz CLAUDE.md) —
+      // hlavní obsah je teď rovnou na /ryby.
+      {
+        source: "/demo",
+        destination: "/ryby",
+        permanent: true,
+      },
+      {
+        source: "/demo/:path*",
+        destination: "/ryby",
+        permanent: true,
+      },
     ];
   },
 };
