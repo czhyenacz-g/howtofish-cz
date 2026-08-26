@@ -9,9 +9,10 @@ export type ResolvedCallout = CharacterMessage & {
   // Prodejce dostane sponsored jen když má skutečný href — bez odkazu
   // není co "partnersky" označovat (viz zadání).
   isSponsored: boolean;
-  // true jen u promotion s body_html (sanitizováno na UCA straně před
-  // uložením) — vykresluje se přes dangerouslySetInnerHTML, viz
-  // CharacterCallout.tsx. Statické zprávy (config.ts) jsou vždy plain text.
+  // true pro promotion s body_html (sanitizováno na UCA straně před
+  // uložením) NEBO pro statickou zprávu (config.ts), která má pár
+  // hardcoded HTML tagů (např. tučné jméno) — obojí se vykresluje přes
+  // dangerouslySetInnerHTML, viz CharacterCallout.tsx.
   isHtml?: boolean;
 };
 

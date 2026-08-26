@@ -9,6 +9,11 @@ export type CharacterMessage = {
   // Duplicitní by bylo vůči navigaci a obsahu stránky (viz zadání).
   href?: string;
   linkLabel?: string;
+  // true jen pro pár slov (např. tučné jméno postavy) uvnitř JINAK
+  // ručně psaného textu tady v repu (ne runtime/uživatelský vstup) —
+  // proto je dangerouslySetInnerHTML v CharacterCallout.tsx pro tenhle
+  // případ bezpečné stejně jako pro sanitizované body_html z UCA.
+  isHtml?: boolean;
 };
 
 export const PROFESSOR_MESSAGES: Record<string, CharacterMessage> = {
@@ -45,11 +50,13 @@ export const PROFESSOR_MESSAGES: Record<string, CharacterMessage> = {
   // zadání zachované beze změny: jmenuje se Profesor, není profesor Oak
   // (lehký vtip), taky tu uvízl, katalogizuje ryby/předměty/bossy/lokace/
   // návody, a chce k tomu pomoc hráče.
-  // \n\n odděluje dva odstavce (max 2-3 věty za sebou, viz zadání) —
-  // CharacterCallout.tsx renderuje plain-text zprávy s whitespace-pre-line.
+  // \n\n odděluje odstavce (max 2-3 věty za sebou, viz zadání) —
+  // CharacterCallout.tsx renderuje s whitespace-pre-line (plain i html
+  // varianta). isHtml: true jen kvůli <strong>Profesore</strong> níž.
   "/o-hre": {
     message:
-      "Říkej mi Profesore. Ne, nejsem profesor Oak — to je z úplně jiné hry (a jiného rybníka). Taky jsem tu uvízl, na těchhle ostrovech, a snažím se dát dohromady katalog všeho, co tu najdeme — ryby, předměty, bossy, lokace i návody.\n\nS tím ale potřebuju tvoji pomoc. Čím víc toho spolu zapíšeme, tím větší šanci budou mít další hráči, co sem teprve dorazí.",
+      "Říkej mi <strong>Profesore</strong>.\n\nNe, nejsem profesor Oak — to je z úplně jiné hry (a jiného rybníka). Taky jsem tu uvízl, na těchhle ostrovech, a snažím se dát dohromady katalog všeho, co tu najdeme — ryby, předměty, bossy, lokace i návody.\n\nS tím ale potřebuju tvoji pomoc. Čím víc toho spolu zapíšeme, tím větší šanci budou mít další hráči, co sem teprve dorazí.",
+    isHtml: true,
   },
 };
 

@@ -221,10 +221,13 @@ export default function CharacterCallout({
     >
       <div className="pointer-events-auto max-w-[240px] rounded-2xl border-2 border-[#3a2a1a] bg-[#f4ead9] p-3 font-serif text-sm leading-snug text-[#3a2a1a] shadow-xl sm:mb-20 sm:max-w-[360px] sm:p-4">
         {callout.isHtml ? (
-          // body_html je sanitizované už na UCA straně před uložením
-          // (viz HtmlSanitizer.php) — admin-authored obsah, ne uživatelský
-          // vstup, proto je dangerouslySetInnerHTML tady přijatelné.
-          <p dangerouslySetInnerHTML={{ __html: callout.message }} />
+          // HTML jen ze dvou důvěryhodných zdrojů: sanitizované body_html
+          // z UCA (viz HtmlSanitizer.php, admin-authored, ne uživatelský
+          // vstup) nebo ručně psané tagy přímo v config.ts (žádný runtime
+          // vstup) — dangerouslySetInnerHTML je proto v obou případech
+          // bezpečné. whitespace-pre-line: \n\n v datech se má vykreslit
+          // jako odstavcová mezera stejně jako u plain-text varianty níž.
+          <p className="whitespace-pre-line" dangerouslySetInnerHTML={{ __html: callout.message }} />
         ) : (
           // whitespace-pre-line: \n\n v datech (config.ts) se má vykreslit
           // jako odstavcová mezera — texty postav mají mít max 2-3 věty za

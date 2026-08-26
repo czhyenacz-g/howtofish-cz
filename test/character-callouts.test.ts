@@ -327,15 +327,28 @@ test("PROFESSOR_MESSAGES['/o-hre']: obsahuje představení (jméno Profesor, nen
   assert.equal(callout.linkLabel, undefined);
 });
 
-test("PROFESSOR_MESSAGES['/o-hre']: rozdělené na odstavce po max 2-3 větách, 'S tím ale potřebuju...' začíná novým odstavcem", () => {
+test("PROFESSOR_MESSAGES['/o-hre']: rozdělené na odstavce po max 2-3 větách, každý začíná na svém místě", () => {
   const callout = resolveCharacterCallout("/o-hre", "professor");
   const paragraphs = callout.message.split("\n\n");
-  assert.equal(paragraphs.length, 2, "očekávány přesně 2 odstavce");
+  assert.equal(paragraphs.length, 3, "očekávány přesně 3 odstavce");
   for (const paragraph of paragraphs) {
-    const sentenceCount = (paragraph.match(/[.!?]+(?=\s|$)/g) ?? []).length;
+    const sentenceCount = (paragraph.replace(/<[^>]+>/g, "").match(/[.!?]+(?=\s|$)/g) ?? []).length;
     assert.ok(sentenceCount <= 3, `odstavec má ${sentenceCount} vět, čekáno max 3: "${paragraph}"`);
   }
-  assert.match(paragraphs[1], /^S tím ale potřebuju tvoji pomoc\./);
+  assert.match(paragraphs[0], /^Říkej mi <strong>Profesore<\/strong>\.$/);
+  assert.match(paragraphs[1], /^Ne, nejsem profesor Oak/);
+  assert.match(paragraphs[2], /^S tím ale potřebuju tvoji pomoc\./);
+});
+
+test("PROFESSOR_MESSAGES['/o-hre']: 'Profesore' je tučně (isHtml) — jediná statická profesorská zpráva s HTML", () => {
+  const callout = resolveCharacterCallout("/o-hre", "professor");
+  assert.equal(callout.isHtml, true);
+  assert.match(callout.message, /<strong>Profesore<\/strong>/);
+
+  for (const pathname of ["/ryby", "/predmety", "/bossove", "/lokace", "/navody", "/achievementy", "/stream", "/hra"]) {
+    const other = resolveCharacterCallout(pathname, "professor");
+    assert.notEqual(other.isHtml, true, `${pathname}: neočekávané isHtml`);
+  }
 });
 
 test("CharacterCallout.tsx: plain-text zprávy se renderují s whitespace-pre-line (\\n\\n v datech = odstavcová mezera)", () => {
