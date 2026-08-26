@@ -25,6 +25,12 @@ export function isCharacterCalloutRoute(pathname: string): boolean {
   return EXACT_ROUTES.has(pathname) || FISH_DETAIL_PATTERN.test(pathname);
 }
 
+// Prodejce (komerční callout) se na /hra nikdy nezobrazuje — během
+// hraní minihry by rušil. Profesor tam zůstává povolený.
+export function isSellerAllowedOnRoute(pathname: string): boolean {
+  return pathname !== "/hra";
+}
+
 function resolveProfessorMessage(pathname: string): CharacterMessage {
   if (FISH_DETAIL_PATTERN.test(pathname)) return PROFESSOR_MESSAGES["/ryby/[slug]"];
   return PROFESSOR_MESSAGES[pathname] ?? PROFESSOR_MESSAGES["/ryby"];

@@ -10,6 +10,7 @@ import {
 } from "../../lib/character-callouts/professor-state";
 import {
   isCharacterCalloutRoute,
+  isSellerAllowedOnRoute,
   resolveCharacterCallout,
   resolvePromotionCallout,
   type CharacterId,
@@ -78,7 +79,8 @@ export default function CharacterCallout({
       return;
     }
 
-    const picked: CharacterId = Math.random() < 0.5 ? "professor" : "seller";
+    const picked: CharacterId =
+      isSellerAllowedOnRoute(pathname) && Math.random() < 0.5 ? "seller" : "professor";
     setCharacter(picked);
 
     const showTimer = window.setTimeout(() => {

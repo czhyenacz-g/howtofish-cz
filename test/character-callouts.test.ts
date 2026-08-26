@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
   isCharacterCalloutRoute,
+  isSellerAllowedOnRoute,
   resolveCharacterCallout,
   resolvePromotionCallout,
 } from "../lib/character-callouts/resolve-callout.ts";
@@ -57,6 +58,13 @@ test("isCharacterCalloutRoute: formulářové /navrhnout routes jsou vyloučené
 test("isCharacterCalloutRoute: /demo je vyloučené", () => {
   assert.equal(isCharacterCalloutRoute("/demo"), false);
   assert.equal(isCharacterCalloutRoute("/demo/ryby"), false);
+});
+
+test("isSellerAllowedOnRoute: prodejce je vyloučený na /hra, jinde povolený", () => {
+  assert.equal(isSellerAllowedOnRoute("/hra"), false);
+  assert.equal(isSellerAllowedOnRoute("/ryby"), true);
+  assert.equal(isSellerAllowedOnRoute("/ryby/spider-crab"), true);
+  assert.equal(isSellerAllowedOnRoute("/stream"), true);
 });
 
 test("isCharacterCalloutRoute: homepage a utility routes jsou vyloučené", () => {
