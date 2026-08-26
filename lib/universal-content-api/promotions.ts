@@ -34,9 +34,12 @@ function mapRecordToPromotion(record: UcaRecord): PromotionEntry | null {
   const imageUrl = media?.public_url;
   const href = typeof data.href === "string" && data.href ? data.href : undefined;
 
-  // Banner bez obrázku nebo bez cíle nedává smysl zobrazit — radši
-  // spadnout na AdPlaceholder fallback (viz AdSlot) než ukázat rozbitý banner.
-  if (placement === "banner" && (!imageUrl || !href)) return null;
+  // Banner bez obrázku nedává smysl zobrazit — radši spadnout na
+  // AdPlaceholder fallback (viz AdSlot) než ukázat rozbitý banner.
+  // Chybějící href je ale v pořádku (affiliate odkazy se doplňují
+  // později v adminu) — banner se pak zobrazí jen jako neklikací
+  // obrázek, viz AffiliateBanner.tsx.
+  if (placement === "banner" && !imageUrl) return null;
 
   const weightRaw = data.weight;
   const weight = typeof weightRaw === "number" && weightRaw > 0 ? weightRaw : 1;

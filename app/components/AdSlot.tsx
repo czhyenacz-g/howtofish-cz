@@ -9,7 +9,9 @@ import AffiliateBanner from "./AffiliateBanner";
 export default async function AdSlot({ pathname }: { pathname: string }) {
   const promotion = await getActivePromotionForRoute("banner", pathname).catch(() => null);
 
-  if (!promotion || !promotion.imageUrl || !promotion.href) {
+  // Affiliate href zatím nemusí existovat (viz zadání) — chybí jen
+  // placeholder nahradí obrázek samotný, ne odkaz na něj.
+  if (!promotion || !promotion.imageUrl) {
     return <AdPlaceholder />;
   }
 

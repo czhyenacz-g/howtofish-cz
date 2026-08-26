@@ -45,7 +45,7 @@ test("getActivePromotions: banner bez obrázku se přeskočí (nedává smysl zo
   );
 });
 
-test("getActivePromotions: banner bez href se přeskočí", async () => {
+test("getActivePromotions: banner bez href se NEpřeskočí — affiliate odkazy zatím nemusí existovat, zobrazí se jako neklikací", async () => {
   await withMockedFetch(
     async () =>
       jsonResponse(200, {
@@ -53,7 +53,10 @@ test("getActivePromotions: banner bez href se přeskočí", async () => {
       }),
     async () => {
       const promotions = await getActivePromotions("banner");
-      assert.equal(promotions.length, 0);
+      assert.equal(promotions.length, 1);
+      assert.equal(promotions[0].title, "No href");
+      assert.ok(promotions[0].imageUrl);
+      assert.equal(promotions[0].href, undefined);
     }
   );
 });

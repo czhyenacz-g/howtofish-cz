@@ -10,11 +10,20 @@ test("AdSlot.tsx: je Server Component (žádná 'use client' direktiva) — výb
   assert.doesNotMatch(firstLine, /^["']use client["']/);
 });
 
-test("AdSlot.tsx: renderuje AffiliateBanner jen s reálným obrázkem+odkazem, jinak AdPlaceholder", () => {
+test("AdSlot.tsx: AdPlaceholder je fallback jen pro chybějící obrázek, ne pro chybějící href", () => {
   assert.match(source, /AffiliateBanner/);
   assert.match(source, /AdPlaceholder/);
-  assert.match(source, /promotion\.imageUrl/);
-  assert.match(source, /promotion\.href/);
+
+  // Guard podmínka (if (!promotion || !promotion.imageUrl) return <AdPlaceholder />)
+  // nesmí obsahovat `promotion.href` — banner bez href se má renderovat
+  // normálně jako neklikací obrázek, ne spadnout do placeholderu.
+  const guardMatch = /if\s*\(([^)]*)\)\s*{\s*return <AdPlaceholder \/>;/.exec(source);
+  assert.ok(guardMatch, "nepodařilo se najít guard podmínku před <AdPlaceholder />");
+  assert.match(guardMatch[1], /promotion\.imageUrl/);
+  assert.doesNotMatch(guardMatch[1], /promotion\.href/);
+
+  // href se pořád předává dál do AffiliateBanner (teď jako volitelný prop).
+  assert.match(source, /href=\{promotion\.href\}/);
 });
 
 test("AdSlot.tsx: nepadá, když je UCA nedostupné (graceful fallback)", () => {
