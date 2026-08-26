@@ -13,3 +13,7 @@ test("CrabRushGame.tsx: najetí myší na kraba volá applyHoverDodge (šance na
   assert.match(source, /onMouseEnter=\{\(\) => handleCrabHover\(crab\.id\)\}/);
   assert.match(source, /setGameState\(\(prev\) => applyHoverDodge\(prev, crabId\)\)/);
 });
+
+test("CrabRushGame.tsx: kořenový element má select-none — rychlé klikání/tažení myší po ploše neoznačuje text", () => {
+  assert.match(source, /<div className="select-none">/);
+});

@@ -223,7 +223,9 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
   const multiplier = comboMultiplier(gameState.combo);
 
   return (
-    <div>
+    // select-none: rychlé klikání/tažení myší po herní ploše při honění
+    // krabů jinak snadno omylem označí okolní text (skóre, badge...).
+    <div className="select-none">
       <audio ref={gameOverAudioRef} src="/audio/catch-fail.mp3" preload="none" />
 
       <div className="flex flex-wrap items-center justify-center gap-2">
