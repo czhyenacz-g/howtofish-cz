@@ -117,6 +117,27 @@ describe("/demo neexistuje jako obsahová stránka", () => {
   });
 });
 
+describe("/aktualizace — placeholder zůstává mimo index/navigaci/sitemap", () => {
+  test("route stále existuje (nesmazáno)", () => {
+    assert.ok(existsSync(fileURLToPath(new URL("../app/(sections)/aktualizace/page.tsx", import.meta.url))));
+  });
+
+  test("má robots index:false, follow:false", () => {
+    const source = readSource("../app/(sections)/aktualizace/page.tsx");
+    assert.match(source, /index:\s*false/);
+    assert.match(source, /follow:\s*false/);
+  });
+
+  test("'Aktualizace' už není v hlavní navigaci (NAV_LINKS)", () => {
+    const source = readSource("../app/config/site.ts");
+    const navLinksBlock = /export const NAV_LINKS = \[[\s\S]*?\] as const;/.exec(source);
+    assert.ok(navLinksBlock, "NAV_LINKS blok nebyl v site.ts nalezen");
+    assert.ok(!navLinksBlock[0].includes("/aktualizace"), "NAV_LINKS pořád obsahuje /aktualizace");
+  });
+
+  // sitemap běhové ověření (ne jen zdrojový text) je v test/sitemap.test.ts.
+});
+
 describe("affiliate odkazy zachovávají sponsored rel", () => {
   test("AffiliateBanner.tsx používá rel='noopener noreferrer sponsored'", () => {
     const source = readSource("../app/components/AffiliateBanner.tsx");

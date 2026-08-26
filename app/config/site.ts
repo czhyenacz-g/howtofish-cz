@@ -13,6 +13,10 @@ export const DISCLAIMER =
 
 export const STEAM_URL = "https://store.steampowered.com/app/4001890/How_to_Fish/";
 
+// "Aktualizace" tu záměrně chybí — /aktualizace je zatím jen
+// placeholder (žádný reálný obsah), takže je noindex a mimo hlavní
+// navigaci, dokud nebude mít co ukázat. Route zůstává dostupná přímo
+// na URL, viz app/(sections)/aktualizace/page.tsx.
 export const NAV_LINKS = [
   { href: "/navody", label: "Návody" },
   { href: "/ryby", label: "Ryby" },
@@ -20,5 +24,4 @@ export const NAV_LINKS = [
   { href: "/bossove", label: "Bossové" },
   { href: "/lokace", label: "Lokace" },
   { href: "/achievementy", label: "Achievementy" },
-  { href: "/aktualizace", label: "Aktualizace" },
 ] as const;

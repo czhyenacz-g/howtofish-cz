@@ -22,6 +22,10 @@ describe("sitemap", () => {
     assert.ok(!urls.some((u) => u.includes("/navrhnout")));
   });
 
+  test("neobsahuje /aktualizace (zatím jen placeholder)", () => {
+    assert.ok(!urls.some((u) => u.endsWith("/aktualizace")));
+  });
+
   test("obsahuje hlavní sekce (predmety, bossove, lokace, navody, achievementy)", () => {
     for (const path of ["/predmety", "/bossove", "/lokace", "/navody", "/achievementy"]) {
       assert.ok(urls.some((u) => u.endsWith(path)), `chybí ${path}`);
