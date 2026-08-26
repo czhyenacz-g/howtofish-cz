@@ -5,8 +5,14 @@ import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import AmbientAudioToggle from "./components/AmbientAudioToggle";
 import CharacterCallout from "./components/CharacterCallout";
+import MultiplayerIslandTab from "./components/MultiplayerIslandTab";
 import { GOATCOUNTER_CODE } from "./config/analytics";
+import { getAssetById } from "../lib/universal-content-api/assets";
 import { getActivePromotions } from "../lib/universal-content-api/promotions";
+
+// UCA asset #45 ("multiplayer badge") — ručně vybraná grafika pro boční
+// vstup na Multiplayer ostrov, viz MultiplayerIslandTab.tsx.
+const MULTIPLAYER_ISLAND_TAB_ASSET_ID = 45;
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -71,12 +77,14 @@ export default async function RootLayout({
   // CharacterCallout.tsx pro proč se výběr podle route dělá až
   // client-side (usePathname() dostupné až po mountu).
   const sellerPromotions = await getActivePromotions("seller").catch(() => []);
+  const multiplayerIslandAsset = await getAssetById(MULTIPLAYER_ISLAND_TAB_ASSET_ID).catch(() => null);
 
   return (
     <html lang="cs" className={`${breeSerif.variable} ${inter.variable}`}>
       <body className="bg-gray-900 font-sans text-white antialiased">
         {children}
         <AmbientAudioToggle />
+        <MultiplayerIslandTab imageUrl={multiplayerIslandAsset?.imageUrl ?? null} />
         <CharacterCallout sellerPromotions={sellerPromotions} />
         <Analytics />
         {GOATCOUNTER_CODE && (

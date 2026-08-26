@@ -210,6 +210,11 @@ export default function CharacterCallout({
   return (
     <div
       aria-live="polite"
+      // Značka pro jiné fixed prvky (MultiplayerIslandTab), že je právě
+      // vysunutá postava — viz useCharacterCalloutOpen.ts. Přítomná po
+      // celou dobu entering/open/closing (ne jen "open"), protože i
+      // během přechodu postava zabírá vizuální prostor.
+      data-character-callout-open="true"
       className={`pointer-events-none fixed right-0 bottom-2 z-40 flex flex-col-reverse items-end gap-1 transition-transform ease-out sm:bottom-auto sm:top-1/2 sm:flex-row sm:items-end sm:gap-0 sm:-translate-y-1/2 ${
         visible ? "translate-x-0 duration-500" : "translate-x-[110%] duration-300"
       }`}

@@ -340,3 +340,7 @@ test("PROFESSOR_MESSAGES['/o-hre']: rozdělené na odstavce po max 2-3 větách,
 test("CharacterCallout.tsx: plain-text zprávy se renderují s whitespace-pre-line (\\n\\n v datech = odstavcová mezera)", () => {
   assert.match(componentSource, /<p className="whitespace-pre-line">\{callout\.message\}<\/p>/);
 });
+
+test("CharacterCallout.tsx: vysunutý stav (entering/open/closing) má data-character-callout-open=\"true\" — jiné fixed prvky (MultiplayerIslandTab) na něj reagují", () => {
+  assert.match(componentSource, /data-character-callout-open="true"/);
+});
