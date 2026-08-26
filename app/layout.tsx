@@ -60,6 +60,8 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  // Seznam Webmaster Tools — ověření vlastnictví domény.
+  other: { "seznam-wmt": "u8jWUBqNTvwQqaLxBP41XVTY31jVGxCf" },
 };
 
 export default async function RootLayout({
