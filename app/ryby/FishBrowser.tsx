@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import type { FishCategory, FishEntry } from "../../data/fish";
-import type { CommunityCatch, FishSuggestion } from "../../lib/universal-content-api/types";
+import type { CommunityCatch, FishSuggestion, PromotionEntry } from "../../lib/universal-content-api/types";
 import AddFishSuggestionCard from "../components/AddFishSuggestionCard";
 import AdPlaceholder from "../components/AdPlaceholder";
+import AffiliateBanner from "../components/AffiliateBanner";
 import FishCard from "../components/FishCard";
 import FishSuggestionCard from "../components/FishSuggestionCard";
 
@@ -22,10 +23,12 @@ export default function FishBrowser({
   fish,
   featuredCatches = {},
   suggestions = [],
+  bannerPromotion = null,
 }: {
   fish: FishEntry[];
   featuredCatches?: Record<string, CommunityCatch>;
   suggestions?: FishSuggestion[];
+  bannerPromotion?: PromotionEntry | null;
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | FishCategory>("all");
@@ -74,7 +77,11 @@ export default function FishBrowser({
       </div>
 
       <div className="mt-6">
-        <AdPlaceholder />
+        {bannerPromotion?.imageUrl && bannerPromotion.href ? (
+          <AffiliateBanner imageSrc={bannerPromotion.imageUrl} href={bannerPromotion.href} title={bannerPromotion.title} />
+        ) : (
+          <AdPlaceholder />
+        )}
       </div>
 
       {filtered.length === 0 && (

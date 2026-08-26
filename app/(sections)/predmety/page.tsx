@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getItemEntries, getMyPendingItems } from "../../../lib/universal-content-api/items";
-import AdPlaceholder from "../../components/AdPlaceholder";
+import AdSlot from "../../components/AdSlot";
 import PredmetyBrowser from "./PredmetyBrowser";
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default async function PredmetyPage() {
       </p>
 
       <div className="mt-6">
-        <AdPlaceholder />
+        <AdSlot pathname="/predmety" />
       </div>
 
       <div className="mt-8">

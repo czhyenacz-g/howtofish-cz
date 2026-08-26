@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getLiveStreams } from "../../lib/streams/get-live-streams";
+import { getActivePromotionForRoute } from "../../lib/universal-content-api/promotions";
 import StreamBrowser from "./StreamBrowser";
 
 export const metadata: Metadata = {
@@ -13,7 +14,10 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function StreamPage() {
-  const { streams, totalViewers, failedPlatforms, updatedAt } = await getLiveStreams();
+  const [{ streams, totalViewers, failedPlatforms, updatedAt }, bannerPromotion] = await Promise.all([
+    getLiveStreams(),
+    getActivePromotionForRoute("banner", "/stream").catch(() => null),
+  ]);
 
   return (
     <div className="bg-gradient-to-b from-[#0a2438] via-[#0e4f66] to-[#146b78] px-4 py-12 text-white">
@@ -32,6 +36,7 @@ export default async function StreamPage() {
           totalViewers={totalViewers}
           failedPlatforms={failedPlatforms}
           updatedAt={updatedAt}
+          bannerPromotion={bannerPromotion}
         />
       </div>
     </div>

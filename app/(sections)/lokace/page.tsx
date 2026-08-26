@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getLocationEntries, getMyPendingLocations } from "../../../lib/universal-content-api/locations";
-import AdPlaceholder from "../../components/AdPlaceholder";
+import AdSlot from "../../components/AdSlot";
 import LokaceBrowser from "./LokaceBrowser";
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default async function LokacePage() {
       </p>
 
       <div className="mt-6">
-        <AdPlaceholder />
+        <AdSlot pathname="/lokace" />
       </div>
 
       <div className="mt-8">

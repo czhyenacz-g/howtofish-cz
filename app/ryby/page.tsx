@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { fishEntries } from "../../data/fish";
 import { getCurrentUser } from "../../lib/auth/current-user";
 import { getApprovedCatchCovers } from "../../lib/universal-content-api/catches";
+import { getActivePromotionForRoute } from "../../lib/universal-content-api/promotions";
 import { getMyPendingSuggestions } from "../../lib/universal-content-api/suggestions";
 import FishBrowser from "./FishBrowser";
 
@@ -18,11 +19,15 @@ export default async function RybyPage() {
   // getApprovedCatchCovers) — ne jeden request na rybu. Předává se
   // celý CommunityCatch (ne jen URL), ať FishCard může zobrazit i
   // nickname/badge, ne jen obrázek.
-  const [covers, mySuggestions] = await Promise.all([
+  const [covers, mySuggestions, bannerPromotion] = await Promise.all([
     getApprovedCatchCovers().catch(() => new Map()),
     // Server-side filtr podle steam_id ze session — nikdy se
     // nestahují cizí pending návrhy do browseru (viz suggestions.ts).
     user ? getMyPendingSuggestions(user.steamId).catch(() => []) : Promise.resolve([]),
+    // FishBrowser je "use client" — banner promotion se vybírá tady
+    // server-side (žádný seznam kandidátů do browseru) a předává už
+    // hotová jako plain prop, viz AdSlot pro přímé Server Component použití.
+    getActivePromotionForRoute("banner", "/ryby").catch(() => null),
   ]);
   const featuredCatches = Object.fromEntries(covers);
 
@@ -50,7 +55,12 @@ export default async function RybyPage() {
         </div>
 
         <div className="mt-10">
-          <FishBrowser fish={fishEntries} featuredCatches={featuredCatches} suggestions={mySuggestions} />
+          <FishBrowser
+            fish={fishEntries}
+            featuredCatches={featuredCatches}
+            suggestions={mySuggestions}
+            bannerPromotion={bannerPromotion}
+          />
         </div>
       </div>
     </div>

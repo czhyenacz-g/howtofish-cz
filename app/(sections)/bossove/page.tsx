@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getBossEntries, getMyPendingBosses } from "../../../lib/universal-content-api/bosses";
-import AdPlaceholder from "../../components/AdPlaceholder";
+import AdSlot from "../../components/AdSlot";
 import BossoveBrowser from "./BossoveBrowser";
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default async function BossovePage() {
       </p>
 
       <div className="mt-6">
-        <AdPlaceholder />
+        <AdSlot pathname="/bossove" />
       </div>
 
       <div className="mt-8">

@@ -37,15 +37,20 @@ export async function uploadCommunityImage(recordId: number, file: File): Promis
   await ucaUploadRequest(mediaPath(), formData, UPLOAD_TIMEOUT_MS);
 }
 
-/** Veřejné, schválené záznamy dané collection — cachováno (viz APPROVED_REVALIDATE_SECONDS). */
+/**
+ * Veřejné, schválené záznamy dané collection — cachováno (výchozí viz
+ * APPROVED_REVALIDATE_SECONDS, `revalidateSeconds` jde přebít pro
+ * collections s jiným požadovaným cache oknem, např. promotions ~2 min).
+ */
 export async function getApprovedCommunityRecords(
   collection: string,
-  perPage = 100
+  perPage = 100,
+  revalidateSeconds: number = APPROVED_REVALIDATE_SECONDS
 ): Promise<UcaRecord[]> {
   const query = new URLSearchParams({ status: "approved", per_page: String(perPage) });
   const response = await ucaJsonRequest<UcaPaginatedResponse<UcaRecord>>(
     recordsPath(`?${query.toString()}`, collection),
-    { method: "GET", timeoutMs: READ_TIMEOUT_MS, revalidateSeconds: APPROVED_REVALIDATE_SECONDS }
+    { method: "GET", timeoutMs: READ_TIMEOUT_MS, revalidateSeconds }
   );
   return response.data;
 }

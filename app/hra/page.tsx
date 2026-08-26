@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getCurrentUser } from "../../lib/auth/current-user";
 import { getLeaderboard } from "../../lib/universal-content-api/scores";
-import AdPlaceholder from "../components/AdPlaceholder";
+import AdSlot from "../components/AdSlot";
 import CrabRushGame from "./CrabRushGame";
 import Leaderboard from "./Leaderboard";
 import { GAME_SLUG } from "./evaluate-score-submission";
@@ -32,7 +32,7 @@ export default async function HraPage() {
       <div className="mx-auto mt-8 max-w-3xl">
         <CrabRushGame user={user} />
         <div className="mt-8">
-          <AdPlaceholder />
+          <AdSlot pathname="/hra" />
         </div>
         <Leaderboard entries={leaderboard} />
       </div>

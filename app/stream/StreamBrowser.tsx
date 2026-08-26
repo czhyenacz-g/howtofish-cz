@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import type { LiveStream, Platform } from "../../lib/streams/types";
+import type { PromotionEntry } from "../../lib/universal-content-api/types";
 import AdPlaceholder from "../components/AdPlaceholder";
+import AffiliateBanner from "../components/AffiliateBanner";
 
 const PLATFORM_LABEL: Record<Platform, string> = {
   twitch: "Twitch",
@@ -54,11 +56,13 @@ export default function StreamBrowser({
   totalViewers,
   failedPlatforms,
   updatedAt,
+  bannerPromotion = null,
 }: {
   streams: LiveStream[];
   totalViewers: number | null;
   failedPlatforms: Platform[];
   updatedAt: string;
+  bannerPromotion?: PromotionEntry | null;
 }) {
   const [filter, setFilter] = useState<"all" | Platform>("all");
 
@@ -93,7 +97,11 @@ export default function StreamBrowser({
       )}
 
       <div className="mx-auto mt-6 max-w-3xl">
-        <AdPlaceholder />
+        {bannerPromotion?.imageUrl && bannerPromotion.href ? (
+          <AffiliateBanner imageSrc={bannerPromotion.imageUrl} href={bannerPromotion.href} title={bannerPromotion.title} />
+        ) : (
+          <AdPlaceholder />
+        )}
       </div>
 
       <div className="mt-6 flex flex-wrap justify-center gap-2 font-serif">

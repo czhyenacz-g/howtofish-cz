@@ -226,3 +226,23 @@ export type GuideSuggestionData = {
   note?: string;
   rights_confirmed: true;
 };
+
+// ---------------------------------------------------------------------
+// Promotions (banner / seller) — admin-spravovaný obsah z UCA, žádný
+// pending/approve flow (admin je důvěryhodný zdroj, `active` je jejich
+// vlastní on/off přepínač). Typ žije tady (ne v promotions.ts, který má
+// "server-only") — CharacterCallout je "use client" a potřebuje
+// PromotionEntry jako typ pro prop, viz app/components/CharacterCallout.tsx.
+export type PromotionPlacement = "banner" | "seller";
+
+export type PromotionEntry = {
+  id: string;
+  placement: PromotionPlacement;
+  pagePattern: string;
+  title: string;
+  bodyHtml?: string;
+  ctaLabel?: string;
+  href?: string;
+  imageUrl?: string;
+  weight: number;
+};

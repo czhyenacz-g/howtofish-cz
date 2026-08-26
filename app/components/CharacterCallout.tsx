@@ -11,8 +11,11 @@ import {
 import {
   isCharacterCalloutRoute,
   resolveCharacterCallout,
+  resolvePromotionCallout,
   type CharacterId,
 } from "../../lib/character-callouts/resolve-callout";
+import { pickPromotion } from "../../lib/promotions/match-route";
+import type { PromotionEntry } from "../../lib/universal-content-api/types";
 
 const DELAY_MS = 6000;
 const EXIT_MS = 300;
@@ -34,7 +37,18 @@ type Phase = "idle" | "entering" | "open" | "closing" | "minimized";
 //
 // Náhodný výběr postavy proběhne až po mountu (useEffect), aby se
 // předešlo hydration mismatchi — server vždy vyrenderuje null.
-export default function CharacterCallout() {
+export default function CharacterCallout({
+  sellerPromotions = [],
+}: {
+  // Malý, ne-citlivý seznam (admin-psaný marketing text) — načtený
+  // server-side v root layoutu (viz lib/universal-content-api/
+  // promotions.ts) a předaný sem jako plain prop. Výběr podle route se
+  // ale musí stát tady, klient-side, protože pathname je (kvůli
+  // hydration mismatchi) dostupný až po mountu přes usePathname() — viz
+  // report pro odůvodnění téhle konkrétní výjimky z "no candidate list
+  // in the browser".
+  sellerPromotions?: PromotionEntry[];
+}) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [character, setCharacter] = useState<CharacterId | null>(null);
@@ -116,7 +130,12 @@ export default function CharacterCallout() {
     );
   }
 
-  const callout = resolveCharacterCallout(pathname, character);
+  // Aktivní promotion (pokud existuje pro tuhle route) má přednost před
+  // statickou fallback hláškou — profesor se tímhle vůbec nezabývá.
+  const matchedPromotion = character === "seller" ? pickPromotion(sellerPromotions, pathname) : null;
+  const callout = matchedPromotion
+    ? resolvePromotionCallout(matchedPromotion)
+    : resolveCharacterCallout(pathname, character);
   const image = CHARACTER_IMAGE[character];
   const visible = phase === "open";
 
@@ -128,7 +147,14 @@ export default function CharacterCallout() {
       }`}
     >
       <div className="pointer-events-auto max-w-[240px] rounded-2xl border-2 border-[#3a2a1a] bg-[#f4ead9] p-3 font-serif text-sm leading-snug text-[#3a2a1a] shadow-xl sm:mb-20 sm:max-w-[360px] sm:p-4">
-        <p>{callout.message}</p>
+        {callout.isHtml ? (
+          // body_html je sanitizované už na UCA straně před uložením
+          // (viz HtmlSanitizer.php) — admin-authored obsah, ne uživatelský
+          // vstup, proto je dangerouslySetInnerHTML tady přijatelné.
+          <p dangerouslySetInnerHTML={{ __html: callout.message }} />
+        ) : (
+          <p>{callout.message}</p>
+        )}
         {callout.isSponsored && (
           <p className="mt-2 text-[10px] font-sans uppercase tracking-wide text-[#8a6d4a]">Partnerský tip</p>
         )}

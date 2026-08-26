@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getSteamAchievements } from "../../../lib/steam/achievements";
-import AdPlaceholder from "../../components/AdPlaceholder";
+import AdSlot from "../../components/AdSlot";
 import AchievementBrowser from "./AchievementBrowser";
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default async function AchievementyPage() {
       </p>
 
       <div className="mt-6">
-        <AdPlaceholder />
+        <AdSlot pathname="/achievementy" />
       </div>
 
       {!achievements || achievements.length === 0 ? (

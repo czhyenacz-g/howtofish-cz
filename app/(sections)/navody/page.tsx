@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getGuideEntries, getMyPendingGuides } from "../../../lib/universal-content-api/guides";
-import AdPlaceholder from "../../components/AdPlaceholder";
+import AdSlot from "../../components/AdSlot";
 import NavodyBrowser from "./NavodyBrowser";
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default async function NavodyPage() {
       </p>
 
       <div className="mt-6">
-        <AdPlaceholder />
+        <AdSlot pathname="/navody" />
       </div>
 
       <div className="mt-8">

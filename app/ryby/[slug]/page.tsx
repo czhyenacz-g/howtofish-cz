@@ -5,7 +5,7 @@ import { fishEntries } from "../../../data/fish";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getApprovedCatches, selectFeaturedCatch } from "../../../lib/universal-content-api/catches";
 import VerificationBadge from "../../components/VerificationBadge";
-import AdPlaceholder from "../../components/AdPlaceholder";
+import AdSlot from "../../components/AdSlot";
 import CommunityCatchSection from "./CommunityCatchSection";
 
 export const dynamicParams = false;
@@ -164,7 +164,7 @@ export default async function FishDetailPage({ params }: Props) {
         ) : null}
 
         <div className="mt-10">
-          <AdPlaceholder />
+          <AdSlot pathname={`/ryby/${entry.slug}`} />
         </div>
 
         <section className="mt-10 border-t border-white/10 pt-6">
@@ -188,7 +188,7 @@ export default async function FishDetailPage({ params }: Props) {
         </section>
 
         <div className="mt-10">
-          <AdPlaceholder />
+          <AdSlot pathname={`/ryby/${entry.slug}`} />
         </div>
       </div>
     </div>

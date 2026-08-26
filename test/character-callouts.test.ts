@@ -2,7 +2,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { isCharacterCalloutRoute, resolveCharacterCallout } from "../lib/character-callouts/resolve-callout.ts";
+import {
+  isCharacterCalloutRoute,
+  resolveCharacterCallout,
+  resolvePromotionCallout,
+} from "../lib/character-callouts/resolve-callout.ts";
+import { pickPromotion } from "../lib/promotions/match-route.ts";
+import type { PromotionEntry } from "../lib/universal-content-api/types.ts";
 
 test("resolveCharacterCallout: profesor na /ryby má správnou zprávu a CTA na /ryby/navrhnout", () => {
   const callout = resolveCharacterCallout("/ryby", "professor");
@@ -126,4 +132,67 @@ test("CharacterCallout.tsx: mount efekt kontroluje isProfessorMinimizedForRoute 
   const timerIndex = mountEffect.indexOf("window.setTimeout");
   assert.ok(minimizedCheckIndex !== -1 && timerIndex !== -1, "expected both minimized check and timer scheduling in mount effect");
   assert.ok(minimizedCheckIndex < timerIndex, "minimized check must run before the auto-show timer is scheduled");
+});
+
+// --- Promotions integrace (seller placement) ---------------------------
+
+function promo(overrides: Partial<PromotionEntry> = {}): PromotionEntry {
+  return {
+    id: "community-1",
+    placement: "seller",
+    pagePattern: "*",
+    title: "Fallback title",
+    weight: 1,
+    ...overrides,
+  };
+}
+
+test("resolvePromotionCallout: bez body_html použije title jako plain-text zprávu", () => {
+  const callout = resolvePromotionCallout(promo({ title: "Mám něco pro tebe" }));
+  assert.equal(callout.message, "Mám něco pro tebe");
+  assert.equal(callout.isHtml, false);
+});
+
+test("resolvePromotionCallout: s body_html ho použije jako zprávu a označí isHtml", () => {
+  const callout = resolvePromotionCallout(promo({ bodyHtml: "<p>Sleva <strong>20 %</strong></p>" }));
+  assert.equal(callout.message, "<p>Sleva <strong>20 %</strong></p>");
+  assert.equal(callout.isHtml, true);
+});
+
+test("resolvePromotionCallout: CTA label a href se přenesou beze změny", () => {
+  const callout = resolvePromotionCallout(promo({ href: "/hra", ctaLabel: "Zahrát si" }));
+  assert.equal(callout.href, "/hra");
+  assert.equal(callout.linkLabel, "Zahrát si");
+});
+
+test("resolvePromotionCallout: externí href (http/https) je isSponsored, interní ('/...') není", () => {
+  const external = resolvePromotionCallout(promo({ href: "https://example.com/product" }));
+  const internal = resolvePromotionCallout(promo({ href: "/ryby" }));
+  assert.equal(external.isSponsored, true);
+  assert.equal(internal.isSponsored, false);
+});
+
+test("resolvePromotionCallout: bez href je vždy isSponsored=false", () => {
+  const callout = resolvePromotionCallout(promo({ href: undefined }));
+  assert.equal(callout.isSponsored, false);
+});
+
+test("seller bez aktivní promotion pro danou route padá zpět na statickou SELLER_MESSAGE (pickPromotion vrátí null)", () => {
+  const promotions: PromotionEntry[] = [promo({ pagePattern: "/predmety" })];
+  const matched = pickPromotion(promotions, "/hra");
+  assert.equal(matched, null);
+  // Komponenta v tomhle případě volá resolveCharacterCallout(pathname, "seller") — ověřeno níž na zdrojovém kódu.
+  const fallback = resolveCharacterCallout("/hra", "seller");
+  assert.match(fallback.message, /Hej! Mám něco zajímavého/);
+});
+
+test("CharacterCallout.tsx: promotion match má přednost, ale jen pro prodejce — profesor sellerPromotions vůbec nepoužívá", () => {
+  assert.match(componentSource, /character === "seller" \? pickPromotion\(sellerPromotions, pathname\) : null/);
+});
+
+test("CharacterCallout.tsx: nikdy neimportuje universal-content-api/promotions.ts jako hodnotu (jen typ PromotionEntry) — data přijdou jako prop", () => {
+  const hasUnsafeImport = componentSource
+    .split("\n")
+    .some((line) => /universal-content-api\/(client|catches|community|promotions)(\.ts)?["']/.test(line) && !/^\s*import\s+type\b/.test(line));
+  assert.equal(hasUnsafeImport, false);
 });

@@ -6,6 +6,7 @@ import Script from "next/script";
 import AmbientAudioToggle from "./components/AmbientAudioToggle";
 import CharacterCallout from "./components/CharacterCallout";
 import { GOATCOUNTER_CODE } from "./config/analytics";
+import { getActivePromotions } from "../lib/universal-content-api/promotions";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -56,15 +57,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Malý, ne-citlivý seznam (admin-psaný marketing text) — viz
+  // CharacterCallout.tsx pro proč se výběr podle route dělá až
+  // client-side (usePathname() dostupné až po mountu).
+  const sellerPromotions = await getActivePromotions("seller").catch(() => []);
+
   return (
     <html lang="cs" className={`${breeSerif.variable} ${inter.variable}`}>
       <body className="bg-gray-900 font-sans text-white antialiased">
         {children}
         <AmbientAudioToggle />
-        <CharacterCallout />
+        <CharacterCallout sellerPromotions={sellerPromotions} />
         <Analytics />
         {GOATCOUNTER_CODE && (
           <Script
