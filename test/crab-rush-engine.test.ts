@@ -15,12 +15,37 @@ import {
   tickDeaths,
   tickMovement,
   tickRoundTimer,
+  type CrabState,
+  CRAB_Y_MAX,
+  CRAB_Y_MIN,
   DEATH_ANIM_MS,
+  MAX_VERTICAL_SHIFTS,
   SUBMERGE_ANIM_MS,
   HIT_SLOW_MS,
   MAX_LIVES,
   TRACK_END_X,
+  VERTICAL_SHIFT_CHECKPOINTS,
+  VERTICAL_SHIFT_MAX_DELTA,
 } from "../app/hra/crab-rush-engine.ts";
+
+function crabAt(overrides: Partial<CrabState> = {}): CrabState {
+  return {
+    id: 1,
+    hp: 2,
+    maxHp: 2,
+    x: 0,
+    y: 50,
+    yTarget: 50,
+    verticalShiftsUsed: 0,
+    baseSpeed: 5,
+    slowUntil: 0,
+    hitAt: null,
+    dying: false,
+    escaping: false,
+    escapedAt: null,
+    ...overrides,
+  };
+}
 
 test("randomCrabHp: vždy vrátí 2–4", () => {
   for (let round = 1; round <= 10; round++) {
@@ -56,7 +81,7 @@ test("spawnCrab + applyHit: nesmrtelný zásah ubere přesně 1 HP a přidá 1 b
 
 test("applyHit: smrtelný zásah (1 HP krab) zabije, přidá skóre a kill count", () => {
   let state = startGame();
-  state = { ...state, crabs: [{ id: 1, hp: 1, maxHp: 1, x: 10, baseSpeed: 5, slowUntil: 0, hitAt: null, dying: false, escaping: false, escapedAt: null }] };
+  state = { ...state, crabs: [{ id: 1, hp: 1, maxHp: 1, x: 10, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 5, slowUntil: 0, hitAt: null, dying: false, escaping: false, escapedAt: null }] };
 
   state = applyHit(state, 1, 500);
 
@@ -71,7 +96,7 @@ test("applyHit: smrtelný zásah (1 HP krab) zabije, přidá skóre a kill count
 
 test("applyHit: nesmrtelný zásah nastaví krátké zpomalení (slowUntil)", () => {
   let state = startGame();
-  state = { ...state, crabs: [{ id: 1, hp: 3, maxHp: 3, x: 10, baseSpeed: 5, slowUntil: 0, hitAt: null, dying: false, escaping: false, escapedAt: null }] };
+  state = { ...state, crabs: [{ id: 1, hp: 3, maxHp: 3, x: 10, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 5, slowUntil: 0, hitAt: null, dying: false, escaping: false, escapedAt: null }] };
 
   const now = 2000;
   state = applyHit(state, 1, now);
@@ -83,7 +108,7 @@ test("applyHit: zásah do umírajícího/neexistujícího kraba nic nedělá", (
   let state = startGame();
   state = {
     ...state,
-    crabs: [{ id: 1, hp: 1, maxHp: 2, x: 10, baseSpeed: 5, slowUntil: 0, hitAt: null, dying: true, escaping: false, escapedAt: null }],
+    crabs: [{ id: 1, hp: 1, maxHp: 2, x: 10, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 5, slowUntil: 0, hitAt: null, dying: true, escaping: false, escapedAt: null }],
   };
   const before = state;
   const after = applyHit(state, 1, 100);
@@ -115,7 +140,7 @@ test("tickMovement: krab, který dosáhne konce trati, ubere 1 život hned, ale 
   state = {
     ...state,
     lives: MAX_LIVES,
-    crabs: [{ id: 1, hp: 2, maxHp: 2, x: TRACK_END_X - 1, baseSpeed: 100, slowUntil: 0, hitAt: null, dying: false, escaping: false, escapedAt: null }],
+    crabs: [{ id: 1, hp: 2, maxHp: 2, x: TRACK_END_X - 1, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 100, slowUntil: 0, hitAt: null, dying: false, escaping: false, escapedAt: null }],
   };
 
   state = tickMovement(state, 1000, 1); // dost velký delta, aby krab přeskočil hranici
@@ -136,7 +161,7 @@ test("tickMovement: potápějící se krab se dál nehýbe a znovu neubírá ži
   state = {
     ...state,
     lives: MAX_LIVES,
-    crabs: [{ id: 1, hp: 2, maxHp: 2, x: 90, baseSpeed: 100, slowUntil: 0, hitAt: null, dying: false, escaping: true, escapedAt: 500 }],
+    crabs: [{ id: 1, hp: 2, maxHp: 2, x: 90, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 100, slowUntil: 0, hitAt: null, dying: false, escaping: true, escapedAt: 500 }],
   };
   state = tickMovement(state, 900, 1);
   assert.equal(state.crabs.length, 1);
@@ -149,7 +174,7 @@ test("tickDeaths: potápějícího se kraba odstraní až po doběhnutí animace
   let state = startGame();
   state = {
     ...state,
-    crabs: [{ id: 1, hp: 2, maxHp: 2, x: 90, baseSpeed: 5, slowUntil: 0, hitAt: null, dying: false, escaping: true, escapedAt: 1000 }],
+    crabs: [{ id: 1, hp: 2, maxHp: 2, x: 90, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 5, slowUntil: 0, hitAt: null, dying: false, escaping: true, escapedAt: 1000 }],
   };
 
   const tooSoon = tickDeaths(state, 1000 + SUBMERGE_ANIM_MS - 10);
@@ -164,7 +189,7 @@ test("tickMovement: 3 uniklí krabi => game-over", () => {
   for (let i = 0; i < MAX_LIVES; i++) {
     state = {
       ...state,
-      crabs: [{ id: i, hp: 2, maxHp: 2, x: TRACK_END_X - 1, baseSpeed: 100, slowUntil: 0, hitAt: null, dying: false, escaping: false, escapedAt: null }],
+      crabs: [{ id: i, hp: 2, maxHp: 2, x: TRACK_END_X - 1, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 100, slowUntil: 0, hitAt: null, dying: false, escaping: false, escapedAt: null }],
     };
     state = tickMovement(state, 1000 + i, 1);
   }
@@ -177,7 +202,7 @@ test("tickMovement: umírající krab se dál nehýbe a neuniká", () => {
   let state = startGame();
   state = {
     ...state,
-    crabs: [{ id: 1, hp: 0, maxHp: 2, x: 99, baseSpeed: 100, slowUntil: 0, hitAt: 100, dying: true, escaping: false, escapedAt: null }],
+    crabs: [{ id: 1, hp: 0, maxHp: 2, x: 99, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 100, slowUntil: 0, hitAt: 100, dying: true, escaping: false, escapedAt: null }],
   };
   state = tickMovement(state, 200, 1);
   assert.equal(state.crabs.length, 1);
@@ -189,7 +214,7 @@ test("tickDeaths: odstraní kraba až po uplynutí animace smrti", () => {
   let state = startGame();
   state = {
     ...state,
-    crabs: [{ id: 1, hp: 0, maxHp: 2, x: 50, baseSpeed: 5, slowUntil: 0, hitAt: 1000, dying: true, escaping: false, escapedAt: null }],
+    crabs: [{ id: 1, hp: 0, maxHp: 2, x: 50, y: 50, yTarget: 50, verticalShiftsUsed: 0, baseSpeed: 5, slowUntil: 0, hitAt: 1000, dying: true, escaping: false, escapedAt: null }],
   };
 
   const tooSoon = tickDeaths(state, 1000 + DEATH_ANIM_MS - 10);
@@ -197,6 +222,78 @@ test("tickDeaths: odstraní kraba až po uplynutí animace smrti", () => {
 
   const later = tickDeaths(state, 1000 + DEATH_ANIM_MS + 10);
   assert.equal(later.crabs.length, 0);
+});
+
+// --- Vertikální bloudění (y/yTarget/verticalShiftsUsed) -----------------
+
+test("spawnCrab: nový krab má yTarget rovné y, nulový počet posunů, y v povoleném pásmu", () => {
+  const state = spawnCrab(startGame(), 0);
+  const crab = state.crabs[0];
+  assert.equal(crab.yTarget, crab.y);
+  assert.equal(crab.verticalShiftsUsed, 0);
+  assert.ok(crab.y >= CRAB_Y_MIN && crab.y <= CRAB_Y_MAX);
+});
+
+test("tickMovement: před prvním checkpointem se vertikální dráha nemění", () => {
+  let state = startGame();
+  state = { ...state, crabs: [crabAt({ x: 5, baseSpeed: 5, y: 40, yTarget: 40 })] };
+  state = tickMovement(state, 1000, 1, () => 0.5); // x -> 10, pořád < VERTICAL_SHIFT_CHECKPOINTS[0] (33)
+  const crab = state.crabs[0];
+  assert.equal(crab.verticalShiftsUsed, 0);
+  assert.equal(crab.yTarget, 40);
+  assert.equal(crab.y, 40);
+});
+
+test("tickMovement: překročení prvního checkpointu vylosuje nový cíl v omezené výchylce od aktuální dráhy", () => {
+  let state = startGame();
+  state = { ...state, crabs: [crabAt({ x: VERTICAL_SHIFT_CHECKPOINTS[0] - 1, baseSpeed: 5, y: 50, yTarget: 50 })] };
+  state = tickMovement(state, 1000, 1, () => 1); // rand=1 -> max kladná výchylka
+  const crab = state.crabs[0];
+  assert.equal(crab.verticalShiftsUsed, 1);
+  assert.equal(crab.yTarget, Math.min(CRAB_Y_MAX, 50 + VERTICAL_SHIFT_MAX_DELTA));
+});
+
+test("tickMovement: nový cíl nikdy nepřekročí CRAB_Y_MIN/CRAB_Y_MAX (clamp), i při extrémním losu", () => {
+  let state = startGame();
+  state = {
+    ...state,
+    crabs: [crabAt({ x: VERTICAL_SHIFT_CHECKPOINTS[0] - 1, baseSpeed: 5, y: CRAB_Y_MIN + 2, yTarget: CRAB_Y_MIN + 2 })],
+  };
+  state = tickMovement(state, 1000, 1, () => 0); // rand=0 -> max záporná výchylka
+  assert.equal(state.crabs[0].yTarget, CRAB_Y_MIN);
+});
+
+test("tickMovement: y se k yTarget blíží postupně (lerp), neteleportuje se tam v jednom ticku", () => {
+  let state = startGame();
+  state = { ...state, crabs: [crabAt({ x: 0, baseSpeed: 0, y: 10, yTarget: 80 })] };
+  state = tickMovement(state, 1000, 0.1);
+  const crab = state.crabs[0];
+  assert.ok(crab.y > 10 && crab.y < 80, `y (${crab.y}) by se měl posunout jen kousek k cíli, ne skočit rovnou na 80`);
+  assert.equal(crab.yTarget, 80);
+});
+
+test("tickMovement: max MAX_VERTICAL_SHIFTS posunů za celou cestu (simulace více malých ticků přes oba checkpointy)", () => {
+  let state = startGame();
+  state = { ...state, crabs: [crabAt({ x: 0, baseSpeed: 20, y: 50, yTarget: 50 })] };
+  for (let i = 0; i < 40 && state.crabs.length > 0 && !state.crabs[0].escaping; i++) {
+    state = tickMovement(state, 1000 + i * 100, 0.1, () => 0.75);
+  }
+  const crab = state.crabs[0];
+  assert.ok(crab.x > VERTICAL_SHIFT_CHECKPOINTS[1], "test setup: krab měl už minout oba checkpointy");
+  assert.equal(crab.verticalShiftsUsed, MAX_VERTICAL_SHIFTS);
+});
+
+test("tickMovement: umírající/potápějící se krab se vertikálně dál nehýbe", () => {
+  let state = startGame();
+  state = {
+    ...state,
+    crabs: [crabAt({ x: 50, y: 33, yTarget: 77, verticalShiftsUsed: 1, dying: true })],
+  };
+  state = tickMovement(state, 1000, 1);
+  const crab = state.crabs[0];
+  assert.equal(crab.y, 33);
+  assert.equal(crab.yTarget, 77);
+  assert.equal(crab.verticalShiftsUsed, 1);
 });
 
 test("roundConfig: rychlost, frekvence spawnu a max krabů rostou s kolem (bez extrémního růstu)", () => {

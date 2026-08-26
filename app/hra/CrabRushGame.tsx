@@ -35,17 +35,11 @@ function formatTime(seconds: number): string {
   return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
 }
 
-// Čistě kosmetické rozmístění do "pruhů" na výšku trati — nemá vliv na
-// herní logiku, proto to není součástí crab-rush-engine.ts.
-function laneY(id: number): number {
-  return 12 + ((id * 37) % 5) * 17;
-}
-
 // Krab začíná průsvitnět mnohem dřív, hned po startu trati (ne až u
-// vody v polovině) — čistě kosmetické, proto (jako laneY výše) mimo
-// crab-rush-engine.ts. Nikdy neklesne pod WATER_FADE_MIN_OPACITY, ať
-// zůstane viditelný a klikatelný — na 0 ho až dotáhne
-// .animate-crab-submerge při skutečném úniku.
+// vody v polovině) — čistě kosmetické, proto mimo crab-rush-engine.ts.
+// Nikdy neklesne pod WATER_FADE_MIN_OPACITY, ať zůstane viditelný a
+// klikatelný — na 0 ho až dotáhne .animate-crab-submerge při
+// skutečném úniku.
 const WATER_FADE_START_X = 10;
 const WATER_FADE_MIN_OPACITY = 0.4;
 
@@ -279,7 +273,7 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
                 type="button"
                 onClick={(event) => handleCrabClick(crab.id, event)}
                 aria-label={`Krab, zbývá ${crab.hp} z ${crab.maxHp} zásahů`}
-                style={{ left: `${crab.x}%`, top: `${laneY(crab.id)}%`, opacity: waterOpacity(crab.x) }}
+                style={{ left: `${crab.x}%`, top: `${crab.y}%`, opacity: waterOpacity(crab.x) }}
                 className={`absolute flex h-11 w-16 -translate-y-1/2 touch-manipulation items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
                   crab.escaping ? "pointer-events-none animate-crab-submerge" : ""
                 }`}
