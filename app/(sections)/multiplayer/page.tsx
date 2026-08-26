@@ -95,7 +95,10 @@ export default async function MultiplayerPage() {
 
     return (
       <>
-        <Hero activeCount={presences.length}>
+        {/* activeCount tady záměrně null — pro přihlášeného uživatele
+            zobrazuje živý počet MultiplayerBoard (client state, aktualizuje
+            se hned po vlastní akci, ne až po dalším pollu). */}
+        <Hero activeCount={null}>
           <p className="text-center text-sm text-[#0a2438]/70">Přihlášen jako {user.nickname}</p>
         </Hero>
         <MultiplayerBoard

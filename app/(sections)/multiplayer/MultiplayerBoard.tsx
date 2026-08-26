@@ -42,6 +42,11 @@ export default function MultiplayerBoard({
   const myStatusRef = useRef<PresenceStatusKey | null>(myPresence?.status ?? null);
   myStatusRef.current = myPresence?.status ?? null;
 
+  // Status naposledy odeslaný formulářem (opt-in i změna statusu sdílí
+  // stejnou akci) — nastaví se v onClick TÉHOŽ tlačítka, které formulář
+  // odešle, takže je k dispozici hned, jakmile server-action uspěje.
+  const lastSubmittedStatusRef = useRef<PresenceStatusKey>("play");
+
   async function refresh() {
     const result = await refreshBoardAction();
     if (result.ok) {
@@ -66,13 +71,38 @@ export default function MultiplayerBoard({
     return () => clearInterval(interval);
   }, []);
 
-  // Po vlastní úspěšné akci (opt-in / změna statusu / skrytí) rovnou
-  // obnov board, ať se vidím v seznamu hned, ne až po dalším pollu.
+  // Po vlastní úspěšné akci (opt-in / změna statusu) aktualizuj vlastní
+  // kartu (a tím i "Aktivní hráči" count) OKAMŽITĚ, ne až po refreshi —
+  // refresh (níž) pak jen v pozadí sesouhlasí se serverem (čerstvé
+  // last_seen_at, případně nové hráče od jiných uživatelů).
   useEffect(() => {
-    if (presenceState.status === "success" || hideState.status === "success") {
-      void refresh();
-    }
-  }, [presenceState, hideState]);
+    if (presenceState.status !== "success") return;
+
+    const status = lastSubmittedStatusRef.current;
+    setPresences((prev) => {
+      const withoutMe = prev.filter((p) => p.steamId !== currentUser.steamId);
+      const existingRecordId = prev.find((p) => p.steamId === currentUser.steamId)?.recordId ?? 0;
+      const mine: PresenceEntry = {
+        recordId: existingRecordId,
+        steamId: currentUser.steamId,
+        nickname: currentUser.nickname,
+        avatarUrl: currentUser.avatarUrl,
+        status,
+        lastSeenAt: new Date().toISOString(),
+      };
+      return [mine, ...withoutMe];
+    });
+
+    void refresh();
+  }, [presenceState, currentUser.steamId, currentUser.nickname, currentUser.avatarUrl]);
+
+  // "Skrýt mě" — zmiz ze seznamu (a z live countu) okamžitě.
+  useEffect(() => {
+    if (hideState.status !== "success") return;
+
+    setPresences((prev) => prev.filter((p) => p.steamId !== currentUser.steamId));
+    void refresh();
+  }, [hideState, currentUser.steamId]);
 
   const others = presences.filter((p) => p.steamId !== currentUser.steamId);
 
@@ -89,6 +119,9 @@ export default function MultiplayerBoard({
                   type="submit"
                   name="status"
                   value={s.key}
+                  onClick={() => {
+                    lastSubmittedStatusRef.current = s.key;
+                  }}
                   disabled={presencePending}
                   aria-pressed={myPresence.status === s.key}
                   className={`min-h-[44px] rounded-md border px-3 py-2 text-sm transition disabled:cursor-not-allowed disabled:opacity-60 ${
@@ -117,6 +150,9 @@ export default function MultiplayerBoard({
               type="submit"
               name="status"
               value="play"
+              onClick={() => {
+                lastSubmittedStatusRef.current = "play";
+              }}
               disabled={presencePending}
               className="min-h-[44px] w-full rounded-md bg-amber-400 px-6 py-3 font-serif text-base text-gray-900 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
@@ -151,7 +187,15 @@ export default function MultiplayerBoard({
       )}
 
       <section className="mt-8">
-        <h2 className="font-serif text-xl text-amber-300">Aktivní hráči</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-serif text-xl text-amber-300">Aktivní hráči</h2>
+          {/* Živý počet z client state (presences) — aktualizuje se hned po
+              vlastní akci, ne až po dalším 60s pollu. */}
+          <p className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-cyan-100/70">
+            Právě hledají spoluhráče: <strong className="text-amber-300">{presences.length}</strong>{" "}
+            {presences.length === 1 ? "hráč" : "hráčů"}
+          </p>
+        </div>
         {others.length === 0 && !myPresence ? (
           <p className="mt-3 text-cyan-100/60">Nikdo tu teď není — buď první, kdo se přidá!</p>
         ) : (
