@@ -162,11 +162,32 @@ test("CharacterCallout.tsx: klik na '?' (handleReopen) rovnou nastaví 'entering
 });
 
 test("CharacterCallout.tsx: mount efekt kontroluje isProfessorMinimizedForRoute PŘED naplánováním auto-show timeru (refresh respektuje minimized)", () => {
-  const mountEffect = componentSource.split("if (!isCharacterCalloutRoute(pathname)) return;")[1]?.split("[mounted, pathname]")[0] ?? "";
+  const mountEffect = componentSource.split("if (!isCharacterCalloutRoute(pathname)) return;")[1]?.split("[mounted, pathname, gameStarted]")[0] ?? "";
   const minimizedCheckIndex = mountEffect.indexOf("isProfessorMinimizedForRoute(pathname)");
   const timerIndex = mountEffect.indexOf("window.setTimeout");
   assert.ok(minimizedCheckIndex !== -1 && timerIndex !== -1, "expected both minimized check and timer scheduling in mount effect");
   assert.ok(minimizedCheckIndex < timerIndex, "minimized check must run before the auto-show timer is scheduled");
+});
+
+// --- /hra: postava se nezobrazuje, dokud hráč hraje minihru -------------
+
+test("CharacterCallout.tsx: importuje getGameStarted/subscribeGameStarted z game-session.ts a čte je přes useSyncExternalStore", () => {
+  assert.match(componentSource, /import \{ getGameStarted, subscribeGameStarted \} from "\.\.\/\.\.\/lib\/character-callouts\/game-session"/);
+  assert.match(componentSource, /useSyncExternalStore\(subscribeGameStarted, getGameStarted, \(\) => false\)/);
+});
+
+test("CharacterCallout.tsx: HRA_PATHNAME je '/hra' a mount efekt se vrátí (žádný nový timer) dokud gameStarted platí", () => {
+  assert.match(componentSource, /const HRA_PATHNAME = "\/hra";/);
+  const mountEffect = componentSource.split("if (!isCharacterCalloutRoute(pathname)) return;")[1]?.split("[mounted, pathname, gameStarted]")[0] ?? "";
+  assert.match(mountEffect, /if \(pathname === HRA_PATHNAME && gameStarted\) return;/);
+  // Gate musí být HNED po isCharacterCalloutRoute kontrole, před minimized/o-hre/seller větvemi.
+  const gateIndex = mountEffect.indexOf("pathname === HRA_PATHNAME && gameStarted");
+  const minimizedIndex = mountEffect.indexOf("isProfessorMinimizedForRoute(pathname)");
+  assert.ok(gateIndex !== -1 && minimizedIndex !== -1 && gateIndex < minimizedIndex);
+});
+
+test("CharacterCallout.tsx: gameStarted je v deps mount efektu — flip na true okamžitě přeruší (cleanup) čekající/otevřený callout na /hra", () => {
+  assert.match(componentSource, /\}, \[mounted, pathname, gameStarted\]\);/);
 });
 
 // --- Promotions integrace (seller placement) ---------------------------

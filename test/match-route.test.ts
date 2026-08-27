@@ -28,8 +28,8 @@ test("isExternalHref: absolute http(s) is external, relative path is internal", 
   assert.equal(isExternalHref("/ryby/spider-crab"), false);
 });
 
-function candidate(pagePattern: string, weight: number, id: string) {
-  return { pagePattern, weight, id };
+function candidate(pagePattern: string, weight: number, id: string, href?: string) {
+  return { pagePattern, weight, id, href };
 }
 
 test("pickPromotion: no candidates match -> null", () => {
@@ -79,4 +79,31 @@ test("pickPromotion: weight 0 or negative is treated as at least 1 (never fully 
   const zeroWeight = candidate("/ryby", 0, "zero");
   const result = pickPromotion([zeroWeight], "/ryby");
   assert.equal(result?.id, "zero");
+});
+
+test("pickPromotion: promotion s href === aktuální pathname se nikdy nevybere (banner na hru na samotné /hra nedává smysl)", () => {
+  const selfLinking = candidate("*", 1000, "contest", "/hra");
+  const other = candidate("*", 1, "affiliate", "https://example.com/product");
+  for (let i = 0; i < 20; i++) {
+    const result = pickPromotion([selfLinking, other], "/hra");
+    assert.equal(result?.id, "affiliate");
+  }
+});
+
+test("pickPromotion: href === pathname vyřadí jediného kandidáta -> null (ne pád)", () => {
+  const selfLinking = candidate("/hra", 1, "contest", "/hra");
+  const result = pickPromotion([selfLinking], "/hra");
+  assert.equal(result, null);
+});
+
+test("pickPromotion: promotion bez href (undefined) se self-referencing filtrem nikdy nevyřadí", () => {
+  const noHref = candidate("*", 1, "no-href");
+  const result = pickPromotion([noHref], "/hra");
+  assert.equal(result?.id, "no-href");
+});
+
+test("pickPromotion: href jinam než aktuální pathname zůstává eligible", () => {
+  const contest = candidate("*", 1, "contest", "/hra");
+  const result = pickPromotion([contest], "/ryby");
+  assert.equal(result?.id, "contest");
 });

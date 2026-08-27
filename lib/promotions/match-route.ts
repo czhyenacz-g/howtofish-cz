@@ -37,14 +37,20 @@ export function matchSpecificity(pattern: string, pathname: string): RouteMatchS
   return null;
 }
 
-export function pickPromotion<T extends { pagePattern: string; weight: number }>(
+export function pickPromotion<T extends { pagePattern: string; weight: number; href?: string }>(
   candidates: T[],
   pathname: string
 ): T | null {
+  // Promotion, jejíž href míří přesně na stránku, kde se právě zobrazuje,
+  // nedává smysl (např. banner na hru na samotné /hra) — vyřazuje se ještě
+  // před specificity/weight výběrem, ne jen jako speciální případ pro
+  // konkrétní promotion/route (viz zadání).
+  const eligible = candidates.filter((candidate) => candidate.href !== pathname);
+
   let bestRank = 0;
   let bestGroup: T[] = [];
 
-  for (const candidate of candidates) {
+  for (const candidate of eligible) {
     const specificity = matchSpecificity(candidate.pagePattern, pathname);
     if (!specificity) continue;
 

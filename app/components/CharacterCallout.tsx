@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getGameStarted, subscribeGameStarted } from "../../lib/character-callouts/game-session";
 import {
   isProfessorMinimizedForRoute,
   rememberProfessorMinimized,
@@ -30,6 +31,10 @@ const EXIT_MS = 300;
 // najetí animace po vykreslení stránky.
 const O_HRE_PATHNAME = "/o-hre";
 const PROFESSOR_INTRO_DELAY_MS = 300;
+// Dokud hráč hraje minihru na /hra, postava (profesor/prodejce) se tam
+// vůbec nenabízí a případně už otevřená se okamžitě skryje — viz
+// game-session.ts a zadání "nezobrazovat, dokud se hra hraje".
+const HRA_PATHNAME = "/hra";
 
 const CHARACTER_IMAGE: Record<CharacterId, { src: string; width: number; height: number }> = {
   professor: { src: "/images/characters/professor.png", width: 750, height: 1000 },
@@ -76,6 +81,11 @@ export default function CharacterCallout({
     bannerVisibleRef.current = bannerVisible;
   }, [bannerVisible]);
 
+  // Externí (mimo tuhle komponentu) "hraje se minihra na /hra" signál —
+  // viz game-session.ts. `getServerSnapshot` je vždy false, stejný důvod
+  // jako `mounted` výš (server nikdy nerenderuje postavu).
+  const gameStarted = useSyncExternalStore(subscribeGameStarted, getGameStarted, () => false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -89,6 +99,8 @@ export default function CharacterCallout({
     setCharacter(null);
 
     if (!isCharacterCalloutRoute(pathname)) return;
+    // Na /hra se hráč, který už začal hrát, nemá čím rušit — viz zadání.
+    if (pathname === HRA_PATHNAME && gameStarted) return;
 
     // Jednodušší varianta z zadání: pokud je profesor na téhle route
     // zapamatovaný jako minimalizovaný, rovnou ukaž "?" a vůbec
@@ -159,8 +171,11 @@ export default function CharacterCallout({
     return () => {
       timers.current.forEach((id) => clearTimeout(id));
     };
+    // gameStarted v deps: jakmile hráč na /hra spustí hru, efekt se
+    // přehraje, zruší (cleanup) případný čekající/otevřený callout timer
+    // a díky gate výš už žádný nový nenaplánuje — viz zadání.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- bannerVisible se čte přes bannerVisibleRef, aby se rozhodnutí "seller vs. professor" nepřepočítávalo při každé změně viditelnosti banneru mezi routami.
-  }, [mounted, pathname]);
+  }, [mounted, pathname, gameStarted]);
 
   function handleClose() {
     if (character === "professor") {

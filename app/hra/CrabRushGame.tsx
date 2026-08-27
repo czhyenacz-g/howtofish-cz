@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { trackClientEvent } from "../../lib/analytics/track-client-event";
+import { markGameStarted, resetGameStarted } from "../../lib/character-callouts/game-session";
 import { SpeakerIcon, SpeakerMuteIcon } from "../components/icons";
 import CrabIcon from "./CrabIcon";
 import { useCrunchSound } from "./useCrunchSound";
@@ -121,6 +122,12 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
   const gameOverAudioRef = useRef<HTMLAudioElement | null>(null);
   const previousLivesRef = useRef(gameState.lives);
 
+  // Čerstvá návštěva /hra (mount = nová stránka, ne re-render) vždy
+  // vynuluje "hraje se" signál pro CharacterCallout — viz game-session.ts.
+  useEffect(() => {
+    resetGameStarted();
+  }, []);
+
   useEffect(() => {
     if (gameState.status === "game-over" && gameOverHeadingRef.current) {
       gameOverHeadingRef.current.focus();
@@ -193,11 +200,13 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
   function handleStart() {
     unlock();
     setGameState(startGame());
+    markGameStarted();
     trackClientEvent("game_started", { metadata: { game: "crab-rush" } });
   }
 
   function handleRestart() {
     setGameState(startGame());
+    markGameStarted();
     trackClientEvent("game_started", { metadata: { game: "crab-rush" } });
   }
 
