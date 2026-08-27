@@ -61,6 +61,21 @@ test("getActivePromotions: banner bez href se NEpřeskočí — affiliate odkazy
   );
 });
 
+test("getActivePromotions: interní href (relativní cesta, ne affiliate) je validní banner candidate stejně jako externí", async () => {
+  await withMockedFetch(
+    async () =>
+      jsonResponse(200, {
+        data: [record(1, { placement: "banner", page_pattern: "*", title: "Soutěž o Steam hry", href: "/hra", active: true, weight: 10 }, true)],
+      }),
+    async () => {
+      const promotions = await getActivePromotions("banner");
+      assert.equal(promotions.length, 1);
+      assert.equal(promotions[0].href, "/hra");
+      assert.ok(promotions[0].imageUrl);
+    }
+  );
+});
+
 test("getActivePromotions: seller nepotřebuje obrázek ani href", async () => {
   await withMockedFetch(
     async () =>

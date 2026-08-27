@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { isExternalHref } from "../../lib/promotions/match-route";
 
 type AffiliateBannerProps = {
   imageSrc: string;
@@ -58,6 +60,25 @@ export default function AffiliateBanner({ imageSrc, href, title, className = "",
     );
   }
 
+  const linkClassName = `group block overflow-hidden rounded-lg border border-amber-300/20 bg-gradient-to-br from-[#0e4f66] via-[#146b78] to-[#1c8a95] p-3 transition duration-150 hover:-translate-y-0.5 hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${className}`;
+
+  // Interní promotion (např. soutěž vedoucí na /hra) není affiliate reklama —
+  // normální client-side navigace, žádný target="_blank"/rel="sponsored"
+  // (viz zadání). Rozlišeno stejně jako u sellera, viz resolve-callout.ts.
+  if (!isExternalHref(href)) {
+    return (
+      <Link
+        href={href}
+        aria-label={title}
+        data-promotion-banner="true"
+        onClick={onClick}
+        className={linkClassName}
+      >
+        {content}
+      </Link>
+    );
+  }
+
   return (
     <a
       href={href}
@@ -66,7 +87,7 @@ export default function AffiliateBanner({ imageSrc, href, title, className = "",
       aria-label={title}
       data-promotion-banner="true"
       onClick={onClick}
-      className={`group block overflow-hidden rounded-lg border border-amber-300/20 bg-gradient-to-br from-[#0e4f66] via-[#146b78] to-[#1c8a95] p-3 transition duration-150 hover:-translate-y-0.5 hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${className}`}
+      className={linkClassName}
     >
       {content}
     </a>

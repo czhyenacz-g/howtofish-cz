@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { trackClientEvent } from "../../lib/analytics/track-client-event";
 import { excludeRecentlyClicked, isPromotionRecentlyClicked, markPromotionClicked } from "../../lib/promotions/clicked-promotions";
-import { pickPromotion } from "../../lib/promotions/match-route";
+import { isExternalHref, pickPromotion } from "../../lib/promotions/match-route";
 import type { PromotionEntry } from "../../lib/universal-content-api/types";
 import AdPlaceholder from "./AdPlaceholder";
 import AffiliateBanner from "./AffiliateBanner";
@@ -50,7 +50,12 @@ export default function AffiliateBannerSlot({
   }, []);
 
   function handleClick() {
-    if (!promotion) return;
+    if (!promotion || !promotion.href) return;
+    // Interní promotion (soutěž) není affiliate reklama — nezapisuje se do
+    // 7denního "už jsem klikl" vyřazení (má se dál připomínat) a neloguje
+    // se jako affiliate_click (významově by to byla špatná data, viz
+    // zadání). Zůstává eligible napořád, klik se nijak netrackuje.
+    if (!isExternalHref(promotion.href)) return;
     markPromotionClicked(promotion.id);
     trackClientEvent("affiliate_click", { metadata: { promotion_id: promotion.id, placement: "banner" } });
   }

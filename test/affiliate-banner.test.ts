@@ -12,27 +12,37 @@ describe("AffiliateBanner — href je volitelný (affiliate odkazy zatím nemus�
     assert.match(source, /href\?:\s*string/);
   });
 
-  test("bez href renderuje <div> (neklikací), ne <a>", () => {
+  test("bez href renderuje <div> (neklikací), ne <a>/<Link>", () => {
     assert.match(source, /if \(!href\) \{\s*return \(\s*<div/);
   });
 
-  test("s href renderuje <a> se sponsored rel", () => {
+  test("s externím href renderuje <a> se sponsored rel a target=_blank", () => {
     assert.match(source, /<a\s/);
     assert.match(source, /rel="noopener noreferrer sponsored"/);
     assert.match(source, /target="_blank"/);
   });
 
-  test("neklikací <div> variantu neobsahuje sponsored rel (ten patří jen ke skutečnému odkazu)", () => {
-    const divBranch = /if \(!href\) \{([\s\S]*?)\n {2}\}\n\n {2}return \(/.exec(source);
+  test("s interním href (isExternalHref === false) renderuje Next <Link>, bez sponsored rel a bez target=_blank", () => {
+    assert.match(source, /import Link from "next\/link";/);
+    assert.match(source, /if \(!isExternalHref\(href\)\) \{/);
+    const linkBranch = /if \(!isExternalHref\(href\)\) \{([\s\S]*?)\n {2}\}\n\n {2}return \(/.exec(source);
+    assert.ok(linkBranch, "nepodařilo se najít větev interního <Link>");
+    assert.match(linkBranch[1], /<Link\s/);
+    assert.doesNotMatch(linkBranch[1], /rel="noopener noreferrer sponsored"/);
+    assert.doesNotMatch(linkBranch[1], /target="_blank"/);
+  });
+
+  test("neklikací <div> variantu neobsahuje sponsored rel (ten patří jen ke skutečnému externímu odkazu)", () => {
+    const divBranch = /if \(!href\) \{([\s\S]*?)\n {2}\}\n\n {2}const linkClassName/.exec(source);
     assert.ok(divBranch, "nepodařilo se najít větev 'if (!href) { ... }'");
     assert.doesNotMatch(divBranch[1], /rel="noopener noreferrer sponsored"/);
   });
 });
 
 describe("AffiliateBanner — data-promotion-banner atribut (seller callout koordinace)", () => {
-  test("obě varianty (s href i bez) mají data-promotion-banner=\"true\"", () => {
+  test("všechny tři varianty (div, interní Link, externí a) mají data-promotion-banner=\"true\"", () => {
     const matches = source.match(/data-promotion-banner="true"/g) ?? [];
-    assert.equal(matches.length, 2, "očekávány přesně 2 výskyty (<div> i <a> větev)");
+    assert.equal(matches.length, 3, "očekávány přesně 3 výskyty (<div>, <Link>, <a>)");
   });
 });
 
@@ -41,11 +51,14 @@ describe("AffiliateBanner — onClick (7denní vyřazení prokliknuté promotion
     assert.match(source, /onClick\?:\s*\(\)\s*=>\s*void/);
   });
 
-  test("onClick se předává jen na klikací <a> variantu, ne na neklikací <div>", () => {
+  test("onClick se předává na obě klikací varianty (interní Link i externí a), ne na neklikací <div>", () => {
     const anchorBranch = /return \(\s*<a[\s\S]*?<\/a>\s*\);/.exec(source)?.[0] ?? "";
     assert.match(anchorBranch, /onClick=\{onClick\}/);
 
-    const divBranch = /if \(!href\) \{([\s\S]*?)\n {2}\}\n\n {2}return \(/.exec(source)?.[1] ?? "";
+    const linkBranch = /if \(!isExternalHref\(href\)\) \{([\s\S]*?)\n {2}\}\n\n {2}return \(/.exec(source)?.[1] ?? "";
+    assert.match(linkBranch, /onClick=\{onClick\}/);
+
+    const divBranch = /if \(!href\) \{([\s\S]*?)\n {2}\}\n\n {2}const linkClassName/.exec(source)?.[1] ?? "";
     assert.doesNotMatch(divBranch, /onClick=\{onClick\}/);
   });
 });
