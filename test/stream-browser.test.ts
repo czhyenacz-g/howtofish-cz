@@ -14,3 +14,13 @@ test("StreamBrowser.tsx: banner výběr jde přes AffiliateBannerSlot (candidate
   assert.doesNotMatch(source, /<AffiliateBanner\b/);
   assert.doesNotMatch(source, /<AdPlaceholder\b/);
 });
+
+test("StreamBrowser.tsx: má viditelný h2 nad statistikou živých streamů (SEO struktura nadpisů)", () => {
+  assert.match(source, /<h2 className="[^"]*">Živé streamy právě teď<\/h2>/);
+});
+
+test("StreamBrowser.tsx: prázdný stav (nikdo nestreamuje) odkazuje na /ryby a /hra, ne jen jedna holá věta", () => {
+  const emptyStateBlock = /\{filtered\.length === 0 \? \(([\s\S]*?)\) : \(/.exec(source)?.[1] ?? "";
+  assert.match(emptyStateBlock, /<Link href="\/ryby"/);
+  assert.match(emptyStateBlock, /<Link href="\/hra"/);
+});

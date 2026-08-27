@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import type { LiveStream, Platform } from "../../lib/streams/types";
 import type { PromotionEntry } from "../../lib/universal-content-api/types";
 import AffiliateBannerSlot from "../components/AffiliateBannerSlot";
@@ -76,7 +77,8 @@ export default function StreamBrowser({
 
   return (
     <div className="mt-10">
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center font-serif text-lg text-amber-300">
+      <h2 className="text-center font-serif text-xl text-amber-300">Živé streamy právě teď</h2>
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center font-serif text-lg text-amber-300">
         <span>
           Právě živě: {streams.length} {streams.length === 1 ? "stream" : "streamů"}
         </span>
@@ -123,7 +125,15 @@ export default function StreamBrowser({
 
       {filtered.length === 0 ? (
         <p className="mt-10 text-center text-cyan-100/60">
-          Teď zrovna nikdo How to Fish nestreamuje. Zkus to za chvíli znovu.
+          Teď zrovna nikdo How to Fish nestreamuje. Zkus to za chvíli znovu — mezitím si můžeš projít{" "}
+          <Link href="/ryby" className="underline hover:text-amber-300">
+            encyklopedii úlovků
+          </Link>{" "}
+          nebo zahrát minihru{" "}
+          <Link href="/hra" className="underline hover:text-amber-300">
+            Krabí invaze
+          </Link>
+          .
         </p>
       ) : (
         <div className="mt-8 overflow-hidden rounded-lg border border-white/10">
