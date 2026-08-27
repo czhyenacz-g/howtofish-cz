@@ -191,7 +191,10 @@ export default function CharacterCallout({
         onClick={handleReopen}
         aria-label="Otevřít profesora"
         title="Otevřít profesora"
-        className="fixed right-0 bottom-2 z-40 flex h-12 w-12 translate-x-1.5 rotate-[-3deg] items-center justify-center rounded-full border-2 border-[#3a2a1a] bg-amber-400 font-serif text-xl text-gray-900 shadow-lg transition duration-150 ease-out hover:translate-x-0.5 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none motion-reduce:hover:translate-x-1.5 motion-reduce:hover:scale-100 sm:bottom-auto sm:top-1/2 sm:h-14 sm:w-14 sm:-translate-y-1/2 sm:text-2xl"
+        // Mobile: bottom-44 (176px), ať se nekryje s AmbientAudioToggle
+        // (bottom-4, h-11 -> po 60px) ani s mobilní MultiplayerIslandTab
+        // ikonkou (bottom-24, h-16 -> po 160px). Desktop (sm:) beze změny.
+        className="fixed right-0 bottom-44 z-40 flex h-12 w-12 translate-x-1.5 rotate-[-3deg] items-center justify-center rounded-full border-2 border-[#3a2a1a] bg-amber-400 font-serif text-xl text-gray-900 shadow-lg transition duration-150 ease-out hover:translate-x-0.5 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none motion-reduce:hover:translate-x-1.5 motion-reduce:hover:scale-100 sm:bottom-auto sm:top-1/2 sm:h-14 sm:w-14 sm:-translate-y-1/2 sm:text-2xl"
       >
         ?
       </button>

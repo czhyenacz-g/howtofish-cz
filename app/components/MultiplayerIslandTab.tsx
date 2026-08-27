@@ -69,8 +69,10 @@ export default function MultiplayerIslandTab({ imageUrl }: { imageUrl: string | 
 
       {/* Mobile: kompaktní kulaté tlačítko, jen "ikonová" horní část
           assetu (ostrov + postavičky, bez textu) přes ořez. Nad
-          AmbientAudioToggle (bottom-4) a nad mobilní minimalizovanou
-          CharacterCallout bublinou (bottom-2 right-0) — viz bottom-24. */}
+          AmbientAudioToggle (bottom-4, po 60px) — viz bottom-24. Pod
+          minimalizovanou CharacterCallout "?" bublinou (bottom-44, viz
+          CharacterCallout.tsx), ta je schválně výš, aby se nekryla ani
+          s tímhle tlačítkem, ani se zvukem. */}
       <Link
         href={MULTIPLAYER_ROUTE}
         aria-label="Multiplayer ostrov"
