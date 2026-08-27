@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { getLiveStreams } from "../../lib/streams/get-live-streams";
-import { getActivePromotionForRoute } from "../../lib/universal-content-api/promotions";
+import { pickPromotion } from "../../lib/promotions/match-route";
+import { getActivePromotions } from "../../lib/universal-content-api/promotions";
 import StreamBrowser from "./StreamBrowser";
+
+const PATHNAME = "/stream";
 
 const TITLE = "Kdo právě hraje How to Fish?";
 const DESCRIPTION = "Živé streamy How to Fish z Twitch, YouTube a Kick na jednom místě.";
@@ -19,10 +22,15 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function StreamPage() {
-  const [{ streams, totalViewers, failedPlatforms, updatedAt }, bannerPromotion] = await Promise.all([
+  const [{ streams, totalViewers, failedPlatforms, updatedAt }, bannerCandidates] = await Promise.all([
     getLiveStreams(),
-    getActivePromotionForRoute("banner", "/stream").catch(() => null),
+    // Malý veřejný seznam aktivních banner promotions (bez UCA tokenu) —
+    // StreamBrowser je "use client" a přes AffiliateBannerSlot dořeší
+    // 7denní "už jsem klikl" vyřazení z localStorage (viz
+    // lib/promotions/clicked-promotions.ts), které server nevidí.
+    getActivePromotions("banner").catch(() => []),
   ]);
+  const bannerInitialPick = pickPromotion(bannerCandidates, PATHNAME);
 
   return (
     <div className="bg-gradient-to-b from-[#0a2438] via-[#0e4f66] to-[#146b78] px-4 py-12 text-white">
@@ -41,7 +49,8 @@ export default async function StreamPage() {
           totalViewers={totalViewers}
           failedPlatforms={failedPlatforms}
           updatedAt={updatedAt}
-          bannerPromotion={bannerPromotion}
+          bannerCandidates={bannerCandidates}
+          bannerInitialPick={bannerInitialPick}
         />
       </div>
     </div>

@@ -11,9 +11,14 @@ type AffiliateBannerProps = {
   href?: string;
   title: string;
   className?: string;
+  // Voláno SYNCHRONNĚ při kliknutí na skutečný odkaz (ne při renderu) —
+  // typicky markPromotionClicked z clicked-promotions.ts, viz
+  // AffiliateBannerSlot.tsx. Žádný preventDefault, ať middle-click,
+  // Ctrl/Cmd+click i target="_blank" fungují normálně.
+  onClick?: () => void;
 };
 
-export default function AffiliateBanner({ imageSrc, href, title, className = "" }: AffiliateBannerProps) {
+export default function AffiliateBanner({ imageSrc, href, title, className = "", onClick }: AffiliateBannerProps) {
   const [imageFailed, setImageFailed] = useState(false);
 
   const content = imageFailed ? (
@@ -60,6 +65,7 @@ export default function AffiliateBanner({ imageSrc, href, title, className = "" 
       rel="noopener noreferrer sponsored"
       aria-label={title}
       data-promotion-banner="true"
+      onClick={onClick}
       className={`group block overflow-hidden rounded-lg border border-amber-300/20 bg-gradient-to-br from-[#0e4f66] via-[#146b78] to-[#1c8a95] p-3 transition duration-150 hover:-translate-y-0.5 hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${className}`}
     >
       {content}

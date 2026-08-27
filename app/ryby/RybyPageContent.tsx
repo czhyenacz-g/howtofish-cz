@@ -1,9 +1,12 @@
 import { fishEntries } from "../../data/fish";
 import { getCurrentUser } from "../../lib/auth/current-user";
+import { pickPromotion } from "../../lib/promotions/match-route";
 import { getApprovedCatchCovers } from "../../lib/universal-content-api/catches";
-import { getActivePromotionForRoute } from "../../lib/universal-content-api/promotions";
+import { getActivePromotions } from "../../lib/universal-content-api/promotions";
 import { getMyPendingSuggestions } from "../../lib/universal-content-api/suggestions";
 import FishBrowser from "./FishBrowser";
+
+const PATHNAME = "/ryby";
 
 // Jediný zdroj obsahu pro `/ryby` i `/` (homepage) — obě routy jen
 // vyrenderují tuhle komponentu ve své vlastní Header/Footer kostře
@@ -17,17 +20,21 @@ export default async function RybyPageContent() {
   // getApprovedCatchCovers) — ne jeden request na rybu. Předává se
   // celý CommunityCatch (ne jen URL), ať FishCard může zobrazit i
   // nickname/badge, ne jen obrázek.
-  const [covers, mySuggestions, bannerPromotion] = await Promise.all([
+  const [covers, mySuggestions, bannerCandidates] = await Promise.all([
     getApprovedCatchCovers().catch(() => new Map()),
     // Server-side filtr podle steam_id ze session — nikdy se
     // nestahují cizí pending návrhy do browseru (viz suggestions.ts).
     user ? getMyPendingSuggestions(user.steamId).catch(() => []) : Promise.resolve([]),
-    // FishBrowser je "use client" — banner promotion se vybírá tady
-    // server-side (žádný seznam kandidátů do browseru) a předává už
-    // hotová jako plain prop, viz AdSlot pro přímé Server Component použití.
-    getActivePromotionForRoute("banner", "/ryby").catch(() => null),
+    // Malý veřejný seznam aktivních banner promotions (bez UCA tokenu) —
+    // FishBrowser je "use client" a přes AffiliateBannerSlot dořeší
+    // 7denní "už jsem klikl" vyřazení z localStorage, které server
+    // nevidí (viz lib/promotions/clicked-promotions.ts). initialPick
+    // níž je stejný server-side los jako dřív, ať se nic nezmění pro
+    // SSR/první vykreslení.
+    getActivePromotions("banner").catch(() => []),
   ]);
   const featuredCatches = Object.fromEntries(covers);
+  const bannerInitialPick = pickPromotion(bannerCandidates, PATHNAME);
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-[#0a2438] via-[#0e4f66] to-[#146b78] px-4 py-16 text-white">
@@ -57,7 +64,8 @@ export default async function RybyPageContent() {
             fish={fishEntries}
             featuredCatches={featuredCatches}
             suggestions={mySuggestions}
-            bannerPromotion={bannerPromotion}
+            bannerCandidates={bannerCandidates}
+            bannerInitialPick={bannerInitialPick}
           />
         </div>
       </div>

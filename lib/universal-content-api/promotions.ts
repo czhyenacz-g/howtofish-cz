@@ -1,5 +1,4 @@
 import "server-only";
-import { pickPromotion } from "../promotions/match-route.ts";
 import { getApprovedCommunityRecords } from "./community.ts";
 import type { PromotionEntry, PromotionPlacement, UcaRecord } from "./types.ts";
 
@@ -59,22 +58,17 @@ function mapRecordToPromotion(record: UcaRecord): PromotionEntry | null {
 
 /**
  * Všechny aktivní promotions daného placementu — cachováno ~2 min (viz
- * community.ts). Malý, ne-citlivý seznam (admin-psaný marketing text),
- * proto je v pořádku ho pro seller placement předat i jako plain prop do
- * "use client" CharacterCallout (viz report) — pro banner ho ale nikdy
- * nevidí browser, AdSlot dělá výběr server-side (getActivePromotionForRoute).
+ * community.ts). Malý, ne-citlivý seznam (admin-psaný marketing text,
+ * žádný UCA token) — v pořádku předat jako plain prop i do "use client"
+ * komponent (CharacterCallout pro seller, AffiliateBannerSlot pro
+ * banner), které si samy udělají finální route-match + weighted-random
+ * výběr (viz lib/promotions/match-route.ts) a klientsky dořeší 7denní
+ * "už jsem klikl" vyřazení z localStorage (viz
+ * lib/promotions/clicked-promotions.ts), které server nevidí.
  */
 export async function getActivePromotions(placement: PromotionPlacement): Promise<PromotionEntry[]> {
   const records = await getApprovedCommunityRecords(COLLECTION, 100, REVALIDATE_SECONDS).catch(() => []);
   return records
     .map(mapRecordToPromotion)
     .filter((p): p is PromotionEntry => p !== null && p.placement === placement);
-}
-
-export async function getActivePromotionForRoute(
-  placement: PromotionPlacement,
-  pathname: string
-): Promise<PromotionEntry | null> {
-  const candidates = await getActivePromotions(placement);
-  return pickPromotion(candidates, pathname);
 }

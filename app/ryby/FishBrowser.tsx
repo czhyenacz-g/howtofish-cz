@@ -4,9 +4,11 @@ import { useMemo, useState } from "react";
 import type { FishCategory, FishEntry } from "../../data/fish";
 import type { CommunityCatch, FishSuggestion, PromotionEntry } from "../../lib/universal-content-api/types";
 import AddFishSuggestionCard from "../components/AddFishSuggestionCard";
-import AffiliateBanner from "../components/AffiliateBanner";
+import AffiliateBannerSlot from "../components/AffiliateBannerSlot";
 import FishCard from "../components/FishCard";
 import FishSuggestionCard from "../components/FishSuggestionCard";
+
+const PATHNAME = "/ryby";
 
 const FILTERS: { key: "all" | FishCategory; label: string }[] = [
   { key: "all", label: "Vše" },
@@ -22,12 +24,14 @@ export default function FishBrowser({
   fish,
   featuredCatches = {},
   suggestions = [],
-  bannerPromotion = null,
+  bannerCandidates = [],
+  bannerInitialPick = null,
 }: {
   fish: FishEntry[];
   featuredCatches?: Record<string, CommunityCatch>;
   suggestions?: FishSuggestion[];
-  bannerPromotion?: PromotionEntry | null;
+  bannerCandidates?: PromotionEntry[];
+  bannerInitialPick?: PromotionEntry | null;
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | FishCategory>("all");
@@ -75,13 +79,18 @@ export default function FishBrowser({
         ))}
       </div>
 
-      {/* Bez aktivní banner promotion se tu nic nezobrazuje — žádný
-          "Reklamní prostor" placeholder, viz zadání. */}
-      {bannerPromotion?.imageUrl && (
-        <div className="mt-6">
-          <AffiliateBanner imageSrc={bannerPromotion.imageUrl} href={bannerPromotion.href} title={bannerPromotion.title} />
-        </div>
-      )}
+      {/* placeholderOnEmpty=false: bez aktivní (nevyřazené) banner
+          promotion se tu nic nezobrazuje — žádný "Reklamní prostor"
+          placeholder, viz zadání. */}
+      <div className="mt-6">
+        <AffiliateBannerSlot
+          key={PATHNAME}
+          candidates={bannerCandidates}
+          pathname={PATHNAME}
+          initialPick={bannerInitialPick}
+          placeholderOnEmpty={false}
+        />
+      </div>
 
       {filtered.length === 0 && (
         <p className="mt-10 text-center text-cyan-100/60">

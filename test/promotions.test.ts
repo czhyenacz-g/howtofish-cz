@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 process.env.UNIVERSAL_CONTENT_API_URL = "https://content-api.example.test";
 process.env.UNIVERSAL_CONTENT_API_TOKEN = "uca_test_token_not_real";
 
-const { getActivePromotions, getActivePromotionForRoute } = await import("../lib/universal-content-api/promotions.ts");
+const { getActivePromotions } = await import("../lib/universal-content-api/promotions.ts");
 
 function jsonResponse(status: number, body: unknown) {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -144,35 +144,19 @@ test("getActivePromotions: poslední navázané médium vyhrává (nový upload 
   );
 });
 
-test("getActivePromotionForRoute: pošle request a vrátí promotion odpovídající pathname", async () => {
+test("getActivePromotions: request jde na správnou collection se status=approved", async () => {
   let seenUrl = "";
   await withMockedFetch(
     async (url) => {
       seenUrl = String(url);
       return jsonResponse(200, {
-        data: [
-          record(1, { placement: "banner", page_pattern: "/ryby", title: "Ryby banner", href: "https://x", active: true, weight: 1 }, true),
-          record(2, { placement: "banner", page_pattern: "/predmety", title: "Predmety banner", href: "https://x", active: true, weight: 1 }, true),
-        ],
+        data: [record(1, { placement: "banner", page_pattern: "/ryby", title: "Ryby banner", href: "https://x", active: true, weight: 1 }, true)],
       });
     },
-    async () => {
-      const promotion = await getActivePromotionForRoute("banner", "/predmety");
-      assert.equal(promotion?.title, "Predmety banner");
-    }
+    () => getActivePromotions("banner")
   );
   assert.match(seenUrl, /collections\/promotions\/records/);
   assert.match(seenUrl, /status=approved/);
-});
-
-test("getActivePromotionForRoute: žádný kandidát -> null, ne pád", async () => {
-  await withMockedFetch(
-    async () => jsonResponse(200, { data: [] }),
-    async () => {
-      const promotion = await getActivePromotionForRoute("banner", "/ryby");
-      assert.equal(promotion, null);
-    }
-  );
 });
 
 test("UCA výpadek se nikdy nepropaguje jako neošetřená chyba (catch(() => []))", async () => {

@@ -35,3 +35,17 @@ describe("AffiliateBanner — data-promotion-banner atribut (seller callout koor
     assert.equal(matches.length, 2, "očekávány přesně 2 výskyty (<div> i <a> větev)");
   });
 });
+
+describe("AffiliateBanner — onClick (7denní vyřazení prokliknuté promotion)", () => {
+  test("onClick je volitelný prop, prochází beze změny", () => {
+    assert.match(source, /onClick\?:\s*\(\)\s*=>\s*void/);
+  });
+
+  test("onClick se předává jen na klikací <a> variantu, ne na neklikací <div>", () => {
+    const anchorBranch = /return \(\s*<a[\s\S]*?<\/a>\s*\);/.exec(source)?.[0] ?? "";
+    assert.match(anchorBranch, /onClick=\{onClick\}/);
+
+    const divBranch = /if \(!href\) \{([\s\S]*?)\n {2}\}\n\n {2}return \(/.exec(source)?.[1] ?? "";
+    assert.doesNotMatch(divBranch, /onClick=\{onClick\}/);
+  });
+});

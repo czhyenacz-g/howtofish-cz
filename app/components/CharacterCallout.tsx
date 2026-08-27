@@ -16,6 +16,7 @@ import {
 } from "../../lib/character-callouts/resolve-callout";
 import { getSellerLastShownAt, getSellerShownRoutes, rememberSellerShown } from "../../lib/character-callouts/seller-state";
 import { SELLER_DELAY_MS, shouldShowSeller } from "../../lib/character-callouts/seller-rules";
+import { excludeRecentlyClicked, markPromotionClicked } from "../../lib/promotions/clicked-promotions";
 import { pickPromotion } from "../../lib/promotions/match-route";
 import type { PromotionEntry } from "../../lib/universal-content-api/types";
 import { useBannerVisible } from "./useBannerVisible";
@@ -203,12 +204,22 @@ export default function CharacterCallout({
 
   // Aktivní promotion (pokud existuje pro tuhle route) má přednost před
   // statickou fallback hláškou — profesor se tímhle vůbec nezabývá.
-  const matchedPromotion = character === "seller" ? pickPromotion(sellerPromotions, pathname) : null;
+  // excludeRecentlyClicked: promotion, na kterou uživatel v posledních 7
+  // dnech skutečně klikl, se mu tu neopakuje (viz
+  // lib/promotions/clicked-promotions.ts) — pokud tím nezůstane žádný
+  // kandidát, pickPromotion vrátí null a použije se stejný statický
+  // fallback (SELLER_MESSAGE) jako dnes pro route bez promotion.
+  const availableSellerPromotions = character === "seller" ? excludeRecentlyClicked(sellerPromotions) : [];
+  const matchedPromotion = character === "seller" ? pickPromotion(availableSellerPromotions, pathname) : null;
   const callout = matchedPromotion
     ? resolvePromotionCallout(matchedPromotion)
     : resolveCharacterCallout(pathname, character);
   const image = CHARACTER_IMAGE[character];
   const visible = phase === "open";
+  // Jen skutečná promotion (ne statický fallback bez ID) zapisuje click
+  // do localStorage — viz zadání "fallback seller bez skutečné promotion
+  // nic nezapisuje".
+  const handleSellerCtaClick = matchedPromotion ? () => markPromotionClicked(matchedPromotion.id) : undefined;
 
   return (
     <div
@@ -249,6 +260,7 @@ export default function CharacterCallout({
             href={callout.href}
             target="_blank"
             rel="noopener noreferrer sponsored"
+            onClick={handleSellerCtaClick}
             className="mt-3 inline-flex min-h-[36px] items-center justify-center rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-amber-400"
           >
             {callout.linkLabel}
@@ -257,6 +269,7 @@ export default function CharacterCallout({
         {character === "seller" && callout.href && callout.linkLabel && !callout.isSponsored && (
           <Link
             href={callout.href}
+            onClick={handleSellerCtaClick}
             className="mt-3 inline-flex min-h-[36px] items-center justify-center rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-amber-400"
           >
             {callout.linkLabel}

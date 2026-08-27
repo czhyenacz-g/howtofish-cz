@@ -222,7 +222,25 @@ test("seller bez aktivní promotion pro danou route padá zpět na statickou SEL
 });
 
 test("CharacterCallout.tsx: promotion match má přednost, ale jen pro prodejce — profesor sellerPromotions vůbec nepoužívá", () => {
-  assert.match(componentSource, /character === "seller" \? pickPromotion\(sellerPromotions, pathname\) : null/);
+  assert.match(componentSource, /character === "seller" \? pickPromotion\(availableSellerPromotions, pathname\) : null/);
+});
+
+test("CharacterCallout.tsx: sellerPromotions se před výběrem filtrují přes excludeRecentlyClicked (7denní vyřazení prokliknutých)", () => {
+  assert.match(componentSource, /import \{ excludeRecentlyClicked, markPromotionClicked \} from "\.\.\/\.\.\/lib\/promotions\/clicked-promotions"/);
+  assert.match(
+    componentSource,
+    /const availableSellerPromotions = character === "seller" \? excludeRecentlyClicked\(sellerPromotions\) : \[\];/
+  );
+});
+
+test("CharacterCallout.tsx: seller CTA (obě varianty) volají markPromotionClicked jen pro skutečnou promotion, ne pro statický fallback", () => {
+  assert.match(
+    componentSource,
+    /const handleSellerCtaClick = matchedPromotion \? \(\) => markPromotionClicked\(matchedPromotion\.id\) : undefined;/
+  );
+  const ctaBlock = componentSource.split('{callout.isSponsored && (')[1] ?? "";
+  const onClickMatches = ctaBlock.match(/onClick=\{handleSellerCtaClick\}/g) ?? [];
+  assert.equal(onClickMatches.length, 2, "očekávány 2 CTA větve (sponsored <a> i interní <Link>), obě s onClick");
 });
 
 test("CharacterCallout.tsx: nikdy neimportuje universal-content-api/promotions.ts jako hodnotu (jen typ PromotionEntry) — data přijdou jako prop", () => {

@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import type { LiveStream, Platform } from "../../lib/streams/types";
 import type { PromotionEntry } from "../../lib/universal-content-api/types";
-import AdPlaceholder from "../components/AdPlaceholder";
-import AffiliateBanner from "../components/AffiliateBanner";
+import AffiliateBannerSlot from "../components/AffiliateBannerSlot";
+
+const PATHNAME = "/stream";
 
 const PLATFORM_LABEL: Record<Platform, string> = {
   twitch: "Twitch",
@@ -56,13 +57,15 @@ export default function StreamBrowser({
   totalViewers,
   failedPlatforms,
   updatedAt,
-  bannerPromotion = null,
+  bannerCandidates = [],
+  bannerInitialPick = null,
 }: {
   streams: LiveStream[];
   totalViewers: number | null;
   failedPlatforms: Platform[];
   updatedAt: string;
-  bannerPromotion?: PromotionEntry | null;
+  bannerCandidates?: PromotionEntry[];
+  bannerInitialPick?: PromotionEntry | null;
 }) {
   const [filter, setFilter] = useState<"all" | Platform>("all");
 
@@ -97,11 +100,7 @@ export default function StreamBrowser({
       )}
 
       <div className="mx-auto mt-6 max-w-3xl">
-        {bannerPromotion?.imageUrl ? (
-          <AffiliateBanner imageSrc={bannerPromotion.imageUrl} href={bannerPromotion.href} title={bannerPromotion.title} />
-        ) : (
-          <AdPlaceholder />
-        )}
+        <AffiliateBannerSlot key={PATHNAME} candidates={bannerCandidates} pathname={PATHNAME} initialPick={bannerInitialPick} />
       </div>
 
       <div className="mt-6 flex flex-wrap justify-center gap-2 font-serif">
