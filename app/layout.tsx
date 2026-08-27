@@ -6,6 +6,7 @@ import Script from "next/script";
 import AmbientAudioToggle from "./components/AmbientAudioToggle";
 import CharacterCallout from "./components/CharacterCallout";
 import MultiplayerIslandTab from "./components/MultiplayerIslandTab";
+import PageViewTracker from "./components/PageViewTracker";
 import { GOATCOUNTER_CODE } from "./config/analytics";
 import { getAssetById } from "../lib/universal-content-api/assets";
 import { getActivePromotions } from "../lib/universal-content-api/promotions";
@@ -83,6 +84,7 @@ export default async function RootLayout({
     <html lang="cs" className={`${breeSerif.variable} ${inter.variable}`}>
       <body className="bg-gray-900 font-sans text-white antialiased">
         {children}
+        <PageViewTracker />
         <AmbientAudioToggle />
         <MultiplayerIslandTab imageUrl={multiplayerIslandAsset?.imageUrl ?? null} />
         <CharacterCallout sellerPromotions={sellerPromotions} />

@@ -1,5 +1,6 @@
 "use server";
 
+import { trackEvent } from "../../lib/analytics/events";
 import { getCurrentUser } from "../../lib/auth/current-user";
 import { submitGameScore } from "../../lib/universal-content-api/scores";
 import { evaluateScoreSubmission } from "./evaluate-score-submission";
@@ -34,6 +35,14 @@ export async function saveScoreAction(
     console.error("Crab Rush: uložení skóre selhalo:", error instanceof Error ? error.message : error);
     return { status: "error", message: "Skóre se momentálně nepodařilo uložit. Zkus to prosím znovu." };
   }
+
+  // Až PO úspěšném uložení serverem (viz zadání "pokud score nebylo
+  // přijato serverem, neloguj ho jako validní game_score").
+  await trackEvent({
+    event: "game_score",
+    steamId: evaluation.payload.steam_id,
+    metadata: { game: evaluation.payload.game, score: evaluation.payload.score, round: evaluation.payload.round },
+  });
 
   return { status: "success", message: "Skóre uloženo do žebříčku!" };
 }

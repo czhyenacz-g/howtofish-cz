@@ -30,13 +30,18 @@ test("AffiliateBannerSlot.tsx: mount effect běží jen jednou (prázdné deps),
   assert.match(source, /\}, \[\]\);/);
 });
 
-test("AffiliateBannerSlot.tsx: klik zapisuje markPromotionClicked, ne při renderu", () => {
+test("AffiliateBannerSlot.tsx: klik zapisuje markPromotionClicked i affiliate_click event, ne při renderu", () => {
   const beforeHandleClick = source.split("function handleClick()")[0];
-  // markPromotionClicked se nesmí volat nikde mimo handleClick (a mount efekt níž ho taky nevolá).
+  // markPromotionClicked/trackClientEvent se nesmí volat nikde mimo handleClick (a mount efekt níž ho taky nevolá).
   assert.doesNotMatch(beforeHandleClick, /markPromotionClicked\(/);
+  assert.doesNotMatch(beforeHandleClick, /trackClientEvent\(/);
   const handleClickBody = /function handleClick\(\) \{([\s\S]*?)\n {2}\}/.exec(source)?.[1];
   assert.ok(handleClickBody, "nepodařilo se najít handleClick");
   assert.match(handleClickBody, /markPromotionClicked\(promotion\.id\)/);
+  assert.match(
+    handleClickBody,
+    /trackClientEvent\("affiliate_click", \{ metadata: \{ promotion_id: promotion\.id, placement: "banner" \} \}\)/
+  );
 });
 
 test("AffiliateBannerSlot.tsx: onClick se předává AffiliateBanner jen když promotion má href (bez href není co proklikávat)", () => {

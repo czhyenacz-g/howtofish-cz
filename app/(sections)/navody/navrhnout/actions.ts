@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { trackEvent } from "../../../../lib/analytics/events";
 import { getCurrentUser } from "../../../../lib/auth/current-user";
 import { evaluateCorrection, GENERIC_ERROR } from "../../../../lib/community/validation";
 import {
@@ -68,6 +69,8 @@ export async function submitGuideSuggestionAction(
       }
     }
   }
+
+  await trackEvent({ event: "suggestion_created", steamId: user.steamId, metadata: { type: "guide" } });
 
   redirect("/navody");
 }

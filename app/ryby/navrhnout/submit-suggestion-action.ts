@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { trackEvent } from "../../../lib/analytics/events";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import {
   checkSuggestionRateLimit,
@@ -86,6 +87,8 @@ export async function submitSuggestionAction(
       return { status: "error", message: GENERIC_ERROR };
     }
   }
+
+  await trackEvent({ event: "suggestion_created", steamId: user.steamId, metadata: { type: "fish" } });
 
   redirect("/ryby");
 }

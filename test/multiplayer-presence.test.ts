@@ -166,9 +166,9 @@ describe("getActivePresences (UCA integrace)", () => {
 });
 
 describe("setOwnPresence (upsert)", () => {
-  test("bez existujícího recordu vytvoří nový (POST)", async () => {
+  test("bez existujícího recordu vytvoří nový (POST) a vrátí created:true", async () => {
     const calls: { method: string; url: string }[] = [];
-    await withMockedFetch(
+    const result = await withMockedFetch(
       async (url, init) => {
         calls.push({ method: init?.method ?? "GET", url: String(url) });
         if (calls.length === 1) return jsonResponse(200, { data: [] }); // find own -> none
@@ -179,11 +179,12 @@ describe("setOwnPresence (upsert)", () => {
     assert.equal(calls.length, 2);
     assert.equal(calls[0].method, "GET");
     assert.equal(calls[1].method, "POST");
+    assert.deepEqual(result, { created: true });
   });
 
-  test("s existujícím recordem ho aktualizuje (PATCH), nevytvoří novou řádku", async () => {
+  test("s existujícím viditelným recordem ho aktualizuje (PATCH), nevytvoří novou řádku, vrátí created:false", async () => {
     const calls: { method: string; url: string }[] = [];
-    await withMockedFetch(
+    const result = await withMockedFetch(
       async (url, init) => {
         calls.push({ method: init?.method ?? "GET", url: String(url) });
         if (calls.length === 1) {
@@ -198,6 +199,24 @@ describe("setOwnPresence (upsert)", () => {
     assert.equal(calls.length, 2);
     assert.equal(calls[1].method, "PATCH");
     assert.match(calls[1].url, /records\/77$/);
+    assert.deepEqual(result, { created: false });
+  });
+
+  test("re-aktivace dřív skrytého (visible:false) recordu se počítá jako created:true (nový 'join')", async () => {
+    const result = await withMockedFetch(
+      async (url, init) => {
+        if (init?.method !== "PATCH" && (init?.method ?? "GET") === "GET") {
+          return jsonResponse(200, {
+            data: [
+              presenceRecord({ id: 77, steamId: "1", nickname: "A", visible: false, lastSeenAt: new Date().toISOString() }),
+            ],
+          });
+        }
+        return jsonResponse(200, { data: { id: 77 } });
+      },
+      () => setOwnPresence({ steamId: "1", nickname: "A", avatarUrl: null, status: "play" })
+    );
+    assert.deepEqual(result, { created: true });
   });
 });
 

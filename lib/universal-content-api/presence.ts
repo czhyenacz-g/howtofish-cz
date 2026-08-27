@@ -99,8 +99,13 @@ export type SetPresenceInput = {
  * vlastní record (podle steam_id) a nahraď jeho `data` čerstvým
  * snapshotem, nebo ho založ, pokud ještě neexistuje. Jeden record na
  * steam_id, žádná nová řádka při každém heartbeatu (viz zadání).
+ *
+ * Vrací `{ created: true }` jen když šlo o skutečně NOVÝ record (první
+ * opt-in, nebo znovu-aktivace po expiraci) — volající (setPresenceAction)
+ * tím pozná, jestli jde o skutečný "join" pro analytics, na rozdíl od
+ * heartbeatu/změny statusu, kde `existing` record obvykle už je.
  */
-export async function setOwnPresence(input: SetPresenceInput): Promise<void> {
+export async function setOwnPresence(input: SetPresenceInput): Promise<{ created: boolean }> {
   const data = {
     steam_id: input.steamId,
     nickname: input.nickname,
@@ -112,10 +117,16 @@ export async function setOwnPresence(input: SetPresenceInput): Promise<void> {
 
   const existing = await findOwnPresenceRecord(input.steamId);
   if (existing) {
+    // Znovu-aktivace po "Skrýt mě" počítá jako nový join stejně jako
+    // úplně první opt-in — na rozdíl od heartbeatu/změny statusu, kde
+    // record už byl viditelný.
+    const wasHidden = existing.data.visible !== true;
     await updateCommunityRecord(COLLECTION, existing.id, data);
-  } else {
-    await createCommunityRecord(COLLECTION, data);
+    return { created: wasHidden };
   }
+
+  await createCommunityRecord(COLLECTION, data);
+  return { created: true };
 }
 
 /** "Skrýt mě" — visible=false; no-op, pokud presence ještě neexistuje. */

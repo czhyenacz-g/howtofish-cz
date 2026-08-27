@@ -16,6 +16,7 @@ import {
 } from "../../lib/character-callouts/resolve-callout";
 import { getSellerLastShownAt, getSellerShownRoutes, rememberSellerShown } from "../../lib/character-callouts/seller-state";
 import { SELLER_DELAY_MS, shouldShowSeller } from "../../lib/character-callouts/seller-rules";
+import { trackClientEvent } from "../../lib/analytics/track-client-event";
 import { excludeRecentlyClicked, markPromotionClicked } from "../../lib/promotions/clicked-promotions";
 import { pickPromotion } from "../../lib/promotions/match-route";
 import type { PromotionEntry } from "../../lib/universal-content-api/types";
@@ -217,9 +218,14 @@ export default function CharacterCallout({
   const image = CHARACTER_IMAGE[character];
   const visible = phase === "open";
   // Jen skutečná promotion (ne statický fallback bez ID) zapisuje click
-  // do localStorage — viz zadání "fallback seller bez skutečné promotion
-  // nic nezapisuje".
-  const handleSellerCtaClick = matchedPromotion ? () => markPromotionClicked(matchedPromotion.id) : undefined;
+  // do localStorage i do analytics — viz zadání "fallback seller bez
+  // skutečné promotion nic nezapisuje".
+  const handleSellerCtaClick = matchedPromotion
+    ? () => {
+        markPromotionClicked(matchedPromotion.id);
+        trackClientEvent("affiliate_click", { metadata: { promotion_id: matchedPromotion.id, placement: "seller" } });
+      }
+    : undefined;
 
   return (
     <div

@@ -74,6 +74,15 @@ export default function OchranaSoukromiPage() {
           cookies a data zpracovává agregovaně. Web může volitelně používat i cookie-free analytiku GoatCounter —
           aktuálně není na webu zapnutá.
         </p>
+        <p className="mt-3 text-cyan-100/80">
+          Kromě toho si sami zaznamenáváme malé množství vlastních (first-party) eventů o používání webu — např.
+          zobrazení stránky, nahrání úlovku nebo odeslání návrhu — abychom viděli, které funkce web reálně používá.
+          Nepoužíváme k tomu Google Analytics, Meta Pixel ani žádné externí sledovací nástroje, nevytváříme
+          &bdquo;fingerprint&ldquo; zařízení a neukládáme IP adresu ani user-agent k jednotlivým eventům. Pokud
+          nejsi přihlášený, eventy se párují jen s náhodným identifikátorem uloženým v tvém prohlížeči
+          (localStorage), který nijak nesouvisí s tvou identitou. Pokud jsi přihlášený přes Steam, párují se s
+          tvým Steam ID. Tato data si necháváme přibližně 12 měsíců.
+        </p>
       </section>
 
       <section className="mt-8">

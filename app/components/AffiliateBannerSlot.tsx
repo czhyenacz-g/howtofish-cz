@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { trackClientEvent } from "../../lib/analytics/track-client-event";
 import { excludeRecentlyClicked, isPromotionRecentlyClicked, markPromotionClicked } from "../../lib/promotions/clicked-promotions";
 import { pickPromotion } from "../../lib/promotions/match-route";
 import type { PromotionEntry } from "../../lib/universal-content-api/types";
@@ -51,6 +52,7 @@ export default function AffiliateBannerSlot({
   function handleClick() {
     if (!promotion) return;
     markPromotionClicked(promotion.id);
+    trackClientEvent("affiliate_click", { metadata: { promotion_id: promotion.id, placement: "banner" } });
   }
 
   if (!promotion || !promotion.imageUrl) {

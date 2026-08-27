@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { trackClientEvent } from "../../lib/analytics/track-client-event";
 import { SpeakerIcon, SpeakerMuteIcon } from "../components/icons";
 import CrabIcon from "./CrabIcon";
 import { useCrunchSound } from "./useCrunchSound";
@@ -192,10 +193,12 @@ export default function CrabRushGame({ user }: { user: GameUser }) {
   function handleStart() {
     unlock();
     setGameState(startGame());
+    trackClientEvent("game_started", { metadata: { game: "crab-rush" } });
   }
 
   function handleRestart() {
     setGameState(startGame());
+    trackClientEvent("game_started", { metadata: { game: "crab-rush" } });
   }
 
   function handleCrabClick(crabId: number, event: React.MouseEvent<HTMLButtonElement>) {

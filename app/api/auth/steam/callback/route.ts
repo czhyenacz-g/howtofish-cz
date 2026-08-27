@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { trackEvent } from "../../../../../lib/analytics/events";
 import { upsertSteamUser } from "../../../../../lib/auth/db";
 import { sanitizeReturnTo } from "../../../../../lib/auth/return-to";
 import { fetchSteamProfile } from "../../../../../lib/auth/steam-profile";
@@ -37,6 +38,12 @@ export async function GET(request: NextRequest) {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
   }
+
+  // Best-effort — analytics zápis nikdy nesmí ovlivnit, jestli přihlášení
+  // uspěje (viz zadání). anonymous_id se sem netáhne přes OpenID redirect
+  // (viz report) — anonym -> Steam vazbu zajišťuje místo toho page_view
+  // stream (stejné anonymous_id se dál posílá i po přihlášení).
+  await trackEvent({ event: "steam_login", steamId, path: returnTo });
 
   const response = NextResponse.redirect(new URL(returnTo, request.url));
   response.cookies.set(SESSION_COOKIE_NAME, createSessionCookieValue(steamId), {

@@ -1,5 +1,6 @@
 "use server";
 
+import { trackEvent } from "../../../lib/analytics/events";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { createCatchRecord, uploadCatchImage } from "../../../lib/universal-content-api/catches";
 import { evaluateCatchUpload, GENERIC_ERROR } from "./evaluate-catch-upload";
@@ -51,6 +52,14 @@ export async function uploadCatchAction(
       return { status: "error", message: GENERIC_ERROR };
     }
   }
+
+  // Best-effort, po úspěšném uploadu (upload je úspěšný bez ohledu na
+  // tohle, viz zadání) — jen fish_slug, žádná poznámka/filename/URL.
+  await trackEvent({
+    event: "fish_upload",
+    steamId: evaluation.payload.steam_id,
+    metadata: { fish_slug: evaluation.payload.fish_slug },
+  });
 
   return {
     status: "success",

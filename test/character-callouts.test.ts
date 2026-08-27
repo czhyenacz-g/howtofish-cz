@@ -233,11 +233,14 @@ test("CharacterCallout.tsx: sellerPromotions se před výběrem filtrují přes 
   );
 });
 
-test("CharacterCallout.tsx: seller CTA (obě varianty) volají markPromotionClicked jen pro skutečnou promotion, ne pro statický fallback", () => {
-  assert.match(
-    componentSource,
-    /const handleSellerCtaClick = matchedPromotion \? \(\) => markPromotionClicked\(matchedPromotion\.id\) : undefined;/
-  );
+test("CharacterCallout.tsx: seller CTA (obě varianty) volají markPromotionClicked + trackClientEvent jen pro skutečnou promotion, ne pro statický fallback", () => {
+  const handlerBody = /const handleSellerCtaClick = matchedPromotion\s*\?\s*\(\) => \{([\s\S]*?)\n {6}\}\s*: undefined;/.exec(
+    componentSource
+  )?.[1];
+  assert.ok(handlerBody, "nepodařilo se najít handleSellerCtaClick");
+  assert.match(handlerBody, /markPromotionClicked\(matchedPromotion\.id\)/);
+  assert.match(handlerBody, /trackClientEvent\("affiliate_click", \{ metadata: \{ promotion_id: matchedPromotion\.id, placement: "seller" \} \}\)/);
+
   const ctaBlock = componentSource.split('{callout.isSponsored && (')[1] ?? "";
   const onClickMatches = ctaBlock.match(/onClick=\{handleSellerCtaClick\}/g) ?? [];
   assert.equal(onClickMatches.length, 2, "očekávány 2 CTA větve (sponsored <a> i interní <Link>), obě s onClick");
