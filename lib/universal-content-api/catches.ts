@@ -60,6 +60,21 @@ export async function uploadCatchImage(recordId: number, file: File): Promise<Uc
 }
 
 /**
+ * Programově schválí/zamítne VLASTNÍ record (Content API PATCH s
+ * `status`, vyžaduje scope `records:moderate` — viz docs/AI_GATEWAY.md
+ * a docs/API.md v universal-content-api). Volá se jen podle výsledku
+ * AiGateway moderace (viz moderate-catch-upload.ts) — rozhodovací
+ * logika (kdy schválit/zamítnout) žije tam, tady je jen HTTP volání.
+ */
+export async function setCatchModerationStatus(recordId: number, status: "approved" | "rejected"): Promise<void> {
+  await ucaJsonRequest<{ data: UcaRecord }>(recordsPath(`/${recordId}`), {
+    method: "PATCH",
+    body: { status },
+    timeoutMs: CREATE_TIMEOUT_MS,
+  });
+}
+
+/**
  * Schválené úlovky pro jednu rybu, seřazené od nejstaršího (pro určení
  * "první úlovek") — UCA vrací nejnovější první, řadíme si to sami.
  * Cachováno přes Next fetch cache (viz READ_REVALIDATE_SECONDS).
