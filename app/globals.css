@@ -243,3 +243,41 @@
     animation-duration: 1ms;
   }
 }
+
+/* CreatorVideoCarousel (homepage) — jemný přechod mezi slidy a tenký
+   progress fill v aktivním dotu. Komponenta sama navíc reduced-motion
+   respektuje i logicky (vypne autoplay úplně), tahle CSS pravidla
+   pokrývají jen samotnou animaci pro uživatele, kteří JS media query
+   nemají/mají ho vypnuté jinak. */
+@keyframes carousel-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-carousel-fade-in {
+  animation: carousel-fade-in 300ms ease-out;
+}
+
+@keyframes carousel-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-carousel-progress {
+  animation: carousel-progress 6s linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-carousel-fade-in,
+  .animate-carousel-progress {
+    animation: none;
+  }
+}

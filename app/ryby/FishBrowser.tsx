@@ -5,7 +5,7 @@ import type { FishCategory, FishEntry } from "../../data/fish";
 import type { CommunityCatch, FishSuggestion, PromotionEntry } from "../../lib/universal-content-api/types";
 import AddFishSuggestionCard from "../components/AddFishSuggestionCard";
 import AffiliateBannerSlot from "../components/AffiliateBannerSlot";
-import AgraelVideoPromo from "../components/AgraelVideoPromo";
+import CreatorVideoCarousel from "../components/CreatorVideoCarousel";
 import FishCard from "../components/FishCard";
 import FishSuggestionCard from "../components/FishSuggestionCard";
 import LiveStreamsLink from "../components/LiveStreamsLink";
@@ -81,10 +81,11 @@ export default function FishBrowser({
         ))}
       </div>
 
-      {/* Agrael video promo + odkaz na /stream — nad soutěžním bannerem,
-          jen ho posouvá níž (viz zadání). Kompaktní, žádný nový H1. */}
+      {/* CZ/SK tvůrci carousel + odkaz na /stream — nad soutěžním
+          bannerem, jen ho posouvá níž (viz zadání). Kompaktní, žádný
+          nový H1. */}
       <div className="mt-6">
-        <AgraelVideoPromo />
+        <CreatorVideoCarousel />
         <div className="mt-3">
           <LiveStreamsLink />
         </div>
