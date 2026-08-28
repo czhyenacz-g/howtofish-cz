@@ -5,8 +5,10 @@ import type { FishCategory, FishEntry } from "../../data/fish";
 import type { CommunityCatch, FishSuggestion, PromotionEntry } from "../../lib/universal-content-api/types";
 import AddFishSuggestionCard from "../components/AddFishSuggestionCard";
 import AffiliateBannerSlot from "../components/AffiliateBannerSlot";
+import AgraelVideoPromo from "../components/AgraelVideoPromo";
 import FishCard from "../components/FishCard";
 import FishSuggestionCard from "../components/FishSuggestionCard";
+import LiveStreamsLink from "../components/LiveStreamsLink";
 
 const PATHNAME = "/ryby";
 
@@ -77,6 +79,15 @@ export default function FishBrowser({
             {f.label}
           </button>
         ))}
+      </div>
+
+      {/* Agrael video promo + odkaz na /stream — nad soutěžním bannerem,
+          jen ho posouvá níž (viz zadání). Kompaktní, žádný nový H1. */}
+      <div className="mt-6">
+        <AgraelVideoPromo />
+        <div className="mt-3">
+          <LiveStreamsLink />
+        </div>
       </div>
 
       {/* placeholderOnEmpty=false: bez aktivní (nevyřazené) banner

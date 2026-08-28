@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
         hostname: "*.steamstatic.com",
         pathname: "/steamcommunity/public/images/apps/**",
       },
+      {
+        // YouTube video thumbnaily pro lite-embed (viz AgraelVideoPromo) —
+        // iframe se načte až po kliknutí, do té doby jen statický náhled.
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        pathname: "/vi/**",
+      },
     ],
   },
   experimental: {
