@@ -3,7 +3,7 @@ export const SITE_TAGLINE = "How to Fish česky";
 export const SITE_DOMAIN = "howtofish.cz";
 export const SITE_URL = `https://${SITE_DOMAIN}`;
 
-export const SITE_TITLE = "How to Fish CZ – česká encyklopedie hry How to Fish";
+export const SITE_TITLE = "How to Fish CZ Wiki – ryby, návody, bossové a lokace";
 
 export const SITE_DESCRIPTION =
   "Česká encyklopedie hry How to Fish. Ryby, úlovky, lokace, návody a tipy.";
