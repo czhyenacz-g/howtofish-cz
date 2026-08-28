@@ -12,9 +12,20 @@ const MAX_RESULTS = 15;
 
 // "How to Fish" je i běžná anglická fráze o skutečném rybaření — hlídáme
 // se proti false positives kombinací gaming kategorie a klíčových slov.
+//
+// "how to fish" je samo o sobě pozitivní signál (ne jen "how to fish
+// game") — reálné CZ/SK streamer titulky typicky nemají žádné z
+// ostatních anglických buzzwords (gameplay/steam/co-op apod.), jen
+// samotný název hry + český text (např. "JAK JSEM SE STAL RYBÁŘEM |
+// HOW TO FISH | #1"), a bez tohohle klíčového slova je tenhle filtr
+// dřív takové titulky tiše zahazoval, i když reálně o hru šlo. Riziko
+// false positive od skutečných rybářských návodů zůstává nízké — ty
+// prakticky nikdy nejsou v YouTube kategorii "Gaming" ani jako živý
+// stream (viz GAMING_CATEGORY_ID + eventType "live" v requestu výš),
+// takže se sem vůbec nedostanou k tomuhle druhotnému textovému filtru.
 const POSITIVE_KEYWORDS = [
+  "how to fish",
   "dazed games",
-  "how to fish game",
   "gameplay",
   "steam",
   "co-op",
@@ -36,7 +47,7 @@ const NEGATIVE_KEYWORDS = [
   "trout fishing",
 ];
 
-function looksRelevant(title: string, description: string): boolean {
+export function looksRelevant(title: string, description: string): boolean {
   const text = `${title} ${description}`.toLowerCase();
   const positive = POSITIVE_KEYWORDS.filter((k) => text.includes(k)).length;
   const negative = NEGATIVE_KEYWORDS.filter((k) => text.includes(k)).length;
