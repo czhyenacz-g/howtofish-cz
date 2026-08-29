@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fishEntries } from "../../../data/fish";
+import { getFishGuidesForFish } from "../../../data/fish-guides";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getApprovedCatches, selectFeaturedCatch } from "../../../lib/universal-content-api/catches";
 import VerificationBadge from "../../components/VerificationBadge";
@@ -48,6 +49,10 @@ export default async function FishDetailPage({ params }: Props) {
   if (!entry) {
     notFound();
   }
+
+  // Lehké propojení na nové SEO návody (viz data/fish-guides.ts) — jen
+  // pokud pro tuhle rybu skutečně existují, jinak se sekce nevykreslí.
+  const relatedGuides = getFishGuidesForFish(entry.slug);
 
   const [user, catches] = await Promise.all([
     getCurrentUser(),
@@ -193,6 +198,24 @@ export default async function FishDetailPage({ params }: Props) {
             ))}
           </ul>
         </section>
+
+        {relatedGuides.length > 0 && (
+          <section className="mt-10 border-t border-white/10 pt-6">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-100/50">Související návody</h2>
+            <ul className="mt-2 space-y-1 text-sm">
+              {relatedGuides.map((guide) => (
+                <li key={guide.slug}>
+                  <Link
+                    href={`/navody/${guide.type === "how-to-catch" ? "jak-chytit" : "kde-najit"}-${guide.fishSlug}`}
+                    className="text-cyan-100/70 underline hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                  >
+                    {guide.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <div className="mt-10">
           <AdSlot pathname={`/ryby/${entry.slug}`} />

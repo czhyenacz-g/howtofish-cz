@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getLiveStreams } from "../../lib/streams/get-live-streams";
+import { creatorProfiles } from "../../data/creators";
 import { pickPromotion } from "../../lib/promotions/match-route";
 import { getActivePromotions } from "../../lib/universal-content-api/promotions";
 import { SITE_URL } from "../config/site";
@@ -108,6 +109,22 @@ export default async function StreamPage() {
             ))}
           </div>
         </section>
+
+        {creatorProfiles.length > 0 && (
+          <section className="mx-auto mt-12 max-w-2xl border-t border-white/10 pt-8">
+            <h2 className="font-serif text-xl text-amber-300">Čeští a slovenští tvůrci</h2>
+            <p className="mt-2 text-sm text-cyan-100/70">CZ/SK tvůrci, kteří si zahráli How to Fish, a jejich dostupná videa ze hry.</p>
+            <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
+              {creatorProfiles.map((creator) => (
+                <li key={creator.slug}>
+                  <Link href={`/stream/${creator.slug}`} className="text-cyan-100/80 underline hover:text-amber-300">
+                    {creator.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </div>
   );

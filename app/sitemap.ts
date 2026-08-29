@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { fishEntries } from "../data/fish.ts";
 import { guides as curatedGuides } from "../data/guides.ts";
+import { fishGuides } from "../data/fish-guides.ts";
+import { creatorProfiles } from "../data/creators.ts";
 import { SITE_URL } from "./config/site.ts";
 
 // Homepage (`/`) je záměrně mimo sitemap — zobrazuje stejný obsah jako
@@ -41,6 +43,29 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
+    });
+  }
+
+  // Nové SEO návody ("jak chytit" / "kde najít") — statická
+  // data/fish-guides.ts, jen skutečně existující (a tedy indexovatelné)
+  // stránky, viz generateStaticParams v jejich page.tsx.
+  for (const guide of fishGuides) {
+    const prefix = guide.type === "how-to-catch" ? "jak-chytit" : "kde-najit";
+    entries.push({
+      url: `${SITE_URL}/navody/${prefix}-${guide.fishSlug}`,
+      lastModified: guide.lastReviewed ? new Date(guide.lastReviewed) : new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    });
+  }
+
+  // Streamer detail pages — jen potvrzení tvůrci z data/creator-videos.ts.
+  for (const creator of creatorProfiles) {
+    entries.push({
+      url: `${SITE_URL}/stream/${creator.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.4,
     });
   }
 
