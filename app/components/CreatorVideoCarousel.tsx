@@ -142,7 +142,14 @@ function CarouselMedia({
   if (slide.platform === "kick") {
     return (
       <div className="relative aspect-video w-full shrink-0 sm:w-[42%]">
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 border-b border-white/10 bg-gradient-to-br from-[#0a2438] to-[#123c4d] text-center sm:border-b-0 sm:border-r">
+        {slide.image && (
+          <Image src={slide.image} alt="" fill sizes="(min-width: 640px) 42vw, 100vw" className="object-cover" />
+        )}
+        <div
+          className={`absolute inset-0 flex flex-col items-center justify-center gap-1.5 border-b border-white/10 text-center sm:border-b-0 sm:border-r ${
+            slide.image ? "bg-black/55" : "bg-gradient-to-br from-[#0a2438] to-[#123c4d]"
+          }`}
+        >
           <span className="rounded border border-white/20 bg-white/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-cyan-100/90">
             Kick
           </span>

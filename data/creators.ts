@@ -12,6 +12,7 @@ export type CreatorProfileVideo = {
   platform: CreatorVideo["platform"];
   url: string;
   youtubeId?: string;
+  image?: string;
 };
 
 export type CreatorProfile = {
@@ -27,7 +28,7 @@ export const creatorProfiles: CreatorProfile[] = creatorNames.map((name) => ({
   name,
   videos: creatorVideos
     .filter((v) => v.creator === name)
-    .map((v) => ({ title: v.title, subtitle: v.subtitle, platform: v.platform, url: v.url, youtubeId: v.youtubeId })),
+    .map((v) => ({ title: v.title, subtitle: v.subtitle, platform: v.platform, url: v.url, youtubeId: v.youtubeId, image: v.image })),
 }));
 
 export function getCreatorProfile(slug: string): CreatorProfile | undefined {

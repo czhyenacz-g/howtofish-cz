@@ -25,6 +25,8 @@ export type CreatorVideo = {
   url: string;
   /** Jen pro platform "youtube" — zbytek (embed/thumbnail URL) se odvozuje z tohoto ID. */
   youtubeId?: string;
+  /** Jen pro platform "kick" — logo nahrané ručně přes UCA admin (žádný scraping/API pro Kick VOD thumbnaily, viz výše). */
+  image?: string;
   ctaLabel: string;
 };
 
@@ -54,6 +56,7 @@ export const creatorVideos: CreatorVideo[] = [
     platform: "kick",
     language: "cs",
     url: "https://kick.com/flygun/videos",
+    image: "https://content-api.darbujan.com/media/43",
     title: "FlyGun hraje How to Fish",
     subtitle: "How to Fish s klukama",
     ctaLabel: "Zobrazit záznamy na Kicku",
@@ -63,6 +66,7 @@ export const creatorVideos: CreatorVideo[] = [
     platform: "kick",
     language: "cs",
     url: "https://kick.com/freezecz/clips",
+    image: "https://content-api.darbujan.com/media/44",
     title: "Freeze hraje How to Fish",
     subtitle: "COOP s českými streamery",
     ctaLabel: "Klipy na Kicku",
@@ -72,6 +76,7 @@ export const creatorVideos: CreatorVideo[] = [
     platform: "kick",
     language: "cs",
     url: "https://kick.com/miken/clips",
+    image: "https://content-api.darbujan.com/media/42",
     title: "Miken hraje How to Fish",
     subtitle: "Klipy z How to Fish",
     ctaLabel: "Klipy na Kicku",

@@ -117,8 +117,14 @@ export default async function CreatorPage({ params }: Props) {
   );
 }
 
-function VideoCard({ video }: { video: { title: string; subtitle: string; platform: "youtube" | "kick"; url: string; youtubeId?: string } }) {
-  const thumbnailSrc = video.youtubeId ? `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg` : null;
+function VideoCard({
+  video,
+}: {
+  video: { title: string; subtitle: string; platform: "youtube" | "kick"; url: string; youtubeId?: string; image?: string };
+}) {
+  const thumbnailSrc = video.youtubeId
+    ? `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`
+    : (video.image ?? null);
 
   return (
     <a
