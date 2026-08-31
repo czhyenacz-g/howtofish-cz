@@ -59,7 +59,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // Streamer detail pages — jen potvrzení tvůrci z data/creator-videos.ts.
+  // Streamer detail pages — jak ověření tvůrci s videi (data/creator-videos.ts),
+  // tak opatrně formulované profily bez videa (data/creators.ts) — všichni
+  // jsou skutečné, indexovatelné stránky (viz app/stream/[creator]/page.tsx).
   for (const creator of creatorProfiles) {
     entries.push({
       url: `${SITE_URL}/stream/${creator.slug}`,

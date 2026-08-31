@@ -8,13 +8,13 @@ import AffiliateBannerSlot from "../components/AffiliateBannerSlot";
 
 const PATHNAME = "/stream";
 
-const PLATFORM_LABEL: Record<Platform, string> = {
+export const PLATFORM_LABEL: Record<Platform, string> = {
   twitch: "Twitch",
   youtube: "YouTube",
   kick: "Kick",
 };
 
-const PLATFORM_BADGE_CLASS: Record<Platform, string> = {
+export const PLATFORM_BADGE_CLASS: Record<Platform, string> = {
   twitch: "border-violet-400/40 bg-violet-500/20 text-violet-300",
   youtube: "border-red-400/40 bg-red-500/20 text-red-300",
   kick: "border-emerald-400/40 bg-emerald-500/20 text-emerald-300",

@@ -2,61 +2,119 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import {
+  HRA_LINK,
+  MULTIPLAYER_LINK,
+  O_HRE_LINK,
+  WORLD_GROUP,
+  buildLinks,
+  buildMobileLinks,
+  isEntryActive,
+  isNavGroup,
+} from "../app/components/nav-config.ts";
 
-// Header.tsx je "use client" a importuje React hooky přímo — pod
-// --conditions=react-server ho nejde přímo naimportovat (viz
-// test/use-banner-visible.test.ts pro stejný důvod). Zdrojová kontrola,
-// stejný vzor jako ostatní framework-vázané testy v repu.
+// Header.tsx samotný zůstává "use client" a nejde importovat pod
+// --conditions=react-server — jen zdrojová kontrola pro věci, co
+// nav-config.ts nepokrývá (JSX rendering detaily).
 const headerSource = readFileSync(fileURLToPath(new URL("../app/components/Header.tsx", import.meta.url)), "utf8");
 const footerSource = readFileSync(fileURLToPath(new URL("../app/components/Footer.tsx", import.meta.url)), "utf8");
 
-test("Header.tsx: položka pro /hra se jmenuje 'Krabí invaze', ne 'Hra'", () => {
-  assert.match(headerSource, /const HRA_LINK = \{ href: "\/hra", label: "Krabí invaze" \}/);
+test("Krabí invaze vede na existující route /hra", () => {
+  assert.equal(HRA_LINK.href, "/hra");
+  assert.equal(HRA_LINK.label, "Krabí invaze");
 });
 
-test("Header.tsx: label 'Hra' už se nikde nepoužívá jako text položky (jen jako součást delších slov jako 'hra' v komentářích/URL se nekontroluje)", () => {
-  assert.doesNotMatch(headerSource, /label:\s*"Hra"/);
+test("O hře odkazuje na /o-hre", () => {
+  assert.equal(O_HRE_LINK.href, "/o-hre");
 });
 
-test("Header.tsx: 'Krabí invaze' vede na existující route /hra", () => {
-  const hraLinkMatch = /const HRA_LINK = \{ href: "([^"]+)", label: "Krabí invaze" \}/.exec(headerSource);
-  assert.ok(hraLinkMatch, "nepodařilo se najít HRA_LINK");
-  assert.equal(hraLinkMatch[1], "/hra");
+test("Svět je skupina obsahující Lokace a Bossové", () => {
+  assert.ok(isNavGroup(WORLD_GROUP));
+  const hrefs = WORLD_GROUP.children.map((c) => c.href);
+  assert.deepEqual(hrefs.sort(), ["/bossove", "/lokace"]);
 });
 
-test("Header.tsx: /hra používá CrabIcon, ne GameIcon (gamepad)", () => {
-  assert.match(headerSource, /"\/hra":\s*CrabIcon/);
-  assert.doesNotMatch(headerSource, /GameIcon/);
+test("produkční desktop menu (basePath='') obsahuje Svět, ne samostatné Lokace/Bossové", () => {
+  const links = buildLinks("");
+  const labels = links.map((l) => l.label);
+  assert.ok(labels.includes("Svět"));
+  assert.ok(!labels.includes("Lokace"), "Lokace nesmí být samostatná top-level položka");
+  assert.ok(!labels.includes("Bossové"), "Bossové nesmí být samostatná top-level položka");
 });
 
-test("Header.tsx: O_HRE_LINK existuje a míří na /o-hre", () => {
-  assert.match(headerSource, /const O_HRE_LINK = \{ href: "\/o-hre", label: "O hře" \}/);
+test("Multiplayer ostrov je v hlavním produkčním menu", () => {
+  const links = buildLinks("");
+  assert.ok(links.some((l) => !isNavGroup(l) && l.href === MULTIPLAYER_LINK.href));
 });
 
-test("Header.tsx: desktop pill navigace (buildLinks) O hře NEobsahuje — jen sekundární odkaz mimo <ul>, aby menu zůstalo v jednom řádku", () => {
-  const buildLinksBody = /function buildLinks\(basePath: string\) \{([\s\S]*?)\n\}/.exec(headerSource)?.[1];
-  assert.ok(buildLinksBody);
-  assert.doesNotMatch(buildLinksBody, /O_HRE_LINK/);
+test("Krabí invaze zůstává v hlavním produkčním menu", () => {
+  const links = buildLinks("");
+  assert.ok(links.some((l) => !isNavGroup(l) && l.href === HRA_LINK.href));
 });
 
-test("Header.tsx: mobilní seznam (buildMobileLinks) vkládá O_HRE_LINK před poslední položku (Krabí invaze)", () => {
-  const bodyMatch = /function buildMobileLinks\([^)]*\) \{([\s\S]*?)\n\}/.exec(headerSource)?.[1];
-  assert.ok(bodyMatch);
-  assert.match(bodyMatch, /O_HRE_LINK/);
-  assert.match(bodyMatch, /slice\(0, -1\)/);
+test("produkční desktop menu má stejný počet top-level položek jako dřív (8) — merge Svět uvolnil slot pro Multiplayer", () => {
+  const links = buildLinks("");
+  assert.equal(links.length, 8);
 });
 
-test("Header.tsx: mobilní panel renderuje mobileLinks, desktop pill nav pořád jen links (odděleno)", () => {
-  assert.match(headerSource, /const mobileLinks = buildMobileLinks\(links\);/);
-  assert.match(headerSource, /\{mobileLinks\.map\(\(link\) => \{/);
+test("demo sekce (basePath!=='') zůstává beze změny — plochý seznam z NAV_LINKS, bez Svět/Multiplayer/Krabí invaze", () => {
+  const links = buildLinks("/demo");
+  assert.ok(!links.some((l) => l.label === "Svět"));
+  assert.ok(!links.some((l) => !isNavGroup(l) && l.href === MULTIPLAYER_LINK.href));
+  assert.ok(!links.some((l) => !isNavGroup(l) && l.href === HRA_LINK.href));
 });
 
-test("Header.tsx: sekundární odkaz 'O hře' v desktop headeru je jen text (underline), ne pill styl jako hlavní nav", () => {
-  const secondaryLinkBlock = headerSource.split('{O_HRE_LINK.label}')[0].split("O_HRE_LINK.href}`}")[1] ?? "";
-  assert.match(secondaryLinkBlock, /underline/);
-  assert.doesNotMatch(secondaryLinkBlock, /tabClass|liveTabClass/);
+test("/lokace a /lokace/* aktivují Svět", () => {
+  assert.equal(isEntryActive("/lokace", "", WORLD_GROUP), true);
+  assert.equal(isEntryActive("/lokace/plaz", "", WORLD_GROUP), true);
+});
+
+test("/bossove a /bossove/* aktivují Svět", () => {
+  assert.equal(isEntryActive("/bossove", "", WORLD_GROUP), true);
+  assert.equal(isEntryActive("/bossove/kraken", "", WORLD_GROUP), true);
+});
+
+test("nesouvisející route Svět neaktivuje", () => {
+  assert.equal(isEntryActive("/ryby", "", WORLD_GROUP), false);
+});
+
+test("aktivace Svět respektuje basePath (demo sekce)", () => {
+  assert.equal(isEntryActive("/demo/lokace", "/demo", WORLD_GROUP), true);
+  assert.equal(isEntryActive("/lokace", "/demo", WORLD_GROUP), false);
+});
+
+test("mobilní seznam vkládá O_HRE_LINK před poslední položku (Krabí invaze)", () => {
+  const mobileLinks = buildMobileLinks(buildLinks(""));
+  const last = mobileLinks[mobileLinks.length - 1];
+  const secondToLast = mobileLinks[mobileLinks.length - 2];
+  assert.ok(!isNavGroup(last) && last.href === HRA_LINK.href);
+  assert.ok(!isNavGroup(secondToLast) && secondToLast.href === O_HRE_LINK.href);
+});
+
+test("mobilní seznam pořád obsahuje skupinu Svět (Lokace/Bossové zůstávají dosažitelné)", () => {
+  const mobileLinks = buildMobileLinks(buildLinks(""));
+  assert.ok(mobileLinks.some((l) => l.label === "Svět"));
+});
+
+test("Header.tsx: desktop pill navigace nemá flex-wrap (zůstává v jednom řádku, jako dřív)", () => {
+  const navBlock = headerSource.split('aria-label="Hlavní navigace"')[1]?.split("</nav>")[0] ?? "";
+  assert.doesNotMatch(navBlock, /flex-wrap/);
+});
+
+test("Header.tsx: mobilní panel nemá horizontální overflow (žádná pevná šířka širší než viewport)", () => {
+  const mobileNavBlock = headerSource.split('id="mobile-nav"')[1]?.split("</nav>")[0] ?? "";
+  assert.doesNotMatch(mobileNavBlock, /w-\[\d{3,}px\]/);
+});
+
+test("Header.tsx: WorldDropdown používá role=menu/menuitem pro přístupnost", () => {
+  assert.match(headerSource, /role="menu"/);
+  assert.match(headerSource, /role="menuitem"/);
 });
 
 test("Footer.tsx: odkaz 'O hře' je vždy v patičce (SECONDARY_LINKS)", () => {
   assert.match(footerSource, /\{ href: "\/o-hre", label: "O hře" \}/);
+});
+
+test("Footer.tsx: prominentní Multiplayer ostrov CTA v patičce zůstal zachovaný", () => {
+  assert.match(footerSource, /\/multiplayer/);
 });

@@ -3,7 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_LINKS } from "../config/site";
+import {
+  LIVE_LINK,
+  O_HRE_LINK,
+  WORLD_GROUP,
+  buildLinks,
+  buildMobileLinks,
+  isActive,
+  isEntryActive,
+  isNavGroup,
+  type NavEntry,
+} from "./nav-config.ts";
 import HeaderLogo from "./HeaderLogo";
 import SteamIcon from "./SteamIcon";
 import {
@@ -16,6 +26,7 @@ import {
   ItemIcon,
   LiveIcon,
   LocationIcon,
+  MultiplayerIcon,
   UpdateIcon,
   type IconProps,
 } from "./icons";
@@ -31,40 +42,8 @@ const ICON_BY_HREF: Record<string, (props: IconProps) => React.ReactElement> = {
   "/aktualizace": UpdateIcon,
   "/hra": CrabIcon,
   "/o-hre": InfoIcon,
+  "/multiplayer": MultiplayerIcon,
 };
-
-const LIVE_LINK = { href: "/stream", label: "Živě" } as const;
-// Krabí invaze je konkrétní minihra (dřív jen obecný label "Hra") —
-// odlišená vlastním jménem a krabí ikonou místo gamepadu, viz zadání.
-const HRA_LINK = { href: "/hra", label: "Krabí invaze" } as const;
-// "O hře" je informační stránka o samotné hře, ne o minihře — v hlavním
-// pill menu by přidala 9. položku a riskovala dvouřádkový header (viz
-// zadání "nechci dvouřádkové menu"), proto je v desktop headeru jen jako
-// menší sekundární odkaz (viz JSX níž) a v mobilním panelu vložená do
-// hlavního seznamu, ne v téhle desktop pill sadě.
-const O_HRE_LINK = { href: "/o-hre", label: "O hře" } as const;
-
-// /stream je jedna z nejdůležitějších dynamických funkcí webu, takže
-// "Živě" chceme hned za logem — i když v NAV_LINKS (a v patičce, kde
-// pořadí měnit nechceme) má Ryby jiné pořadové místo. "Krabí invaze" se
-// pro stejný důvod přidává na konec.
-function buildLinks(basePath: string) {
-  if (basePath !== "") return NAV_LINKS;
-  const ryby = NAV_LINKS.find((link) => link.href === "/ryby");
-  const rest = NAV_LINKS.filter((link) => link.href !== "/ryby");
-  return ryby ? [LIVE_LINK, ryby, ...rest, HRA_LINK] : [LIVE_LINK, ...NAV_LINKS, HRA_LINK];
-}
-
-// Jen pro mobilní panel — "O hře" vložené před "Krabí invaze" (preferované
-// pořadí ze zadání). Desktop pill row ji z prostorových důvodů nemá, viz
-// O_HRE_LINK výše.
-function buildMobileLinks(links: readonly { href: string; label: string }[]) {
-  return [...links.slice(0, -1), O_HRE_LINK, links[links.length - 1]];
-}
-
-function isActive(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
 
 function tabClass(active: boolean) {
   const base =
@@ -105,6 +84,71 @@ function LivePulseDot() {
   );
 }
 
+// Jednoduchý přístupný dropdown pro "Svět" (Lokace + Bossové) — hover na
+// myš, klik/Enter/Space na klávesnici (nativní chování <button>), zavírá
+// se při změně routy (`open` prop řízený z Header, ne lokální state, aby
+// šel resetovat spolu s mobilním panelem).
+function WorldDropdown({
+  basePath,
+  pathname,
+  open,
+  onOpenChange,
+}: {
+  basePath: string;
+  pathname: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const active = isEntryActive(pathname, basePath, WORLD_GROUP);
+
+  return (
+    <li className="relative" onMouseEnter={() => onOpenChange(true)} onMouseLeave={() => onOpenChange(false)}>
+      <button
+        type="button"
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={() => onOpenChange(!open)}
+        className={tabClass(active)}
+      >
+        <LocationIcon className="h-4 w-4 shrink-0" />
+        {WORLD_GROUP.label}
+        <span aria-hidden="true" className={`text-[10px] transition-transform ${open ? "rotate-180" : ""}`}>
+          ▾
+        </span>
+      </button>
+      {open && (
+        <ul
+          role="menu"
+          aria-label={WORLD_GROUP.label}
+          className="absolute left-0 top-full z-20 mt-1 min-w-[10rem] rounded-md border border-white/15 bg-[#0e3347] py-1 shadow-xl"
+        >
+          {WORLD_GROUP.children.map((child) => {
+            const href = `${basePath}${child.href}`;
+            const childActive = isActive(pathname, href);
+            const Icon = ICON_BY_HREF[child.href];
+            return (
+              <li key={href} role="none">
+                <Link
+                  href={href}
+                  role="menuitem"
+                  aria-current={childActive ? "page" : undefined}
+                  onFocus={() => onOpenChange(true)}
+                  className={`flex items-center gap-2 px-3 py-2 font-serif text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+                    childActive ? "text-amber-300" : "text-[#f4ead9]/90 hover:bg-white/5 hover:text-amber-200"
+                  }`}
+                >
+                  {Icon && <Icon className="h-4 w-4 shrink-0" />}
+                  {child.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </li>
+  );
+}
+
 type HeaderUser = { nickname: string; avatarUrl: string | null } | null;
 
 function SteamAuthControl({ user, pathname }: { user: HeaderUser; pathname: string }) {
@@ -139,6 +183,8 @@ function SteamAuthControl({ user, pathname }: { user: HeaderUser; pathname: stri
 export default function Header({ basePath = "", user = null }: { basePath?: string; user?: HeaderUser }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [worldOpen, setWorldOpen] = useState(false);
+  const [mobileWorldOpen, setMobileWorldOpen] = useState(false);
   const links = buildLinks(basePath);
   const mobileLinks = buildMobileLinks(links);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -146,11 +192,16 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
 
   useEffect(() => {
     setOpen(false);
+    setWorldOpen(false);
+    setMobileWorldOpen(false);
   }, [pathname]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        setWorldOpen(false);
+      }
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -191,6 +242,99 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
     };
   }, [open]);
 
+  function renderMobileEntry(entry: NavEntry) {
+    if (isNavGroup(entry)) {
+      const active = isEntryActive(pathname, basePath, entry);
+      return (
+        <li key={entry.label}>
+          <button
+            type="button"
+            aria-expanded={mobileWorldOpen}
+            aria-controls="mobile-world-group"
+            onClick={() => setMobileWorldOpen((v) => !v)}
+            className={`flex min-h-[44px] w-full items-center justify-between gap-2.5 rounded-md border px-4 py-3 text-left font-serif text-base transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none ${
+              active
+                ? "border-amber-300 bg-gradient-to-b from-[#f3dfb0] to-[#e8cfa0] text-[#0a2438]"
+                : "border-white/10 bg-white/5 text-[#f4ead9] hover:border-amber-300/50 hover:bg-white/10"
+            }`}
+          >
+            <span className="flex items-center gap-2.5">
+              <LocationIcon className="h-5 w-5 shrink-0" />
+              {entry.label}
+            </span>
+            <span aria-hidden="true" className={`text-xs transition-transform ${mobileWorldOpen ? "rotate-180" : ""}`}>
+              ▾
+            </span>
+          </button>
+          {mobileWorldOpen && (
+            <ul id="mobile-world-group" className="mt-1.5 flex flex-col gap-1.5 pl-4">
+              {entry.children.map((child) => {
+                const href = `${basePath}${child.href}`;
+                const childActive = isActive(pathname, href);
+                const Icon = ICON_BY_HREF[child.href];
+                return (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      aria-current={childActive ? "page" : undefined}
+                      className={`flex min-h-[44px] items-center gap-2.5 rounded-md border px-4 py-3 transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none ${
+                        childActive
+                          ? "border-amber-300 bg-gradient-to-b from-[#f3dfb0] to-[#e8cfa0] text-[#0a2438]"
+                          : "border-white/10 bg-white/5 text-[#f4ead9] hover:border-amber-300/50 hover:bg-white/10"
+                      }`}
+                    >
+                      {Icon && <Icon className="h-5 w-5 shrink-0" />}
+                      {child.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </li>
+      );
+    }
+
+    const href = `${basePath}${entry.href}`;
+    const active = isActive(pathname, href);
+    const isLive = entry.href === LIVE_LINK.href;
+    const Icon = ICON_BY_HREF[entry.href];
+
+    if (isLive) {
+      return (
+        <li key={href}>
+          <Link
+            href={href}
+            aria-current={active ? "page" : undefined}
+            title="Sleduj, kdo právě hraje How to Fish"
+            aria-label="Živě – sleduj, kdo právě hraje How to Fish"
+            className={liveMobileClass(active)}
+          >
+            <LivePulseDot />
+            {Icon && <Icon className="h-5 w-5 shrink-0" />}
+            {entry.label}
+          </Link>
+        </li>
+      );
+    }
+    return (
+      <li key={href}>
+        <Link
+          href={href}
+          aria-current={active ? "page" : undefined}
+          className={`flex min-h-[44px] items-center gap-2.5 rounded-md border px-4 py-3 transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none ${
+            active
+              ? "border-amber-300 bg-gradient-to-b from-[#f3dfb0] to-[#e8cfa0] text-[#0a2438]"
+              : "border-white/10 bg-white/5 text-[#f4ead9] hover:border-amber-300/50 hover:bg-white/10"
+          }`}
+        >
+          {Icon && <Icon className="h-5 w-5 shrink-0" />}
+          {entry.label}
+        </Link>
+      </li>
+    );
+  }
+
   return (
     <header className="relative overflow-hidden bg-gradient-to-b from-[#0e3347] via-[#0a2438] to-[#081c2c] shadow-sm shadow-black/20">
       <div
@@ -202,11 +346,23 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
 
         <nav aria-label="Hlavní navigace" className="hidden xl:block">
           <ul className="flex items-center gap-1 font-serif text-sm">
-            {links.map((link) => {
-              const href = `${basePath}${link.href}`;
+            {links.map((entry) => {
+              if (isNavGroup(entry)) {
+                return (
+                  <WorldDropdown
+                    key={entry.label}
+                    basePath={basePath}
+                    pathname={pathname}
+                    open={worldOpen}
+                    onOpenChange={setWorldOpen}
+                  />
+                );
+              }
+
+              const href = `${basePath}${entry.href}`;
               const active = isActive(pathname, href);
-              const isLive = link.href === LIVE_LINK.href;
-              const Icon = ICON_BY_HREF[link.href];
+              const isLive = entry.href === LIVE_LINK.href;
+              const Icon = ICON_BY_HREF[entry.href];
               return (
                 <li key={href}>
                   <Link
@@ -218,7 +374,7 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
                   >
                     {isLive && <LivePulseDot />}
                     {Icon && <Icon className="h-4 w-4 shrink-0" />}
-                    {link.label}
+                    {entry.label}
                   </Link>
                 </li>
               );
@@ -227,8 +383,7 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
         </nav>
 
         {/* "O hře" jako méně výrazný sekundární odkaz (obyčejný podtržený
-            text, ne pill) — viz O_HRE_LINK výše, proč není v hlavní
-            navigaci. */}
+            text, ne pill) — viz nav-config.ts, proč není v hlavní navigaci. */}
         <Link
           href={`${basePath}${O_HRE_LINK.href}`}
           aria-current={isActive(pathname, `${basePath}${O_HRE_LINK.href}`) ? "page" : undefined}
@@ -288,45 +443,7 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
             </div>
 
             <ul className="flex flex-col gap-2 font-serif text-base">
-              {mobileLinks.map((link) => {
-                const href = `${basePath}${link.href}`;
-                const active = isActive(pathname, href);
-                const isLive = link.href === LIVE_LINK.href;
-                const Icon = ICON_BY_HREF[link.href];
-                if (isLive) {
-                  return (
-                    <li key={href}>
-                      <Link
-                        href={href}
-                        aria-current={active ? "page" : undefined}
-                        title="Sleduj, kdo právě hraje How to Fish"
-                        aria-label="Živě – sleduj, kdo právě hraje How to Fish"
-                        className={liveMobileClass(active)}
-                      >
-                        <LivePulseDot />
-                        {Icon && <Icon className="h-5 w-5 shrink-0" />}
-                        {link.label}
-                      </Link>
-                    </li>
-                  );
-                }
-                return (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      aria-current={active ? "page" : undefined}
-                      className={`flex min-h-[44px] items-center gap-2.5 rounded-md border px-4 py-3 transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 motion-reduce:transition-none ${
-                        active
-                          ? "border-amber-300 bg-gradient-to-b from-[#f3dfb0] to-[#e8cfa0] text-[#0a2438]"
-                          : "border-white/10 bg-white/5 text-[#f4ead9] hover:border-amber-300/50 hover:bg-white/10"
-                      }`}
-                    >
-                      {Icon && <Icon className="h-5 w-5 shrink-0" />}
-                      {link.label}
-                    </Link>
-                  </li>
-                );
-              })}
+              {mobileLinks.map((entry) => renderMobileEntry(entry))}
             </ul>
 
             <div className="mt-3 border-t border-white/10 pt-3">

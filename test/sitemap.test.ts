@@ -44,4 +44,10 @@ describe("sitemap", () => {
   test("homepage (/) není v sitemap duplicitně vůči /ryby", () => {
     assert.ok(!urls.some((u) => /https?:\/\/[^/]+\/$/.test(u)));
   });
+
+  test("obsahuje nové streamer profily (haiset, kapesnik69, fattypillow, marwex)", () => {
+    for (const slug of ["haiset", "kapesnik69", "fattypillow", "marwex"]) {
+      assert.ok(urls.some((u) => u.endsWith(`/stream/${slug}`)), `chybí /stream/${slug}`);
+    }
+  });
 });

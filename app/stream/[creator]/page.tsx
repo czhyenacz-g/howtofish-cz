@@ -24,8 +24,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const creator = getCreatorProfile(slug);
   if (!creator) return {};
 
-  const title = `${creator.name} a How to Fish – videa a streamy`;
-  const description = `Videa ${creator.name} ze hry How to Fish a odkazy na další český obsah, návody a streamy na HowToFish.cz.`;
+  const hasVideos = creator.videos.length > 0;
+  // U tvůrců bez ověřeného videa nepíšeme do titulku/description "videa
+  // a streamy" — nemáme je, co bychom ukázali (viz zadání "nevymýšlej
+  // neověřené informace").
+  const title = hasVideos
+    ? `${creator.name} a How to Fish – videa a streamy`
+    : `${creator.name} a How to Fish`;
+  const description = hasVideos
+    ? `Videa ${creator.name} ze hry How to Fish a odkazy na další český obsah, návody a streamy na HowToFish.cz.`
+    : `${creator.name} a How to Fish: co víme o jeho spojení se hrou, a odkazy na další český obsah na HowToFish.cz.`;
 
   return {
     title,
@@ -45,6 +53,14 @@ export default async function CreatorPage({ params }: Props) {
 
   const otherCreators = creatorProfiles.filter((c) => c.slug !== creator.slug);
   const pageUrl = `${SITE_URL}/stream/${creator.slug}`;
+
+  // Doložená souvislost mezi tvůrci (např. společné hraní) — obousměrně:
+  // "forward" je tvůrce, na kterého tenhle profil odkazuje
+  // (relatedCreatorSlug), "mentionedBy" jsou profily, které odkazují sem.
+  const relatedCreator = creator.relatedCreatorSlug
+    ? creatorProfiles.find((c) => c.slug === creator.relatedCreatorSlug)
+    : undefined;
+  const mentionedBy = creatorProfiles.filter((c) => c.relatedCreatorSlug === creator.slug);
 
   const breadcrumbItems = [
     { label: "HowToFish.cz", href: "/" },
@@ -81,18 +97,54 @@ export default async function CreatorPage({ params }: Props) {
         <h1 className="mt-4 font-serif text-3xl sm:text-4xl">{creator.name} a How to Fish</h1>
 
         <p className="mt-4 text-lg text-cyan-100/80">
-          {creator.name} patří mezi CZ/SK tvůrce, kteří si zahráli How to Fish. Níže najdeš dostupná videa ze hry a
-          odkazy na další obsah na HowToFish.cz.
+          {creator.bio ??
+            `${creator.name} patří mezi CZ/SK tvůrce, kteří si zahráli How to Fish. Níže najdeš dostupná videa ze hry a odkazy na další obsah na HowToFish.cz.`}
         </p>
 
-        <section className="mt-8">
-          <h2 className="font-serif text-xl text-amber-300">Videa z How to Fish</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {creator.videos.map((video) => (
-              <VideoCard key={video.url} video={video} />
+        {(relatedCreator || mentionedBy.length > 0) && (
+          <p className="mt-3 text-sm text-cyan-100/70">
+            {relatedCreator && (
+              <>
+                {creator.name} se objevil při společném hraní s{" "}
+                <Link href={`/stream/${relatedCreator.slug}`} className="underline hover:text-amber-300">
+                  {relatedCreator.name}
+                </Link>
+                .
+              </>
+            )}
+            {mentionedBy.map((mentioner) => (
+              <span key={mentioner.slug} className="block">
+                {mentioner.name} se s {creator.name} objevil/a při společném hraní How to Fish —{" "}
+                <Link href={`/stream/${mentioner.slug}`} className="underline hover:text-amber-300">
+                  více o {mentioner.name}
+                </Link>
+                .
+              </span>
             ))}
-          </div>
-        </section>
+          </p>
+        )}
+
+        {creator.externalLink && (
+          <a
+            href={creator.externalLink.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block rounded-md bg-amber-400 px-4 py-2 font-serif text-sm text-gray-900 transition hover:bg-amber-300"
+          >
+            {creator.externalLink.label}
+          </a>
+        )}
+
+        {creator.videos.length > 0 && (
+          <section className="mt-8">
+            <h2 className="font-serif text-xl text-amber-300">Videa z How to Fish</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {creator.videos.map((video) => (
+                <VideoCard key={video.url} video={video} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {otherCreators.length > 0 && (
           <section className="mt-10 border-t border-white/10 pt-6">
