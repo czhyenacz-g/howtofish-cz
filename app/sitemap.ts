@@ -3,6 +3,7 @@ import { fishEntries } from "../data/fish.ts";
 import { guides as curatedGuides } from "../data/guides.ts";
 import { fishGuides } from "../data/fish-guides.ts";
 import { creatorProfiles } from "../data/creators.ts";
+import { getIndexableVideos } from "../data/how-to-fish-videos.ts";
 import { SITE_URL } from "./config/site.ts";
 
 // Homepage (`/`) je záměrně mimo sitemap — zobrazuje stejný obsah jako
@@ -67,6 +68,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/stream/${creator.slug}`,
       lastModified: new Date(),
       changeFrequency: "monthly",
+      priority: 0.4,
+    });
+  }
+
+  // How to Fish video detaily — jen `indexable: true` (viz zadání "noindex
+  // videa do sitemap nedávej").
+  for (const video of getIndexableVideos()) {
+    entries.push({
+      url: `${SITE_URL}/videa/${video.slug}`,
+      lastModified: new Date(video.publishedAt),
+      changeFrequency: "yearly",
       priority: 0.4,
     });
   }

@@ -50,4 +50,15 @@ describe("sitemap", () => {
       assert.ok(urls.some((u) => u.endsWith(`/stream/${slug}`)), `chybí /stream/${slug}`);
     }
   });
+
+  test("obsahuje jen indexable video detaily z data/how-to-fish-videos.ts", () => {
+    for (const slug of [
+      "flygun-rybareni-zabavny",
+      "flygun-lethal-company-haiset",
+      "to-nejlepsi-z-how-to-fish-sestrih",
+      "how-to-fish-1-herdyn-archiv",
+    ]) {
+      assert.ok(urls.some((u) => u.endsWith(`/videa/${slug}`)), `chybí /videa/${slug}`);
+    }
+  });
 });

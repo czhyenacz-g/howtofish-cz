@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getLiveStreams } from "../../lib/streams/get-live-streams";
 import { creatorProfiles } from "../../data/creators";
+import { howToFishVideos } from "../../data/how-to-fish-videos.ts";
+import HowToFishVideoCard from "../components/HowToFishVideoCard.tsx";
 import { pickPromotion } from "../../lib/promotions/match-route";
 import { getActivePromotions } from "../../lib/universal-content-api/promotions";
 import { SITE_URL } from "../config/site";
@@ -109,6 +111,20 @@ export default async function StreamPage() {
             ))}
           </div>
         </section>
+
+        {howToFishVideos.length > 0 && (
+          <section className="mx-auto mt-12 max-w-4xl border-t border-white/10 pt-8">
+            <h2 className="font-serif text-xl text-amber-300">Nejnovější How to Fish videa českých tvůrců</h2>
+            <p className="mt-2 text-sm text-cyan-100/70">
+              Pilotní výběr — stejný model brzy rozšíříme o další tvůrce.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {howToFishVideos.slice(0, 4).map((video) => (
+                <HowToFishVideoCard key={video.slug} video={video} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {creatorProfiles.length > 0 && (
           <section className="mx-auto mt-12 max-w-4xl border-t border-white/10 pt-8">

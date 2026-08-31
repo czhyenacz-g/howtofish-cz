@@ -3,8 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { creatorProfiles, getCreatorProfile } from "../../../data/creators.ts";
+import { getVideosAuthoredBy, getVideosFeaturingButNotAuthoredBy } from "../../../data/how-to-fish-videos.ts";
 import { SITE_URL } from "../../config/site.ts";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../components/Breadcrumbs.tsx";
+import HowToFishVideoCard from "../../components/HowToFishVideoCard.tsx";
 
 // Nová child route pod stávající /stream (dědí app/stream/layout.tsx,
 // žádný zásah do StreamBrowser/live-stream logiky). Jen potvrzení
@@ -62,6 +64,12 @@ export default async function CreatorPage({ params }: Props) {
     : undefined;
   const mentionedBy = creatorProfiles.filter((c) => c.relatedCreatorSlug === creator.slug);
 
+  // Nový video content model (data/how-to-fish-videos.ts) — oddělené od
+  // staršího creator.videos (carousel na homepage, beze změny). Autor
+  // vs. "jen se objevuje" je tu podstatné rozlišení, viz zadání.
+  const authoredVideos = getVideosAuthoredBy(creator.slug);
+  const featuredVideos = getVideosFeaturingButNotAuthoredBy(creator.slug);
+
   const breadcrumbItems = [
     { label: "HowToFish.cz", href: "/" },
     { label: "Streamy", href: "/stream" },
@@ -82,6 +90,23 @@ export default async function CreatorPage({ params }: Props) {
       thumbnailUrl: `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`,
       embedUrl: `https://www.youtube-nocookie.com/embed/${video.youtubeId}`,
       contentUrl: video.url,
+    });
+  }
+
+  // Nový video model — reálný uploadDate z YouTube Data API, autor
+  // odpovídá skutečnému nahrávajícímu kanálu, ne aktuálně zobrazenému
+  // tvůrci (viz zadání "netvrď, že video vlastníme").
+  for (const video of [...authoredVideos, ...featuredVideos]) {
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      name: video.title,
+      description: video.summary,
+      thumbnailUrl: video.thumbnailUrl,
+      uploadDate: video.publishedAt,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${video.videoId}`,
+      contentUrl: video.url,
+      creator: { "@type": "Person", name: video.author.name },
     });
   }
 
@@ -141,6 +166,31 @@ export default async function CreatorPage({ params }: Props) {
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {creator.videos.map((video) => (
                 <VideoCard key={video.url} video={video} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {authoredVideos.length > 0 && (
+          <section className="mt-8">
+            <h2 className="font-serif text-xl text-amber-300">Vlastní How to Fish videa</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {authoredVideos.map((video) => (
+                <HowToFishVideoCard key={video.slug} video={video} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {featuredVideos.length > 0 && (
+          <section className="mt-8">
+            <h2 className="font-serif text-xl text-amber-300">{creator.name} v dalších How to Fish videích</h2>
+            <p className="mt-1 text-sm text-cyan-100/60">
+              Videa od jiných tvůrců, ve kterých se {creator.name} objevuje.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {featuredVideos.map((video) => (
+                <HowToFishVideoCard key={video.slug} video={video} />
               ))}
             </div>
           </section>
