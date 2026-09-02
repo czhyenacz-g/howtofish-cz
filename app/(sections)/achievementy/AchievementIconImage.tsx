@@ -24,6 +24,14 @@ export default function AchievementIconImage({ src }: { src?: string }) {
       height={56}
       className="h-full w-full object-cover"
       onError={() => setFailed(true)}
+      // Steam už servíruje malé (~64×64), předgenerované PNG ikony ze
+      // svého vlastního CDN (steamstatic.com) — Next/Vercel Image
+      // Optimization tu nemá co zlepšit (žádné responsive varianty,
+      // žádná konverze formátu, která by reálně pomohla), jen za
+      // desítky/stovky distinct achievementů multiplikuje transformace.
+      // `unoptimized` obchází jen resize/reformat pipeline, ne width/
+      // height/lazy-loading/onError — layout, CLS a fallback beze změny.
+      unoptimized
     />
   );
 }
