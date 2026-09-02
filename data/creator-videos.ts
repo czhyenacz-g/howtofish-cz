@@ -7,10 +7,26 @@
 // zhlédnutí ani stav LIVE (viz zadání). YouTube video ID u Agraela a
 // Herdyna ověřeno přes YouTube oEmbed (HTTP 200, video existuje a je
 // vložitelné) a maxresdefault thumbnail (HTTP 200) před nasazením.
-// U Kick tvůrců (FlyGun/Freeze/Miken) žádný iframe/scraping — jen odkaz
-// na jejich veřejný profil/klipy a stylizovaný platform placeholder
-// (žádný konkrétní VOD thumbnail, protože ho nejde spolehlivě získat
-// bez scrapingu/API, viz zadání).
+// U Kick tvůrců (FlyGun/Freeze/Miken/astatoro/2sekundovymato) žádný
+// iframe/scraping — jen odkaz na jejich veřejný profil/klipy a
+// stylizovaný platform placeholder (žádný konkrétní VOD thumbnail,
+// protože ho nejde spolehlivě získat bez scrapingu/API, viz zadání).
+//
+// HouseBox (2026-09-02): youtubeId ověřeno přes YouTube Data API v3
+// (search.list + videos.list) — kanál "HouseBox" (channelId
+// UCam7UAsJfvcs5JesL4nDl_w), popis videa přímo odkazuje na skutečnou
+// Steam stránku How to Fish. maxresdefault thumbnail i oEmbed ověřeny
+// HTTP 200 před nasazením. Druhé HouseBox video ("Rybářská HRA ROKU?!")
+// a bonus třetí díl jsou v data/how-to-fish-videos.ts (autor housebox) —
+// zdejší carousel slide ukazuje jen nejvýraznější z nich, ať carousel
+// nemá dva sloty pro stejného tvůrce (viz zadání).
+//
+// astatoro/2sekundovymato: Kick účty ověřeny přes Kick API
+// (/api/v2/channels/{slug}, HTTP 200, existující channel_id) — jde o
+// obecný odkaz na jejich profil, ne o konkrétní ověřený How to Fish
+// klip. Konkrétní klip, který byl dřív uveden jako důkaz pro astatoro,
+// se při ověření ukázal být z jiné hry (GTA V, ne How to Fish) — proto
+// tady NENÍ použitý, viz report.
 export type CreatorVideoPlatform = "youtube" | "kick";
 
 export type CreatorVideo = {
@@ -39,6 +55,16 @@ export const creatorVideos: CreatorVideo[] = [
     url: "https://www.youtube.com/watch?v=AXKRnUOtGHg",
     title: "Agraelus vyzkoušel How to Fish",
     subtitle: "Jak jsem se stal rybářem",
+    ctaLabel: "Pustit video",
+  },
+  {
+    creator: "HouseBox",
+    platform: "youtube",
+    language: "cs",
+    youtubeId: "aW5dkh1j_WM",
+    url: "https://www.youtube.com/watch?v=aW5dkh1j_WM",
+    title: "HouseBox hraje How to Fish",
+    subtitle: "Rybářská série od HouseBoxe",
     ctaLabel: "Pustit video",
   },
   {
@@ -80,5 +106,23 @@ export const creatorVideos: CreatorVideo[] = [
     title: "Miken hraje How to Fish",
     subtitle: "Klipy z How to Fish",
     ctaLabel: "Klipy na Kicku",
+  },
+  {
+    creator: "astatoro",
+    platform: "kick",
+    language: "sk",
+    url: "https://kick.com/astatoro",
+    title: "Astatoro hraje How to Fish",
+    subtitle: "Slovenský streamer u How to Fish",
+    ctaLabel: "Profil na Kicku",
+  },
+  {
+    creator: "2sekundovymato",
+    platform: "kick",
+    language: "sk",
+    url: "https://kick.com/2sekundovymato",
+    title: "2sekundovymato hraje How to Fish",
+    subtitle: "Slovenský streamer u How to Fish",
+    ctaLabel: "Profil na Kicku",
   },
 ];

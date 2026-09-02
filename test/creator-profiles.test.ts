@@ -4,6 +4,9 @@ import { creatorProfiles, getCreatorProfile } from "../data/creators.ts";
 
 const NEW_CAUTIOUS_SLUGS = ["haiset", "kapesnik69", "fattypillow", "marwex"];
 const EXISTING_VERIFIED_SLUGS = ["agraelus", "herdyn", "flygun", "freeze", "miken"];
+const CZSK_EXPANSION_VERIFIED_SLUGS = ["housebox", "astatoro", "2sekundovymato"];
+const CZSK_EXPANSION_CAUTIOUS_SLUGS = ["anymall", "boshoo"];
+const SK_SLUGS = ["astatoro", "2sekundovymato", "anymall", "boshoo"];
 
 describe("creatorProfiles", () => {
   test("existující ověření tvůrci zůstávají beze změny slugů", () => {
@@ -54,5 +57,74 @@ describe("creatorProfiles", () => {
       const text = profile?.bio ?? "";
       assert.doesNotMatch(text, /\d+\s*(hodin|hodiny|hodin\.|views|zhlédnutí)/i);
     }
+  });
+});
+
+describe("CZ/SK rozšíření creatorů (HouseBox + slovenští tvůrci)", () => {
+  test("noví ověření tvůrci (HouseBox, astatoro, 2sekundovymato) existují pod očekávanými slugy", () => {
+    for (const slug of CZSK_EXPANSION_VERIFIED_SLUGS) {
+      assert.ok(getCreatorProfile(slug), `chybí nový profil ${slug}`);
+    }
+  });
+
+  test("noví opatrní profilé (anymall, boshoo) existují pod očekávanými slugy", () => {
+    for (const slug of CZSK_EXPANSION_CAUTIOUS_SLUGS) {
+      assert.ok(getCreatorProfile(slug), `chybí nový profil ${slug}`);
+    }
+  });
+
+  test("boshoo NENÍ vytvořen pod odhadovaným casingem/spellingem (bosho, boshooo)", () => {
+    assert.equal(getCreatorProfile("bosho"), undefined);
+    assert.equal(getCreatorProfile("boshooo"), undefined);
+    assert.ok(getCreatorProfile("boshoo"));
+  });
+
+  test("touken NEMÁ vlastní indexovatelnou stránku (chybí ověřený důkaz)", () => {
+    assert.equal(getCreatorProfile("touken"), undefined);
+  });
+
+  test("HouseBox má přesně 1 video v creator.videos (carousel highlight) — zbylá 2 jsou v data/how-to-fish-videos.ts", () => {
+    const housebox = getCreatorProfile("housebox");
+    assert.equal(housebox?.videos.length, 1);
+    assert.equal(housebox?.videos[0]?.youtubeId, "aW5dkh1j_WM");
+  });
+
+  test("astatoro/2sekundovymato NEMAJÍ vymyšlený youtubeId ani konkrétní klip URL v carousel datech", () => {
+    for (const slug of ["astatoro", "2sekundovymato"]) {
+      const profile = getCreatorProfile(slug);
+      assert.equal(profile?.videos[0]?.youtubeId, undefined);
+      assert.ok(profile?.videos[0]?.url.startsWith("https://kick.com/"));
+    }
+  });
+
+  test("anymall/boshoo mají prázdné videos a jen externalLink na skutečný Kick profil", () => {
+    for (const slug of ["anymall", "boshoo"]) {
+      const profile = getCreatorProfile(slug);
+      assert.equal(profile?.videos.length, 0);
+      assert.equal(profile?.externalLink?.href, `https://kick.com/${slug}`);
+    }
+  });
+
+  test("country je CZ nebo SK pro každý profil, slovenští tvůrci mají SK", () => {
+    for (const profile of creatorProfiles) {
+      assert.ok(profile.country === "CZ" || profile.country === "SK", `${profile.slug}: neplatný country`);
+    }
+    for (const slug of SK_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.country, "SK", `${slug} by měl mít country SK`);
+    }
+  });
+
+  test("žádný nový profil netvrdí konkrétní viewer statistiky (peak/average/hodiny streamu)", () => {
+    for (const slug of [...CZSK_EXPANSION_VERIFIED_SLUGS, ...CZSK_EXPANSION_CAUTIOUS_SLUGS]) {
+      const text = getCreatorProfile(slug)?.bio ?? "";
+      assert.doesNotMatch(text, /\d+[\s,.]?\d*\s*(peak|average|zhlédnutí|views|subscribers|h \d)/i);
+    }
+  });
+
+  test("intro texty nových tvůrců nejsou identická věta s vyměněným jménem", () => {
+    const texts = [...CZSK_EXPANSION_VERIFIED_SLUGS, ...CZSK_EXPANSION_CAUTIOUS_SLUGS]
+      .map((slug) => getCreatorProfile(slug)?.bio)
+      .filter((bio): bio is string => Boolean(bio));
+    assert.equal(new Set(texts).size, texts.length, "dva noví tvůrci mají doslova stejný bio text");
   });
 });

@@ -9,12 +9,21 @@ import {
   howToFishVideos,
 } from "../data/how-to-fish-videos.ts";
 
-const EXPECTED_VIDEO_IDS = ["ZPxf_8mB1Cc", "2qVTwWK67e4", "W5T_2NSfkZU", "fsoJWHp7CuU"];
+const EXPECTED_VIDEO_IDS = ["ZPxf_8mB1Cc", "2qVTwWK67e4", "W5T_2NSfkZU", "fsoJWHp7CuU", "ILtCeTrDKC8", "OIwQMgWXPEo"];
 const EXCLUDED_VIDEO_ID = "pexyrbH8KCM"; // Feed and Grow: Fish — jiná hra, viz report
 
 describe("howToFishVideos", () => {
-  test("obsahuje přesně 4 videa, žádné navíc", () => {
-    assert.equal(howToFishVideos.length, 4);
+  test("obsahuje přesně 6 videí, žádné navíc", () => {
+    assert.equal(howToFishVideos.length, 6);
+  });
+
+  test("HouseBox je autorem přesně 2 videí (ILtCeTrDKC8, OIwQMgWXPEo)", () => {
+    const authored = getVideosAuthoredBy("housebox");
+    assert.equal(authored.length, 2);
+    assert.deepEqual(
+      authored.map((v) => v.videoId).sort(),
+      ["ILtCeTrDKC8", "OIwQMgWXPEo"]
+    );
   });
 
   test("FlyGun je autorem přesně 2 videí (ZPxf_8mB1Cc, W5T_2NSfkZU)", () => {
@@ -79,11 +88,11 @@ describe("howToFishVideos", () => {
 
   test("howToFishConfirmed je true jen pro videa, kde title/description hru explicitně jmenuje", () => {
     const confirmed = howToFishVideos.filter((v) => v.howToFishConfirmed).map((v) => v.videoId).sort();
-    assert.deepEqual(confirmed, ["2qVTwWK67e4", "fsoJWHp7CuU"]);
+    assert.deepEqual(confirmed, ["2qVTwWK67e4", "ILtCeTrDKC8", "OIwQMgWXPEo", "fsoJWHp7CuU"].sort());
   });
 
   test("všechna videa jsou aktuálně indexable", () => {
-    assert.equal(getIndexableVideos().length, 4);
+    assert.equal(getIndexableVideos().length, 6);
   });
 
   test("getVideoBySlug najde existující video a vrátí undefined pro neexistující slug", () => {

@@ -51,6 +51,30 @@ describe("sitemap", () => {
     }
   });
 
+  test("obsahuje nové CZ/SK creator pages (housebox, astatoro, 2sekundovymato, anymall, boshoo)", () => {
+    for (const slug of ["housebox", "astatoro", "2sekundovymato", "anymall", "boshoo"]) {
+      assert.ok(urls.some((u) => u.endsWith(`/stream/${slug}`)), `chybí /stream/${slug}`);
+    }
+  });
+
+  test("neobsahuje /stream/touken (creator candidate, žádný ověřený důkaz)", () => {
+    assert.ok(!urls.some((u) => u.endsWith("/stream/touken")));
+  });
+
+  test("obsahuje nová HouseBox video videa (/videa/housebox-how-to-fish-1, /videa/housebox-how-to-fish-3)", () => {
+    for (const slug of ["housebox-how-to-fish-1", "housebox-how-to-fish-3"]) {
+      assert.ok(urls.some((u) => u.endsWith(`/videa/${slug}`)), `chybí /videa/${slug}`);
+    }
+  });
+
+  test("žádné URL v sitemap se neopakuje (žádné duplicity)", () => {
+    assert.equal(new Set(urls).size, urls.length);
+  });
+
+  test("žádné URL v sitemap neobsahuje localhost", () => {
+    assert.ok(!urls.some((u) => u.includes("localhost")));
+  });
+
   test("obsahuje jen indexable video detaily z data/how-to-fish-videos.ts", () => {
     for (const slug of [
       "flygun-rybareni-zabavny",

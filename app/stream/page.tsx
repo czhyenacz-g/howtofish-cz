@@ -128,7 +128,7 @@ export default async function StreamPage() {
 
         {creatorProfiles.length > 0 && (
           <section className="mx-auto mt-12 max-w-4xl border-t border-white/10 pt-8">
-            <h2 className="font-serif text-xl text-amber-300">Čeští tvůrci kolem How to Fish</h2>
+            <h2 className="font-serif text-xl text-amber-300">Čeští a slovenští tvůrci kolem How to Fish</h2>
             <p className="mt-2 text-sm text-cyan-100/70">
               Kdo hraje, hrál nebo se objevil u How to Fish v české a slovenské komunitě.
             </p>
@@ -142,7 +142,9 @@ export default async function StreamPage() {
                       className="group flex h-full flex-col gap-1.5 rounded-lg border border-white/10 bg-white/5 p-4 transition hover:border-amber-400/40 hover:bg-white/10"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-serif text-base text-white group-hover:text-amber-300">{creator.name}</span>
+                        <span className="font-serif text-base text-white group-hover:text-amber-300">
+                          {creator.name} <span className="text-sm text-cyan-100/40">{creator.country === "SK" ? "🇸🇰" : "🇨🇿"}</span>
+                        </span>
                         {platform && (
                           <span
                             className={`shrink-0 rounded border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${PLATFORM_BADGE_CLASS[platform]}`}

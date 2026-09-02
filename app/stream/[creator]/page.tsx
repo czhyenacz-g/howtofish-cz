@@ -7,6 +7,14 @@ import { getVideosAuthoredBy, getVideosFeaturingButNotAuthoredBy } from "../../.
 import { SITE_URL } from "../../config/site.ts";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../components/Breadcrumbs.tsx";
 import HowToFishVideoCard from "../../components/HowToFishVideoCard.tsx";
+import LazyYouTubeEmbed from "../../components/LazyYouTubeEmbed.tsx";
+
+// Kolik "dalších CZ/SK tvůrců" se zobrazí dole na stránce — s rostoucím
+// počtem tvůrců by celý seznam byl moc dlouhý (viz zadání "stačí 4-6,
+// ne všech 15"). Pořadí je stabilní (`creatorProfiles` má pevné pořadí,
+// žádný Math.random ani Date.now), takže výběr je deterministický a
+// nemění se při každém buildu.
+const RELATED_CREATORS_LIMIT = 6;
 
 // Nová child route pod stávající /stream (dědí app/stream/layout.tsx,
 // žádný zásah do StreamBrowser/live-stream logiky). Jen potvrzení
@@ -53,7 +61,7 @@ export default async function CreatorPage({ params }: Props) {
   const creator = getCreatorProfile(slug);
   if (!creator) notFound();
 
-  const otherCreators = creatorProfiles.filter((c) => c.slug !== creator.slug);
+  const otherCreators = creatorProfiles.filter((c) => c.slug !== creator.slug).slice(0, RELATED_CREATORS_LIMIT);
   const pageUrl = `${SITE_URL}/stream/${creator.slug}`;
 
   // Doložená souvislost mezi tvůrci (např. společné hraní) — obousměrně:
@@ -203,13 +211,39 @@ export default async function CreatorPage({ params }: Props) {
               {otherCreators.map((c) => (
                 <li key={c.slug}>
                   <Link href={`/stream/${c.slug}`} className="text-cyan-100/80 underline hover:text-amber-300">
-                    {c.name}
+                    {c.name} <span className="text-cyan-100/40">{c.country === "SK" ? "🇸🇰" : "🇨🇿"}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </section>
         )}
+
+        <section className="mt-10 border-t border-white/10 pt-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-100/50">Průvodce How to Fish</h2>
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
+            <li>
+              <Link href="/ryby" className="text-cyan-100/80 underline hover:text-amber-300">
+                Ryby
+              </Link>
+            </li>
+            <li>
+              <Link href="/navody" className="text-cyan-100/80 underline hover:text-amber-300">
+                Návody
+              </Link>
+            </li>
+            <li>
+              <Link href="/bossove" className="text-cyan-100/80 underline hover:text-amber-300">
+                Bossové
+              </Link>
+            </li>
+            <li>
+              <Link href="/lokace" className="text-cyan-100/80 underline hover:text-amber-300">
+                Lokace
+              </Link>
+            </li>
+          </ul>
+        </section>
 
         <Link href="/stream" className="mt-10 inline-block text-sm text-cyan-100/70 underline hover:text-amber-300">
           ← Zpět na Streamy
@@ -224,9 +258,33 @@ function VideoCard({
 }: {
   video: { title: string; subtitle: string; platform: "youtube" | "kick"; url: string; youtubeId?: string; image?: string };
 }) {
-  const thumbnailSrc = video.youtubeId
-    ? `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`
-    : (video.image ?? null);
+  // Reálné YouTube ID -> lazy embed po kliknutí (LazyYouTubeEmbed, stejná
+  // komponenta jako /videa/[slug]) + explicitní "Otevřít na YouTube"
+  // odkaz, viz zadání. Kick (nebo YouTube bez ID) beze změny — pořád jen
+  // odkaz na skutečný profil/klipy, žádný vymyšlený/fake embed.
+  if (video.platform === "youtube" && video.youtubeId) {
+    return (
+      <div className="overflow-hidden rounded-lg border border-white/10 bg-white/5">
+        <LazyYouTubeEmbed
+          videoId={video.youtubeId}
+          title={video.title}
+          thumbnailUrl={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+        />
+        <div className="p-3">
+          <p className="font-serif text-base text-white">{video.title}</p>
+          <p className="mt-1 text-sm text-cyan-100/70">{video.subtitle}</p>
+          <a
+            href={video.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-block text-sm font-semibold text-amber-300 underline hover:text-amber-200"
+          >
+            Otevřít na YouTube ↗
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <a
@@ -235,9 +293,9 @@ function VideoCard({
       rel="noopener noreferrer"
       className="group block overflow-hidden rounded-lg border border-white/10 bg-white/5 transition hover:border-amber-400/40"
     >
-      {thumbnailSrc ? (
+      {video.image ? (
         <div className="relative aspect-video w-full">
-          <Image src={thumbnailSrc} alt="" fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
+          <Image src={video.image} alt="" fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
         </div>
       ) : (
         <div className="flex aspect-video w-full flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#0a2438] to-[#123c4d] text-center">

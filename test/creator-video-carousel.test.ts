@@ -34,6 +34,28 @@ test("creatorVideos: žádný duplicitní tvůrce (dots musí mít unikátní kl
   assert.equal(new Set(names).size, names.length);
 });
 
+test("creatorVideos: obsahuje HouseBox, astatoro a 2sekundovymato", () => {
+  const names = creatorVideos.map((slide) => slide.creator);
+  assert.ok(names.includes("HouseBox"));
+  assert.ok(names.includes("astatoro"));
+  assert.ok(names.includes("2sekundovymato"));
+});
+
+test("creatorVideos: HouseBox má ověřený youtubeId odpovídající jeho URL", () => {
+  const houseBox = creatorVideos.find((slide) => slide.creator === "HouseBox");
+  assert.equal(houseBox?.youtubeId, "aW5dkh1j_WM");
+  assert.equal(houseBox?.url, "https://www.youtube.com/watch?v=aW5dkh1j_WM");
+});
+
+test("creatorVideos: každý slide má platnou language (cs/sk), SK tvůrci jsou skutečně sk", () => {
+  for (const slide of creatorVideos) {
+    assert.ok(slide.language === "cs" || slide.language === "sk", `${slide.creator} má neplatnou language`);
+  }
+  for (const name of ["astatoro", "2sekundovymato"]) {
+    assert.equal(creatorVideos.find((s) => s.creator === name)?.language, "sk");
+  }
+});
+
 test("nextSlideIndex: postupuje o jednu vpřed", () => {
   assert.equal(nextSlideIndex(0, 5), 1);
   assert.equal(nextSlideIndex(3, 5), 4);

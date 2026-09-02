@@ -20,6 +20,15 @@
 // Video https://www.youtube.com/watch?v=pexyrbH8KCM (FlyGunCZ, "Feed
 // and Grow: Fish") sem záměrně NENÍ zařazené — jde o jinou hru, ne
 // How to Fish (ověřeno stejným API voláním).
+//
+// HouseBox (2026-09-02, doplněno): stejný postup ověření (YouTube Data
+// API v3, search.list + videos.list, channelId UCam7UAsJfvcs5JesL4nDl_w).
+// Popis obou videí přímo odkazuje na skutečnou Steam stránku How to Fish
+// (store.steampowered.com/app/4001890/How_to_Fish), takže
+// howToFishConfirmed je true. Prostřední díl série ("Na ŽRALOKA UZINA?",
+// aW5dkh1j_WM) je záměrně jen v data/creator-videos.ts (homepage
+// carousel slide + "Videa z How to Fish" na /stream/housebox), ne tady
+// — ať se stejné video nezdvojí na jedné stránce ve dvou různých kartách.
 
 export type VideoAuthor = {
   name: string;
@@ -71,7 +80,55 @@ const FLYGUN_AUTHOR: VideoAuthor = {
   creatorSlug: "flygun",
 };
 
+const HOUSEBOX_AUTHOR: VideoAuthor = {
+  name: "HouseBox",
+  channelUrl: "https://www.youtube.com/@houseboxcz",
+  creatorSlug: "housebox",
+};
+
 export const howToFishVideos: HowToFishVideo[] = [
+  {
+    slug: "housebox-how-to-fish-1",
+    platform: "youtube",
+    videoId: "ILtCeTrDKC8",
+    url: "https://www.youtube.com/watch?v=ILtCeTrDKC8",
+    title: "Rybářská HRA ROKU?! 🎣 |  How to fish #1",
+    seoTitle: "HouseBox hraje How to Fish #1 – Rybářská HRA ROKU?!",
+    publishedAt: "2026-08-28T16:30:39Z",
+    thumbnailUrl: "https://i.ytimg.com/vi/ILtCeTrDKC8/maxresdefault.jpg",
+    author: HOUSEBOX_AUTHOR,
+    featuredCreatorSlugs: ["housebox"],
+    howToFishConfirmed: true,
+    summary:
+      "První díl HouseBoxovy vlastní série z How to Fish, publikovaný 28. srpna 2026. Popis videa přímo odkazuje na Steam stránku hry, takže souvislost s How to Fish je jednoznačně potvrzená. HouseBox v něm začíná objevovat základy rybaření a herní mechaniky — konkrétní úlovky, bossy ani lokace video v názvu ani popisu nejmenuje.",
+    fishSlugs: [],
+    bossSlugs: [],
+    locationSlugs: [],
+    itemSlugs: [],
+    guideSlugs: [],
+    indexable: true,
+  },
+  {
+    slug: "housebox-how-to-fish-3",
+    platform: "youtube",
+    videoId: "OIwQMgWXPEo",
+    url: "https://www.youtube.com/watch?v=OIwQMgWXPEo",
+    title: "VYHRÁL JSEM RYBÍ JACKPOT! 🎰 | How to fish #3",
+    seoTitle: "HouseBox hraje How to Fish #3 – Vyhrál jsem rybí jackpot!",
+    publishedAt: "2026-09-02T16:30:36Z",
+    thumbnailUrl: "https://i.ytimg.com/vi/OIwQMgWXPEo/maxresdefault.jpg",
+    author: HOUSEBOX_AUTHOR,
+    featuredCreatorSlugs: ["housebox"],
+    howToFishConfirmed: true,
+    summary:
+      "Třetí díl HouseBoxovy série z How to Fish, publikovaný 2. září 2026 — stejně jako předchozí díly odkazuje popis videa přímo na Steam stránku hry. Navazuje na první dva díly; konkrétní ryby, bossy ani lokace video znovu nejmenuje, takže tahle pole zůstávají prázdná.",
+    fishSlugs: [],
+    bossSlugs: [],
+    locationSlugs: [],
+    itemSlugs: [],
+    guideSlugs: [],
+    indexable: true,
+  },
   {
     slug: "flygun-rybareni-zabavny",
     platform: "youtube",

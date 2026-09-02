@@ -213,9 +213,15 @@ function CarouselInfo({
 }) {
   return (
     <div className="flex flex-1 flex-col justify-center gap-1.5 p-4 sm:p-5">
-      <span className="w-fit rounded border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-100/70">
-        {slide.platform === "youtube" ? "YouTube" : "Kick"}
-      </span>
+      <div className="flex items-center gap-1.5">
+        <span className="w-fit rounded border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-100/70">
+          {slide.platform === "youtube" ? "YouTube" : "Kick"}
+        </span>
+        {/* Nenápadný country badge (viz zadání "nesmí být dominantní") — odvozený přímo ze `slide.language`, žádné nové pole v datech. */}
+        <span className="text-xs text-cyan-100/50" aria-label={slide.language === "sk" ? "Slovensko" : "Česko"}>
+          {slide.language === "sk" ? "🇸🇰 SK" : "🇨🇿 CZ"}
+        </span>
+      </div>
       <p className="font-serif text-lg text-white sm:text-xl">{slide.title}</p>
       <p className="text-sm text-cyan-100/80">{slide.subtitle}</p>
 
