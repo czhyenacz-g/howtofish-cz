@@ -6,19 +6,22 @@ import { creatorProfiles } from "../data/creators.ts";
 import { getIndexableVideos } from "../data/how-to-fish-videos.ts";
 import { SITE_URL } from "./config/site.ts";
 
-// Homepage (`/`) je záměrně mimo sitemap — zobrazuje stejný obsah jako
-// `/ryby` a canonical obou vždy míří na `/ryby` (viz app/page.tsx),
-// takže `/ryby` je tu jediná pravda. `/demo` je smazané (permanent
+// Homepage (`/`) má teď VLASTNÍ unikátní obsah (streameři/live/Krabí
+// invaze/Multiplayer, viz app/page.tsx) místo dřívější duplicity s
+// `/ryby` — patří proto do sitemap s vlastním canonical na "/", ne
+// s canonical na "/ryby" jako dřív. `/demo` je smazané (permanent
 // redirect na /ryby, viz next.config.ts), `/*/navrhnout` formuláře a
 // auth routes jsou trvale noindex na úrovni stránky, sem nepatří.
 // `/aktualizace` zůstává mimo — je to zatím jen prázdný placeholder.
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [
-    { url: `${SITE_URL}/ryby`, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${SITE_URL}/o-hre`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/hra`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/stream`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.4 },
+    { url: SITE_URL, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
+    { url: `${SITE_URL}/streameri`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/stream`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.8 },
+    { url: `${SITE_URL}/ryby`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/hra`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/multiplayer`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.5 },
+    { url: `${SITE_URL}/o-hre`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
   ];
 
   for (const path of ["/predmety", "/bossove", "/lokace", "/navody", "/achievementy"]) {
@@ -62,13 +65,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Streamer detail pages — jak ověření tvůrci s videi (data/creator-videos.ts),
   // tak opatrně formulované profily bez videa (data/creators.ts) — všichni
-  // jsou skutečné, indexovatelné stránky (viz app/stream/[creator]/page.tsx).
+  // jsou skutečné, indexovatelné stránky (viz app/streameri/[slug]/page.tsx).
+  // Bývalé /stream/{slug} teď trvale přesměrovává sem (next.config.ts).
   for (const creator of creatorProfiles) {
     entries.push({
-      url: `${SITE_URL}/stream/${creator.slug}`,
+      url: `${SITE_URL}/streameri/${creator.slug}`,
       lastModified: new Date(),
       changeFrequency: "monthly",
-      priority: 0.4,
+      priority: 0.6,
     });
   }
 

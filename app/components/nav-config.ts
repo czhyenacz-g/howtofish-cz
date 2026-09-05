@@ -13,6 +13,9 @@ export function isNavGroup(entry: NavEntry): entry is NavGroup {
   return "children" in entry;
 }
 
+// Streameři jsou teď hlavní obsahová osa webu (viz zadání
+// "restrukturalizace na streamery") — první položka hned za logem.
+export const STREAMERI_LINK: SimpleNavLink = { href: "/streameri", label: "Streameři" };
 export const LIVE_LINK: SimpleNavLink = { href: "/stream", label: "Živě" };
 // Krabí invaze je konkrétní minihra (dřív jen obecný label "Hra") —
 // odlišená vlastním jménem a krabí ikonou místo gamepadu.
@@ -24,41 +27,22 @@ export const HRA_LINK: SimpleNavLink = { href: "/hra", label: "Krabí invaze" };
 export const O_HRE_LINK: SimpleNavLink = { href: "/o-hre", label: "O hře" };
 export const MULTIPLAYER_LINK: SimpleNavLink = { href: "/multiplayer", label: "Multiplayer ostrov" };
 
-// "Svět" sloučí dřívější dvě samostatné hlavní položky (Lokace, Bossové)
-// do jednoho dropdownu — uvolní přesně jeden slot v pill-navigaci, který
-// zabere Multiplayer ostrov, takže celkový počet top-level položek
-// zůstává stejný jako dřív (viz komentář ve Footer.tsx o 9 položkách bez
-// flex-wrap).
+// "Svět How to Fish" sloučí VŠECHNY dřívější samostatné encyklopedické
+// hlavní položky (Ryby, Předměty, Návody, Lokace, Achievementy, Bossové)
+// do jednoho dropdownu (viz zadání "hlavní menu má být výrazně
+// jednodušší") — postaveno přímo nad NAV_LINKS, ať existuje jediný zdroj
+// pravdy pro "jaké encyklopedické sekce web má" (stejné pořadí i v patičce).
 export const WORLD_GROUP: NavGroup = {
-  label: "Svět",
-  children: [
-    { href: "/lokace", label: "Lokace" },
-    { href: "/bossove", label: "Bossové" },
-  ],
+  label: "Svět How to Fish",
+  children: [...NAV_LINKS],
 };
 
-function findLink(href: string): SimpleNavLink {
-  const link = NAV_LINKS.find((l) => l.href === href);
-  if (!link) throw new Error(`nav-config: NAV_LINKS neobsahuje ${href}`);
-  return link;
-}
-
-// /stream je jedna z nejdůležitějších dynamických funkcí webu, takže
-// "Živě" chceme hned za logem — i když v NAV_LINKS (a v patičce, kde
-// pořadí měnit nechceme) má Ryby jiné pořadové místo. "Krabí invaze" a
-// "Multiplayer ostrov" se pro stejný důvod přidávají na konec.
+// Streameři/Živě/Svět/Krabí invaze/Multiplayer — 5 top-level položek
+// místo dřívějších 8 (viz zadání "výrazně jednodušší menu"). "O hře"
+// zůstává mimo hlavní pill-navigaci (viz O_HRE_LINK výš).
 export function buildLinks(basePath: string): NavEntry[] {
   if (basePath !== "") return [...NAV_LINKS];
-  return [
-    LIVE_LINK,
-    findLink("/ryby"),
-    findLink("/navody"),
-    findLink("/predmety"),
-    WORLD_GROUP,
-    findLink("/achievementy"),
-    MULTIPLAYER_LINK,
-    HRA_LINK,
-  ];
+  return [STREAMERI_LINK, LIVE_LINK, WORLD_GROUP, MULTIPLAYER_LINK, HRA_LINK];
 }
 
 // Jen pro mobilní panel — "O hře" vložené před poslední položku (Krabí

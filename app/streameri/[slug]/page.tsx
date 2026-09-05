@@ -3,11 +3,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { creatorProfiles, getCreatorProfile } from "../../../data/creators.ts";
+import { getPublicGearForCreator } from "../../../data/creator-gear.ts";
 import { getVideosAuthoredBy, getVideosFeaturingButNotAuthoredBy } from "../../../data/how-to-fish-videos.ts";
+import { getLiveStreams } from "../../../lib/streams/get-live-streams.ts";
+import { findLiveStreamForCreator } from "../../../lib/creators/live-match.ts";
+import { getCreatorPlatforms, getCreatorPrimaryLink } from "../../../lib/creators/platform.ts";
 import { SITE_URL } from "../../config/site.ts";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../components/Breadcrumbs.tsx";
 import HowToFishVideoCard from "../../components/HowToFishVideoCard.tsx";
 import LazyYouTubeEmbed from "../../components/LazyYouTubeEmbed.tsx";
+import CreatorAvatar from "../../components/CreatorAvatar.tsx";
+import { PLATFORM_BADGE_CLASS, PLATFORM_LABEL } from "../../stream/StreamBrowser.tsx";
+import { LiveIcon } from "../../components/icons";
 
 // Kolik "dalších CZ/SK tvůrců" se zobrazí dole na stránce — s rostoucím
 // počtem tvůrců by celý seznam byl moc dlouhý (viz zadání "stačí 4-6,
@@ -16,21 +23,26 @@ import LazyYouTubeEmbed from "../../components/LazyYouTubeEmbed.tsx";
 // nemění se při každém buildu.
 const RELATED_CREATORS_LIMIT = 6;
 
-// Nová child route pod stávající /stream (dědí app/stream/layout.tsx,
-// žádný zásah do StreamBrowser/live-stream logiky). Jen potvrzení
-// tvůrci z data/creator-videos.ts (přes data/creators.ts) — žádná nová
-// URL, žádné vymyšlené údaje.
-
+// Bývalé /stream/[creator] (viz next.config.ts redirects — trvalý
+// redirect na tuhle route, ať se neztratí SEO hodnota/interní odkazy).
+// Profily jsou pořád jen potvrzení tvůrci z data/creator-videos.ts (přes
+// data/creators.ts) — žádná nová vymyšlená URL, žádné vymyšlené údaje.
+//
+// Na rozdíl od bývalé verze stránka teď navíc ukazuje LIVE stav (proto
+// `revalidate`, ne čistě statická stránka) — zdroj je stejná
+// lib/streams/get-live-streams.ts jako na /stream, žádná druhá
+// integrace.
 export const dynamicParams = false;
+export const revalidate = 60;
 
-type Props = { params: Promise<{ creator: string }> };
+type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
-  return creatorProfiles.map((c) => ({ creator: c.slug }));
+  return creatorProfiles.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { creator: slug } = await params;
+  const { slug } = await params;
   const creator = getCreatorProfile(slug);
   if (!creator) return {};
 
@@ -41,7 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // data/creators.ts) přebijí tuhle obecnou šablonu, když chceme
   // konkrétnější text pro daného tvůrce.
   const title =
-    creator.seoTitle ?? (hasVideos ? `${creator.name} a How to Fish – videa a streamy` : `${creator.name} a How to Fish`);
+    creator.seoTitle ?? (hasVideos ? `${creator.name} – videa, streamy a How to Fish` : `${creator.name} a How to Fish`);
   const description =
     creator.seoDescription ??
     (hasVideos
@@ -51,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: `/stream/${creator.slug}` },
+    alternates: { canonical: `/streameri/${creator.slug}` },
     openGraph: {
       description,
       images: [{ url: `/api/og?title=${encodeURIComponent(creator.name)}&sub=${encodeURIComponent("How to Fish CZ")}`, width: 1200, height: 630 }],
@@ -60,12 +72,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CreatorPage({ params }: Props) {
-  const { creator: slug } = await params;
+  const { slug } = await params;
   const creator = getCreatorProfile(slug);
   if (!creator) notFound();
 
   const otherCreators = creatorProfiles.filter((c) => c.slug !== creator.slug).slice(0, RELATED_CREATORS_LIMIT);
-  const pageUrl = `${SITE_URL}/stream/${creator.slug}`;
+  const pageUrl = `${SITE_URL}/streameri/${creator.slug}`;
 
   // Doložená souvislost mezi tvůrci (např. společné hraní) — obousměrně:
   // "forward" je tvůrce, na kterého tenhle profil odkazuje
@@ -76,14 +88,24 @@ export default async function CreatorPage({ params }: Props) {
   const mentionedBy = creatorProfiles.filter((c) => c.relatedCreatorSlug === creator.slug);
 
   // Nový video content model (data/how-to-fish-videos.ts) — oddělené od
-  // staršího creator.videos (carousel na homepage, beze změny). Autor
-  // vs. "jen se objevuje" je tu podstatné rozlišení, viz zadání.
+  // staršího creator.videos (dřívější homepage carousel, beze změny).
+  // Autor vs. "jen se objevuje" je tu podstatné rozlišení, viz zadání.
   const authoredVideos = getVideosAuthoredBy(creator.slug);
   const featuredVideos = getVideosFeaturingButNotAuthoredBy(creator.slug);
+  const gear = getPublicGearForCreator(creator.slug);
+  const platforms = getCreatorPlatforms(creator);
+  const primaryLink = getCreatorPrimaryLink(creator);
+
+  // Stejný zdroj jako /stream (lib/streams/get-live-streams.ts) — žádná
+  // druhá LIVE integrace. Chyba/timeout providerů se řeší uvnitř (viz
+  // Promise.allSettled tam), takže tahle stránka nikdy nespadne kvůli
+  // nedostupnému Twitch/YouTube/Kick API.
+  const { streams } = await getLiveStreams();
+  const liveStream = findLiveStreamForCreator(creator.name, streams);
 
   const breadcrumbItems = [
     { label: "HowToFish.cz", href: "/" },
-    { label: "Streamy", href: "/stream" },
+    { label: "Streameři", href: "/streameri" },
     { label: creator.name },
   ];
 
@@ -130,7 +152,39 @@ export default async function CreatorPage({ params }: Props) {
       <div className="mx-auto max-w-3xl">
         <Breadcrumbs items={breadcrumbItems} />
 
-        <h1 className="mt-4 font-serif text-3xl sm:text-4xl">{creator.name} a How to Fish</h1>
+        {/* HERO (zadání bod 5A) */}
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <CreatorAvatar name={creator.name} size="lg" />
+          <div className="min-w-0">
+            <h1 className="font-serif text-3xl sm:text-4xl">
+              {creator.name} <span className="text-xl text-cyan-100/50">{creator.country === "SK" ? "🇸🇰" : "🇨🇿"}</span>
+            </h1>
+            {platforms.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {platforms.map((p) => (
+                  <span key={p} className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase tracking-wide ${PLATFORM_BADGE_CLASS[p]}`}>
+                    {PLATFORM_LABEL[p]}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {liveStream && (
+          <Link
+            href={liveStream.streamUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 flex items-center gap-3 rounded-xl border border-[#ffb199] bg-gradient-to-b from-[#5c2318] to-[#2a0f09] p-4 shadow-[0_0_16px_1px_rgba(255,107,82,0.3)] transition hover:border-[#ff8a75]"
+          >
+            <LiveIcon className="h-5 w-5 shrink-0 text-[#ff9c85]" />
+            <span className="min-w-0">
+              <span className="block text-xs font-bold uppercase tracking-wide text-[#ff9c85]">Právě live</span>
+              <span className="block truncate font-serif text-white">{liveStream.title}</span>
+            </span>
+          </Link>
+        )}
 
         <p className="mt-4 text-lg text-cyan-100/80">
           {creator.bio ??
@@ -142,7 +196,7 @@ export default async function CreatorPage({ params }: Props) {
             {relatedCreator && (
               <>
                 {creator.name} se objevil při společném hraní s{" "}
-                <Link href={`/stream/${relatedCreator.slug}`} className="underline hover:text-amber-300">
+                <Link href={`/streameri/${relatedCreator.slug}`} className="underline hover:text-amber-300">
                   {relatedCreator.name}
                 </Link>
                 .
@@ -151,7 +205,7 @@ export default async function CreatorPage({ params }: Props) {
             {mentionedBy.map((mentioner) => (
               <span key={mentioner.slug} className="block">
                 {mentioner.name} se s {creator.name} objevil/a při společném hraní How to Fish —{" "}
-                <Link href={`/stream/${mentioner.slug}`} className="underline hover:text-amber-300">
+                <Link href={`/streameri/${mentioner.slug}`} className="underline hover:text-amber-300">
                   více o {mentioner.name}
                 </Link>
                 .
@@ -171,6 +225,7 @@ export default async function CreatorPage({ params }: Props) {
           </a>
         )}
 
+        {/* B) HOW TO FISH OBSAH (zadání bod 5B) */}
         {creator.videos.length > 0 && (
           <section className="mt-8">
             <h2 className="font-serif text-xl text-amber-300">Videa z How to Fish</h2>
@@ -207,13 +262,48 @@ export default async function CreatorPage({ params }: Props) {
           </section>
         )}
 
+        {creator.videos.length === 0 && authoredVideos.length === 0 && featuredVideos.length === 0 && primaryLink && !creator.externalLink && (
+          <p className="mt-6 text-sm text-cyan-100/60">
+            Zatím tu nemáme žádné konkrétní video —{" "}
+            <a href={primaryLink.href} target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-300">
+              zdroj k dispozici zde
+            </a>
+            .
+          </p>
+        )}
+
+        {/* C) TECHNIKA STREAMERA (zadání bod 5C) — vykresluje se JEN, když existuje aspoň jeden veřejně zobrazitelný záznam. */}
+        {gear.length > 0 && (
+          <section className="mt-8">
+            <h2 className="font-serif text-xl text-amber-300">Technika a vybavení</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {gear.map((item) => (
+                <div key={`${item.creatorSlug}-${item.productName}`} className="rounded-lg border border-white/10 bg-white/5 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100/50">{item.category}</p>
+                  <p className="mt-1 font-serif text-base text-white">
+                    {item.brand ? `${item.brand} ` : ""}
+                    {item.productName}
+                  </p>
+                  {item.confidence === "historical" && <p className="mt-1 text-xs text-cyan-100/50">dříve používal/a</p>}
+                  {item.note && <p className="mt-1 text-sm text-cyan-100/70">{item.note}</p>}
+                  <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-xs text-cyan-100/50 underline hover:text-amber-300">
+                    Zdroj
+                  </a>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {otherCreators.length > 0 && (
-          <section className="mt-10 border-t border-white/10 pt-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-100/50">Další CZ/SK tvůrci</h2>
+          <section className="mt-10" aria-labelledby="other-creators-heading">
+            <h2 id="other-creators-heading" className="text-sm font-semibold uppercase tracking-wide text-cyan-100/50">
+              Další CZ/SK tvůrci
+            </h2>
             <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
               {otherCreators.map((c) => (
                 <li key={c.slug}>
-                  <Link href={`/stream/${c.slug}`} className="text-cyan-100/80 underline hover:text-amber-300">
+                  <Link href={`/streameri/${c.slug}`} className="text-cyan-100/80 underline hover:text-amber-300">
                     {c.name} <span className="text-cyan-100/40">{c.country === "SK" ? "🇸🇰" : "🇨🇿"}</span>
                   </Link>
                 </li>
@@ -248,8 +338,8 @@ export default async function CreatorPage({ params }: Props) {
           </ul>
         </section>
 
-        <Link href="/stream" className="mt-10 inline-block text-sm text-cyan-100/70 underline hover:text-amber-300">
-          ← Zpět na Streamy
+        <Link href="/streameri" className="mt-10 inline-block text-sm text-cyan-100/70 underline hover:text-amber-300">
+          ← Zpět na Streameři
         </Link>
       </div>
     </div>

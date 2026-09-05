@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getLiveStreams } from "../../lib/streams/get-live-streams";
-import { creatorProfiles } from "../../data/creators";
 import { howToFishVideos } from "../../data/how-to-fish-videos.ts";
 import HowToFishVideoCard from "../components/HowToFishVideoCard.tsx";
 import { pickPromotion } from "../../lib/promotions/match-route";
 import { getActivePromotions } from "../../lib/universal-content-api/promotions";
 import { SITE_URL } from "../config/site";
 import { STREAM_FAQ } from "./faq";
-import StreamBrowser, { PLATFORM_BADGE_CLASS, PLATFORM_LABEL } from "./StreamBrowser";
+import StreamBrowser from "./StreamBrowser";
 
 const PATHNAME = "/stream";
 
@@ -126,43 +125,20 @@ export default async function StreamPage() {
           </section>
         )}
 
-        {creatorProfiles.length > 0 && (
-          <section className="mx-auto mt-12 max-w-4xl border-t border-white/10 pt-8">
-            <h2 className="font-serif text-xl text-amber-300">Čeští a slovenští tvůrci kolem How to Fish</h2>
-            <p className="mt-2 text-sm text-cyan-100/70">
-              Kdo hraje, hrál nebo se objevil u How to Fish v české a slovenské komunitě.
-            </p>
-            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-              {creatorProfiles.map((creator) => {
-                const platform = creator.videos[0]?.platform;
-                return (
-                  <li key={creator.slug}>
-                    <Link
-                      href={`/stream/${creator.slug}`}
-                      className="group flex h-full flex-col gap-1.5 rounded-lg border border-white/10 bg-white/5 p-4 transition hover:border-amber-400/40 hover:bg-white/10"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-serif text-base text-white group-hover:text-amber-300">
-                          {creator.name} <span className="text-sm text-cyan-100/40">{creator.country === "SK" ? "🇸🇰" : "🇨🇿"}</span>
-                        </span>
-                        {platform && (
-                          <span
-                            className={`shrink-0 rounded border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${PLATFORM_BADGE_CLASS[platform]}`}
-                          >
-                            {PLATFORM_LABEL[platform]}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-cyan-100/70">
-                        {creator.bio ?? `CZ/SK tvůrce, který/á si zahrál/a How to Fish.`}
-                      </p>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        )}
+        {/* Katalog tvůrců má teď vlastní stránku (/streameri) s LIVE
+            zvýrazněním a plnohodnotnými profily (zadání "restrukturalizace
+            na streamery") — tady zůstává jen odkaz, ať se stejná karta
+            neduplikuje na dvou místech. */}
+        <section className="mx-auto mt-12 max-w-2xl border-t border-white/10 pt-8 text-center">
+          <h2 className="font-serif text-xl text-amber-300">Čeští a slovenští tvůrci kolem How to Fish</h2>
+          <p className="mt-2 text-sm text-cyan-100/70">Kdo hraje, hrál nebo se objevil u How to Fish v české a slovenské komunitě.</p>
+          <Link
+            href="/streameri"
+            className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 font-serif text-amber-300 transition hover:bg-amber-400/20"
+          >
+            Všichni streameři →
+          </Link>
+        </section>
 
         <section className="mx-auto mt-12 max-w-2xl border-t border-white/10 pt-8 text-center">
           <h2 className="font-serif text-xl text-amber-300">Chceš hrát s ostatními?</h2>

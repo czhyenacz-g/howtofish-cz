@@ -1,6 +1,7 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import sitemap from "../app/sitemap.ts";
+import { SITE_URL } from "../app/config/site.ts";
 
 describe("sitemap", () => {
   const entries = sitemap();
@@ -41,28 +42,40 @@ describe("sitemap", () => {
     assert.ok(urls.some((u) => u.includes("/ryby/") && !u.endsWith("/ryby/")));
   });
 
-  test("homepage (/) není v sitemap duplicitně vůči /ryby", () => {
-    assert.ok(!urls.some((u) => /https?:\/\/[^/]+\/$/.test(u)));
+  // Homepage má teď vlastní unikátní obsah (streameři/live), takže na
+  // rozdíl od dřívějška PATŘÍ do sitemap s vlastním canonical na "/"
+  // (viz app/page.tsx, app/sitemap.ts) — už není duplicita /ryby.
+  test("homepage (/) je v sitemap přesně jednou, s vlastní URL (ne canonical redirect na /ryby)", () => {
+    const homepageMatches = urls.filter((u) => u === SITE_URL || u === `${SITE_URL}/`);
+    assert.equal(homepageMatches.length, 1);
   });
 
-  test("obsahuje nové streamer profily (haiset, kapesnik69, fattypillow, marwex)", () => {
+  test("obsahuje /streameri (katalog tvůrců)", () => {
+    assert.ok(urls.some((u) => u.endsWith("/streameri")));
+  });
+
+  test("obsahuje nové streamer profily na /streameri/{slug} (haiset, kapesnik69, fattypillow, marwex) — bývalé /stream/{slug} teď trvale přesměrovává (next.config.ts)", () => {
     for (const slug of ["haiset", "kapesnik69", "fattypillow", "marwex"]) {
-      assert.ok(urls.some((u) => u.endsWith(`/stream/${slug}`)), `chybí /stream/${slug}`);
+      assert.ok(urls.some((u) => u.endsWith(`/streameri/${slug}`)), `chybí /streameri/${slug}`);
     }
   });
 
-  test("obsahuje nové CZ/SK creator pages (housebox, astatoro, 2sekundovymato, anymall, boshoo)", () => {
+  test("obsahuje nové CZ/SK creator pages na /streameri/{slug} (housebox, astatoro, 2sekundovymato, anymall, boshoo)", () => {
     for (const slug of ["housebox", "astatoro", "2sekundovymato", "anymall", "boshoo"]) {
-      assert.ok(urls.some((u) => u.endsWith(`/stream/${slug}`)), `chybí /stream/${slug}`);
+      assert.ok(urls.some((u) => u.endsWith(`/streameri/${slug}`)), `chybí /streameri/${slug}`);
     }
   });
 
-  test("neobsahuje /stream/touken (creator candidate, žádný ověřený důkaz)", () => {
-    assert.ok(!urls.some((u) => u.endsWith("/stream/touken")));
+  test("neobsahuje /streameri/touken (creator candidate, žádný ověřený důkaz)", () => {
+    assert.ok(!urls.some((u) => u.endsWith("/streameri/touken")));
   });
 
-  test("obsahuje /stream/pixelorezlive", () => {
-    assert.ok(urls.some((u) => u.endsWith("/stream/pixelorezlive")));
+  test("neobsahuje žádnou starou /stream/{slug} URL (jen /stream samotné, live agregátor)", () => {
+    assert.ok(!urls.some((u) => /\/stream\/[^/]+$/.test(u)));
+  });
+
+  test("obsahuje /streameri/pixelorezlive", () => {
+    assert.ok(urls.some((u) => u.endsWith("/streameri/pixelorezlive")));
   });
 
   test("obsahuje nová HouseBox video videa (/videa/housebox-how-to-fish-1, /videa/housebox-how-to-fish-3)", () => {

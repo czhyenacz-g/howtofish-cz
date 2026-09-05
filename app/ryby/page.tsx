@@ -8,8 +8,9 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
-  // `/ryby` je kanonická hlavní landing page (viz app/page.tsx, který
-  // zobrazuje stejný obsah na `/` a taky odkazuje canonical sem).
+  // Homepage (`/`) má teď vlastní unikátní obsah (streameři/live), takže
+  // `/ryby` je od teď sama sobě kanonická, ne canonical na dřívější
+  // duplicitu (viz app/page.tsx).
   alternates: { canonical: "/ryby" },
   openGraph: {
     images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }],

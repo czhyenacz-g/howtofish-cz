@@ -6,18 +6,25 @@ import {
   HRA_LINK,
   MULTIPLAYER_LINK,
   O_HRE_LINK,
+  STREAMERI_LINK,
   WORLD_GROUP,
   buildLinks,
   buildMobileLinks,
   isEntryActive,
   isNavGroup,
 } from "../app/components/nav-config.ts";
+import { NAV_LINKS } from "../app/config/site.ts";
 
 // Header.tsx samotný zůstává "use client" a nejde importovat pod
 // --conditions=react-server — jen zdrojová kontrola pro věci, co
 // nav-config.ts nepokrývá (JSX rendering detaily).
 const headerSource = readFileSync(fileURLToPath(new URL("../app/components/Header.tsx", import.meta.url)), "utf8");
 const footerSource = readFileSync(fileURLToPath(new URL("../app/components/Footer.tsx", import.meta.url)), "utf8");
+
+test("Streameři vedou na /streameri (zadání: nová hlavní obsahová osa)", () => {
+  assert.equal(STREAMERI_LINK.href, "/streameri");
+  assert.equal(STREAMERI_LINK.label, "Streameři");
+});
 
 test("Krabí invaze vede na existující route /hra", () => {
   assert.equal(HRA_LINK.href, "/hra");
@@ -28,18 +35,20 @@ test("O hře odkazuje na /o-hre", () => {
   assert.equal(O_HRE_LINK.href, "/o-hre");
 });
 
-test("Svět je skupina obsahující Lokace a Bossové", () => {
+test("Svět How to Fish je skupina obsahující VŠECHNY encyklopedické sekce z NAV_LINKS (zadání: hlavní menu výrazně jednodušší)", () => {
   assert.ok(isNavGroup(WORLD_GROUP));
-  const hrefs = WORLD_GROUP.children.map((c) => c.href);
-  assert.deepEqual(hrefs.sort(), ["/bossove", "/lokace"]);
+  assert.equal(WORLD_GROUP.label, "Svět How to Fish");
+  const hrefs = WORLD_GROUP.children.map((c) => c.href).sort();
+  assert.deepEqual(hrefs, [...NAV_LINKS.map((l) => l.href)].sort());
 });
 
-test("produkční desktop menu (basePath='') obsahuje Svět, ne samostatné Lokace/Bossové", () => {
+test("produkční desktop menu (basePath='') obsahuje Streameři, Živě, Svět, Multiplayer, Krabí invaze — a NE samostatné encyklopedické položky", () => {
   const links = buildLinks("");
   const labels = links.map((l) => l.label);
-  assert.ok(labels.includes("Svět"));
-  assert.ok(!labels.includes("Lokace"), "Lokace nesmí být samostatná top-level položka");
-  assert.ok(!labels.includes("Bossové"), "Bossové nesmí být samostatná top-level položka");
+  assert.deepEqual(labels, ["Streameři", "Živě", "Svět How to Fish", "Multiplayer ostrov", "Krabí invaze"]);
+  for (const encyclopediaLabel of NAV_LINKS.map((l) => l.label)) {
+    assert.ok(!labels.includes(encyclopediaLabel), `${encyclopediaLabel} nesmí být samostatná top-level položka`);
+  }
 });
 
 test("Multiplayer ostrov je v hlavním produkčním menu", () => {
@@ -52,30 +61,30 @@ test("Krabí invaze zůstává v hlavním produkčním menu", () => {
   assert.ok(links.some((l) => !isNavGroup(l) && l.href === HRA_LINK.href));
 });
 
-test("produkční desktop menu má stejný počet top-level položek jako dřív (8) — merge Svět uvolnil slot pro Multiplayer", () => {
+test("produkční desktop menu je výrazně jednodušší než dřív — 5 top-level položek místo dřívějších 8 (zadání)", () => {
   const links = buildLinks("");
-  assert.equal(links.length, 8);
+  assert.equal(links.length, 5);
 });
 
-test("demo sekce (basePath!=='') zůstává beze změny — plochý seznam z NAV_LINKS, bez Svět/Multiplayer/Krabí invaze", () => {
+test("demo sekce (basePath!=='') zůstává beze změny — plochý seznam z NAV_LINKS, bez Svět/Streameři/Multiplayer/Krabí invaze", () => {
   const links = buildLinks("/demo");
-  assert.ok(!links.some((l) => l.label === "Svět"));
+  assert.ok(!links.some((l) => l.label === "Svět How to Fish"));
+  assert.ok(!links.some((l) => !isNavGroup(l) && l.href === STREAMERI_LINK.href));
   assert.ok(!links.some((l) => !isNavGroup(l) && l.href === MULTIPLAYER_LINK.href));
   assert.ok(!links.some((l) => !isNavGroup(l) && l.href === HRA_LINK.href));
 });
 
-test("/lokace a /lokace/* aktivují Svět", () => {
-  assert.equal(isEntryActive("/lokace", "", WORLD_GROUP), true);
-  assert.equal(isEntryActive("/lokace/plaz", "", WORLD_GROUP), true);
+test("/ryby a /lokace a /bossove (všechny encyklopedické sekce) aktivují Svět", () => {
+  for (const href of NAV_LINKS.map((l) => l.href)) {
+    assert.equal(isEntryActive(href, "", WORLD_GROUP), true, `${href} by měl aktivovat Svět`);
+    assert.equal(isEntryActive(`${href}/nejaky-slug`, "", WORLD_GROUP), true, `${href}/* by měl aktivovat Svět`);
+  }
 });
 
-test("/bossove a /bossove/* aktivují Svět", () => {
-  assert.equal(isEntryActive("/bossove", "", WORLD_GROUP), true);
-  assert.equal(isEntryActive("/bossove/kraken", "", WORLD_GROUP), true);
-});
-
-test("nesouvisející route Svět neaktivuje", () => {
-  assert.equal(isEntryActive("/ryby", "", WORLD_GROUP), false);
+test("nesouvisející route (streameři/živě/multiplayer) Svět neaktivuje", () => {
+  assert.equal(isEntryActive("/streameri", "", WORLD_GROUP), false);
+  assert.equal(isEntryActive("/stream", "", WORLD_GROUP), false);
+  assert.equal(isEntryActive("/multiplayer", "", WORLD_GROUP), false);
 });
 
 test("aktivace Svět respektuje basePath (demo sekce)", () => {
@@ -91,9 +100,14 @@ test("mobilní seznam vkládá O_HRE_LINK před poslední položku (Krabí invaz
   assert.ok(!isNavGroup(secondToLast) && secondToLast.href === O_HRE_LINK.href);
 });
 
-test("mobilní seznam pořád obsahuje skupinu Svět (Lokace/Bossové zůstávají dosažitelné)", () => {
+test("mobilní seznam pořád obsahuje skupinu Svět How to Fish (všechny encyklopedické sekce zůstávají dosažitelné)", () => {
   const mobileLinks = buildMobileLinks(buildLinks(""));
-  assert.ok(mobileLinks.some((l) => l.label === "Svět"));
+  assert.ok(mobileLinks.some((l) => l.label === "Svět How to Fish"));
+});
+
+test("mobilní seznam obsahuje Streameři jako první položku", () => {
+  const mobileLinks = buildMobileLinks(buildLinks(""));
+  assert.ok(!isNavGroup(mobileLinks[0]) && mobileLinks[0].href === STREAMERI_LINK.href);
 });
 
 test("Header.tsx: desktop pill navigace nemá flex-wrap (zůstává v jednom řádku, jako dřív)", () => {
@@ -111,10 +125,19 @@ test("Header.tsx: WorldDropdown používá role=menu/menuitem pro přístupnost"
   assert.match(headerSource, /role="menuitem"/);
 });
 
+test("Header.tsx: /streameri má vlastní ikonu v ICON_BY_HREF", () => {
+  assert.match(headerSource, /"\/streameri":\s*StreamerIcon/);
+});
+
 test("Footer.tsx: odkaz 'O hře' je vždy v patičce (SECONDARY_LINKS)", () => {
   assert.match(footerSource, /\{ href: "\/o-hre", label: "O hře" \}/);
 });
 
 test("Footer.tsx: prominentní Multiplayer ostrov CTA v patičce zůstal zachovaný", () => {
   assert.match(footerSource, /\/multiplayer/);
+});
+
+test("Footer.tsx: Streameři a Živě jsou v patičce viditelné", () => {
+  assert.match(footerSource, />\s*Streameři\s*</);
+  assert.match(footerSource, />\s*Živě\s*</);
 });

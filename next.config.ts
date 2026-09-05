@@ -53,6 +53,15 @@ const nextConfig: NextConfig = {
         destination: "/ryby",
         permanent: true,
       },
+      // Profily tvůrců se přesunuly z /stream/{slug} na /streameri/{slug}
+      // (viz zadání "restrukturalizace na streamery") — /stream samotné
+      // (bez dalšího segmentu, živé streamy) zůstává beze změny, tenhle
+      // vzor matchuje jen "/stream/cokoliv", ne holé "/stream".
+      {
+        source: "/stream/:slug",
+        destination: "/streameri/:slug",
+        permanent: true,
+      },
     ];
   },
 };

@@ -1,4 +1,5 @@
 export { default as LiveIcon } from "./LiveIcon";
+export { default as StreamerIcon } from "./StreamerIcon";
 export { default as FishIcon } from "./FishIcon";
 export { default as GuideIcon } from "./GuideIcon";
 export { default as ItemIcon } from "./ItemIcon";

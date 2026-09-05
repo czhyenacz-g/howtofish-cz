@@ -27,11 +27,13 @@ import {
   LiveIcon,
   LocationIcon,
   MultiplayerIcon,
+  StreamerIcon,
   UpdateIcon,
   type IconProps,
 } from "./icons";
 
 const ICON_BY_HREF: Record<string, (props: IconProps) => React.ReactElement> = {
+  "/streameri": StreamerIcon,
   "/stream": LiveIcon,
   "/ryby": FishIcon,
   "/navody": GuideIcon,

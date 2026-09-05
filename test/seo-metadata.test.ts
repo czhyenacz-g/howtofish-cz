@@ -10,14 +10,23 @@ function readSource(relPath: string): string {
   return readFileSync(fileURLToPath(new URL(relPath, import.meta.url)), "utf8");
 }
 
-describe("/ a /ryby sdílí jeden zdroj obsahu", () => {
-  test("app/page.tsx renderuje sdílenou RybyPageContent (ne vlastní implementaci)", () => {
+// Homepage má teď vlastní unikátní obsah (streameři/live/Krabí invaze/
+// Multiplayer, viz zadání "restrukturalizace na streamery") místo
+// dřívější duplicity s /ryby — / a /ryby jsou od teď dvě samostatné
+// stránky, každá s vlastní kanonickou URL na sebe sama.
+describe("/ má vlastní obsah (streameři), ne sdílenou RybyPageContent", () => {
+  test("app/page.tsx nevykresluje RybyPageContent", () => {
     const source = readSource("../app/page.tsx");
-    assert.match(source, /import RybyPageContent from ["']\.\/ryby\/RybyPageContent["']/);
-    assert.match(source, /<RybyPageContent\s*\/>/);
+    assert.doesNotMatch(source, /RybyPageContent/);
   });
 
-  test("app/ryby/page.tsx renderuje stejnou RybyPageContent", () => {
+  test("app/page.tsx vykresluje sekci streamerů (CreatorCard) a live sekci", () => {
+    const source = readSource("../app/page.tsx");
+    assert.match(source, /CreatorCard/);
+    assert.match(source, /getLiveStreams/);
+  });
+
+  test("app/ryby/page.tsx renderuje RybyPageContent beze změny", () => {
     const source = readSource("../app/ryby/page.tsx");
     assert.match(source, /import RybyPageContent from ["']\.\/RybyPageContent["']/);
     assert.match(source, /<RybyPageContent\s*\/>/);
@@ -25,12 +34,12 @@ describe("/ a /ryby sdílí jeden zdroj obsahu", () => {
 });
 
 describe("canonical URL", () => {
-  test("/ má canonical /ryby", () => {
+  test("/ má vlastní canonical / (ne /ryby, obsah už není duplicitní)", () => {
     const source = readSource("../app/page.tsx");
-    assert.match(source, /alternates:\s*{\s*canonical:\s*["']\/ryby["']\s*}/);
+    assert.match(source, /alternates:\s*{\s*canonical:\s*["']\/["']\s*}/);
   });
 
-  test("/ryby má canonical /ryby (ne zděděné z rootu)", () => {
+  test("/ryby má canonical /ryby (sama na sebe, ne zděděné z rootu)", () => {
     const source = readSource("../app/ryby/page.tsx");
     assert.match(source, /alternates:\s*{\s*canonical:\s*["']\/ryby["']\s*}/);
   });
