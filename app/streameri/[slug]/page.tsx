@@ -10,6 +10,7 @@ import { findLiveStreamForCreator } from "../../../lib/creators/live-match.ts";
 import { getCreatorPlatforms, getCreatorPrimaryLink } from "../../../lib/creators/platform.ts";
 import { SITE_URL } from "../../config/site.ts";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../components/Breadcrumbs.tsx";
+import CreatorGearSection from "../../components/CreatorGearSection.tsx";
 import HowToFishVideoCard from "../../components/HowToFishVideoCard.tsx";
 import LazyYouTubeEmbed from "../../components/LazyYouTubeEmbed.tsx";
 import CreatorAvatar from "../../components/CreatorAvatar.tsx";
@@ -54,11 +55,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // konkrétnější text pro daného tvůrce.
   const title =
     creator.seoTitle ?? (hasVideos ? `${creator.name} – videa, streamy a How to Fish` : `${creator.name} a How to Fish`);
-  const description =
+  const baseDescription =
     creator.seoDescription ??
     (hasVideos
       ? `Videa ${creator.name} ze hry How to Fish a odkazy na další český obsah, návody a streamy na HowToFish.cz.`
       : `${creator.name} a How to Fish: co víme o jeho spojení se hrou, a odkazy na další český obsah na HowToFish.cz.`);
+
+  // Krátký doplněk jen tam, kde má tvůrce skutečně veřejný gear (zadání
+  // bod 18) — žádné keyword stuffing, jedna věta navíc.
+  const gearSuffix = getPublicGearForCreator(slug).length > 0 ? " Najdeš tu i jeho technické vybavení." : "";
+  const description = `${baseDescription}${gearSuffix}`;
 
   return {
     title,
@@ -272,28 +278,8 @@ export default async function CreatorPage({ params }: Props) {
           </p>
         )}
 
-        {/* C) TECHNIKA STREAMERA (zadání bod 5C) — vykresluje se JEN, když existuje aspoň jeden veřejně zobrazitelný záznam. */}
-        {gear.length > 0 && (
-          <section className="mt-8">
-            <h2 className="font-serif text-xl text-amber-300">Technika a vybavení</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {gear.map((item) => (
-                <div key={`${item.creatorSlug}-${item.productName}`} className="rounded-lg border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100/50">{item.category}</p>
-                  <p className="mt-1 font-serif text-base text-white">
-                    {item.brand ? `${item.brand} ` : ""}
-                    {item.productName}
-                  </p>
-                  {item.confidence === "historical" && <p className="mt-1 text-xs text-cyan-100/50">dříve používal/a</p>}
-                  {item.note && <p className="mt-1 text-sm text-cyan-100/70">{item.note}</p>}
-                  <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-xs text-cyan-100/50 underline hover:text-amber-300">
-                    Zdroj
-                  </a>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* C) TECHNIKA STREAMERA (zadání bod 5C) — komponenta sama nic nevykreslí, když gear.length === 0. */}
+        <CreatorGearSection gear={gear} />
 
         {otherCreators.length > 0 && (
           <section className="mt-10" aria-labelledby="other-creators-heading">

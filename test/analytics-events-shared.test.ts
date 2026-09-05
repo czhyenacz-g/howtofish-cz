@@ -10,7 +10,7 @@ import {
   sanitizePath,
 } from "../lib/analytics/events-shared.ts";
 
-test("ANALYTICS_EVENTS: obsahuje přesně požadovaných 11 eventů", () => {
+test("ANALYTICS_EVENTS: obsahuje přesně požadovaných 12 eventů", () => {
   assert.deepEqual(
     [...ANALYTICS_EVENTS].sort(),
     [
@@ -19,6 +19,7 @@ test("ANALYTICS_EVENTS: obsahuje přesně požadovaných 11 eventů", () => {
       "fish_upload",
       "game_score",
       "game_started",
+      "gear_affiliate_click",
       "multiplayer_join",
       "multiplayer_leave",
       "page_view",
@@ -67,6 +68,24 @@ test("sanitizeMetadata: klíč povolený jen u JINÉHO eventu se u tohohle event
   // "score" patří jen game_score, ne affiliate_click.
   const result = sanitizeMetadata("affiliate_click", { promotion_id: "1", score: 999999 });
   assert.deepEqual(result, { promotion_id: "1" });
+});
+
+test("sanitizeMetadata: gear_affiliate_click povoluje jen bezpečné identifikátory, žádnou URL/destination", () => {
+  const result = sanitizeMetadata("gear_affiliate_click", {
+    creator_slug: "housebox",
+    product_name: "RØDE NT-USB",
+    category: "microphone",
+    confidence: "historical",
+    link_type: "allegro-search",
+    destination: "https://go.dognet.com/?url=secret",
+  });
+  assert.deepEqual(result, {
+    creator_slug: "housebox",
+    product_name: "RØDE NT-USB",
+    category: "microphone",
+    confidence: "historical",
+    link_type: "allegro-search",
+  });
 });
 
 test("sanitizeMetadata: vnořené objekty/pole se ořežou (jen primitivní hodnoty)", () => {

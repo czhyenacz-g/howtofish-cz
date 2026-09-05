@@ -157,4 +157,9 @@ describe("affiliate odkazy zachovávají sponsored rel", () => {
     const source = readSource("../app/components/CharacterCallout.tsx");
     assert.match(source, /rel="noopener noreferrer sponsored"/);
   });
+
+  test("GearAffiliateCta.tsx používá sponsored rel pro gear affiliate odkazy", () => {
+    const source = readSource("../app/components/GearAffiliateCta.tsx");
+    assert.match(source, /rel="noopener noreferrer sponsored"/);
+  });
 });

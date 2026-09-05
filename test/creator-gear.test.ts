@@ -2,6 +2,7 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { creatorGear, getPublicGearForCreator } from "../data/creator-gear.ts";
 import type { CreatorGearItem } from "../data/creator-gear.ts";
+import { creatorProfiles } from "../data/creators.ts";
 
 function gearItem(overrides: Partial<CreatorGearItem> = {}): CreatorGearItem {
   return {
@@ -17,14 +18,38 @@ function gearItem(overrides: Partial<CreatorGearItem> = {}): CreatorGearItem {
   };
 }
 
-describe("data/creator-gear.ts — připravená struktura pro techniku streamerů, zatím bez vymyšlených dat (zadání bod 5C)", () => {
-  test("creatorGear je zatím prázdné pole — žádný tvůrce nemá v projektu ověřené vybavení", () => {
-    assert.deepEqual(creatorGear, []);
-  });
-
-  test("getPublicGearForCreator vrací prázdné pole pro kohokoliv, dokud jsou data prázdná", () => {
+describe("data/creator-gear.ts — technika streamerů, jen dohledaná/ověřená data (zadání bod 5C)", () => {
+  test("getPublicGearForCreator vrací prázdné pole pro tvůrce bez public gearu", () => {
     assert.deepEqual(getPublicGearForCreator("agraelus"), []);
     assert.deepEqual(getPublicGearForCreator("nonexistent"), []);
+  });
+
+  test("HouseBox má veřejný historical gear (10 položek, gameo.cz zdroj)", () => {
+    const gear = getPublicGearForCreator("housebox");
+    assert.equal(gear.length, 10);
+    assert.ok(gear.every((item) => item.confidence === "historical"));
+  });
+
+  test("integrita reálných dat: žádný záznam v creatorGear není probable/unverified (ty se nikam nepublikují, viz zadání)", () => {
+    for (const item of creatorGear) {
+      assert.ok(
+        item.confidence === "verified" || item.confidence === "historical",
+        `${item.creatorSlug}/${item.productName} má confidence "${item.confidence}" — do creatorGear patří jen verified/historical`
+      );
+    }
+  });
+
+  test("integrita reálných dat: každý sourceUrl je skutečná https URL (žádný vymyšlený/placeholder odkaz)", () => {
+    for (const item of creatorGear) {
+      assert.match(item.sourceUrl, /^https:\/\//, `${item.creatorSlug}/${item.productName} nemá platnou sourceUrl`);
+    }
+  });
+
+  test("integrita reálných dat: creatorSlug odpovídá existujícímu profilu v data/creators.ts", () => {
+    const knownSlugs = new Set(creatorProfiles.map((c) => c.slug));
+    for (const item of creatorGear) {
+      assert.ok(knownSlugs.has(item.creatorSlug), `${item.creatorSlug} není mezi creatorProfiles`);
+    }
   });
 
   test("getPublicGearForCreator (nad testovacími daty) zobrazí 'verified' a 'historical', ne 'probable'/'unverified'", () => {
