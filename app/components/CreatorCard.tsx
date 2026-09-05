@@ -3,7 +3,7 @@ import type { CreatorProfile } from "../../data/creators.ts";
 import type { LiveStream } from "../../lib/streams/types.ts";
 import { getCreatorPlatforms } from "../../lib/creators/platform.ts";
 import { PLATFORM_BADGE_CLASS, PLATFORM_LABEL } from "../stream/StreamBrowser.tsx";
-import CreatorAvatar from "./CreatorAvatar.tsx";
+import CreatorImage from "./CreatorImage.tsx";
 import { LiveIcon } from "./icons";
 
 /**
@@ -20,14 +20,13 @@ export default function CreatorCard({ creator, liveStream }: { creator: CreatorP
   return (
     <Link
       href={`/streameri/${creator.slug}`}
-      className={`group flex flex-col gap-3 rounded-2xl border p-4 shadow-sm transition hover:-translate-y-0.5 sm:p-5 ${
+      className={`group flex flex-col gap-3 overflow-hidden rounded-2xl border p-4 shadow-sm transition hover:-translate-y-0.5 sm:p-5 ${
         isLive
           ? "border-[#ffb199] bg-gradient-to-b from-[#5c2318] to-[#2a0f09] shadow-[0_0_16px_1px_rgba(255,107,82,0.25)] hover:border-[#ff8a75]"
           : "border-white/10 bg-white/5 hover:border-amber-400/40 hover:bg-white/10"
       }`}
     >
-      <div className="flex items-center gap-3">
-        <CreatorAvatar name={creator.name} />
+      <CreatorImage creator={creator}>
         <div className="min-w-0 flex-1">
           <p className="truncate font-serif text-lg text-white group-hover:text-amber-300">
             {creator.name} <span className="text-sm text-cyan-100/40">{creator.country === "SK" ? "🇸🇰" : "🇨🇿"}</span>
@@ -49,7 +48,7 @@ export default function CreatorCard({ creator, liveStream }: { creator: CreatorP
             )
           )}
         </div>
-      </div>
+      </CreatorImage>
 
       {isLive && liveStream && <p className="truncate text-sm text-cyan-100/80">{liveStream.title}</p>}
 
