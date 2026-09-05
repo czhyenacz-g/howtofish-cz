@@ -128,3 +128,40 @@ describe("CZ/SK rozšíření creatorů (HouseBox + slovenští tvůrci)", () =>
     assert.equal(new Set(texts).size, texts.length, "dva noví tvůrci mají doslova stejný bio text");
   });
 });
+
+describe("PixelorezLIVE (nový CZ Twitch tvůrce)", () => {
+  const pixelorez = getCreatorProfile("pixelorezlive");
+
+  test("profil existuje pod očekávaným slugem", () => {
+    assert.ok(pixelorez, "chybí profil pixelorezlive");
+  });
+
+  test("country CZ, platforma Twitch přes externalLink na skutečný profil", () => {
+    assert.equal(pixelorez?.country, "CZ");
+    assert.equal(pixelorez?.externalLink?.href, "https://www.twitch.tv/pixelorezlive");
+    assert.equal(pixelorez?.externalLink?.label, "Otevřít Twitch profil");
+  });
+
+  test("nemá žádné vymyšlené video záznamy (žádný ověřený VOD)", () => {
+    assert.equal(pixelorez?.videos.length, 0);
+  });
+
+  test("bio netvrdí pravidelnost, aktuální live stav ani konkrétní statistiky", () => {
+    const bio = pixelorez?.bio ?? "";
+    assert.doesNotMatch(bio.toLowerCase(), /pravidelně|právě (live|hraje)|teď hraje/);
+    assert.doesNotMatch(bio, /\d+[\s,.]?\d*\s*(peak|average|zhlédnutí|views|followers?|sledujících)/i);
+  });
+
+  test("seoTitle/seoDescription jsou nastavené a odlišné od generické šablony ostatních tvůrců bez videa", () => {
+    assert.equal(pixelorez?.seoTitle, "PixelorezLIVE hraje How to Fish");
+    assert.equal(
+      pixelorez?.seoDescription,
+      "PixelorezLIVE patří mezi české Twitch tvůrce, kteří streamovali How to Fish. Podívej se na jeho profil a další CZ/SK tvůrce hry."
+    );
+  });
+
+  test("slug je přesně 'pixelorezlive', ne odhadovaný casing/spelling", () => {
+    assert.equal(getCreatorProfile("pixelorezLIVE"), undefined);
+    assert.equal(getCreatorProfile("pixelorez"), undefined);
+  });
+});

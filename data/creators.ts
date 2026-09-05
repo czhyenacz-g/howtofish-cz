@@ -27,6 +27,9 @@ export type CreatorProfile = {
    * pravidelnosti hraní a chceme opatrnější formulaci (viz zadání).
    */
   bio?: string;
+  /** Přepisuje výchozí <title>/meta description v generateMetadata (app/stream/[creator]/page.tsx), když chceme konkrétnější SEO text než obecná šablona pro tvůrce bez videa. */
+  seoTitle?: string;
+  seoDescription?: string;
   /** Odkaz na profil/platformu, pokud ho máme, ale nemáme konkrétní ověřené video k zobrazení. */
   externalLink?: { label: string; href: string };
   /** Slug jiného tvůrce s doloženou souvislostí (např. společné hraní) — vykreslí se jako věta s interním odkazem. */
@@ -111,6 +114,20 @@ const cautiousProfiles: CreatorProfile[] = [
     videos: [],
     bio: "boshoo patří mezi slovenské streamery, kteří si zahráli How to Fish.",
     externalLink: { label: "Profil na Kicku", href: "https://kick.com/boshoo" },
+  },
+  // PixelorezLIVE (2026-09-05): Twitch stream ze 3. 9. 2026 (kategorie
+  // zahrnovala How to Fish, ~3,5 h, cca 18:05 start) — žádné konkrétní
+  // ověřené VOD URL v projektových datech, proto jen odkaz na profil,
+  // stejný vzorec jako anymall/boshoo výš (žádný embed/VideoObject).
+  {
+    slug: "pixelorezlive",
+    name: "PixelorezLIVE",
+    country: "CZ",
+    videos: [],
+    bio: "PixelorezLIVE je český Twitch streamer, který se v září 2026 pustil do How to Fish. Na HowToFish.cz najdeš jeho Twitch profil a další české a slovenské tvůrce, kteří hru streamovali.",
+    seoTitle: "PixelorezLIVE hraje How to Fish",
+    seoDescription: "PixelorezLIVE patří mezi české Twitch tvůrce, kteří streamovali How to Fish. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/pixelorezlive" },
   },
 ];
 

@@ -61,6 +61,10 @@ describe("sitemap", () => {
     assert.ok(!urls.some((u) => u.endsWith("/stream/touken")));
   });
 
+  test("obsahuje /stream/pixelorezlive", () => {
+    assert.ok(urls.some((u) => u.endsWith("/stream/pixelorezlive")));
+  });
+
   test("obsahuje nová HouseBox video videa (/videa/housebox-how-to-fish-1, /videa/housebox-how-to-fish-3)", () => {
     for (const slug of ["housebox-how-to-fish-1", "housebox-how-to-fish-3"]) {
       assert.ok(urls.some((u) => u.endsWith(`/videa/${slug}`)), `chybí /videa/${slug}`);

@@ -37,13 +37,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const hasVideos = creator.videos.length > 0;
   // U tvůrců bez ověřeného videa nepíšeme do titulku/description "videa
   // a streamy" — nemáme je, co bychom ukázali (viz zadání "nevymýšlej
-  // neověřené informace").
-  const title = hasVideos
-    ? `${creator.name} a How to Fish – videa a streamy`
-    : `${creator.name} a How to Fish`;
-  const description = hasVideos
-    ? `Videa ${creator.name} ze hry How to Fish a odkazy na další český obsah, návody a streamy na HowToFish.cz.`
-    : `${creator.name} a How to Fish: co víme o jeho spojení se hrou, a odkazy na další český obsah na HowToFish.cz.`;
+  // neověřené informace"). `seoTitle`/`seoDescription` (volitelné, viz
+  // data/creators.ts) přebijí tuhle obecnou šablonu, když chceme
+  // konkrétnější text pro daného tvůrce.
+  const title =
+    creator.seoTitle ?? (hasVideos ? `${creator.name} a How to Fish – videa a streamy` : `${creator.name} a How to Fish`);
+  const description =
+    creator.seoDescription ??
+    (hasVideos
+      ? `Videa ${creator.name} ze hry How to Fish a odkazy na další český obsah, návody a streamy na HowToFish.cz.`
+      : `${creator.name} a How to Fish: co víme o jeho spojení se hrou, a odkazy na další český obsah na HowToFish.cz.`);
 
   return {
     title,
