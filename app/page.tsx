@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import FeedbackCallout from "./components/FeedbackCallout";
+import AdSlot from "./components/AdSlot";
 import CreatorCard from "./components/CreatorCard.tsx";
 import HowToFishVideoCard from "./components/HowToFishVideoCard.tsx";
 import OceanWaves from "./components/OceanWaves";
@@ -142,6 +143,14 @@ export default async function Home() {
             </div>
           </section>
         )}
+
+        {/* AD) REKLAMNÍ BANNER — stejný AdSlot jako jinde (UCA promotions,
+            placement "banner"), uprostřed obsahu mezi videi a Krabí invazí. */}
+        <section className="bg-[#081c2c] px-4 py-8">
+          <div className="mx-auto max-w-3xl">
+            <AdSlot pathname="/" />
+          </div>
+        </section>
 
         {/* E) KRABÍ INVAZE */}
         <section className="bg-gradient-to-r from-[#b8402c] to-[#7a2a1c] px-4 py-14 text-center text-white">
