@@ -14,4 +14,6 @@ export { default as MultiplayerIcon } from "./MultiplayerIcon";
 export { default as MessageBottleIcon } from "./MessageBottleIcon";
 export { default as SpeakerIcon } from "./SpeakerIcon";
 export { default as SpeakerMuteIcon } from "./SpeakerMuteIcon";
+export { default as CheckIcon } from "./CheckIcon";
+export { default as ClockIcon } from "./ClockIcon";
 export type { IconProps } from "./types";

@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { creatorProfiles, getCreatorProfile } from "../../../data/creators.ts";
-import { getPublicGearForCreator } from "../../../data/creator-gear.ts";
+import { getPublicGearForCreator, hasConfirmedGear } from "../../../data/creator-gear.ts";
 import { getVideosAuthoredBy, getVideosFeaturingButNotAuthoredBy } from "../../../data/how-to-fish-videos.ts";
 import { getLiveStreams } from "../../../lib/streams/get-live-streams.ts";
 import { findLiveStreamForCreator } from "../../../lib/creators/live-match.ts";
@@ -61,9 +61,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? `Videa ${creator.name} ze hry How to Fish a odkazy na další český obsah, návody a streamy na HowToFish.cz.`
       : `${creator.name} a How to Fish: co víme o jeho spojení se hrou, a odkazy na další český obsah na HowToFish.cz.`);
 
-  // Krátký doplněk jen tam, kde má tvůrce skutečně veřejný gear (zadání
-  // bod 18) — žádné keyword stuffing, jedna věta navíc.
-  const gearSuffix = getPublicGearForCreator(slug).length > 0 ? " Najdeš tu i jeho technické vybavení." : "";
+  // Krátký doplněk jen tam, kde má tvůrce doloženou (ne jen odhadovanou)
+  // techniku (zadání bod 18/24) — u čistě odhadovaných profilů by věta
+  // "najdeš tu jeho vybavení" v meta description overclaimovala, co ve
+  // skutečnosti víme. Žádné keyword stuffing, jedna věta navíc.
+  const gearSuffix = hasConfirmedGear(slug) ? " Najdeš tu i jeho technické vybavení." : "";
   const description = `${baseDescription}${gearSuffix}`;
 
   return {
@@ -279,7 +281,7 @@ export default async function CreatorPage({ params }: Props) {
         )}
 
         {/* C) TECHNIKA STREAMERA (zadání bod 5C) — komponenta sama nic nevykreslí, když gear.length === 0. */}
-        <CreatorGearSection gear={gear} />
+        <CreatorGearSection gear={gear} creatorName={creator.name} />
 
         {otherCreators.length > 0 && (
           <section className="mt-10" aria-labelledby="other-creators-heading">

@@ -18,12 +18,45 @@ describe("CreatorGearSection.tsx", () => {
     assert.doesNotMatch(source, /Brzy doplníme/);
   });
 
-  test("historical položka má viditelný textový badge 'historické' (ne jen barva, zadání bod 24)", () => {
-    assert.match(source, />\s*historické\s*</);
+  test("badge label/tooltip jde přes centrální lib/creators/gear-confidence.ts, ne natvrdo v komponentě", () => {
+    assert.match(source, /getGearConfidenceLabel/);
+    assert.match(source, /getGearConfidenceTooltip/);
+    assert.doesNotMatch(source, />\s*historické\s*</i);
   });
 
   test("formulace u historical je 'dříve používal/a', nikdy 'používá'", () => {
     assert.match(source, /dříve používal\/a/);
+  });
+
+  test("estimated položka má viditelný ' — odhad' přímo u názvu (hard rule, zadání bod 3)", () => {
+    assert.match(source, /— odhad/);
+  });
+
+  test("estimated má vlastní disclaimer větu 'Možná alternativa'", () => {
+    assert.match(source, /Možná alternativa/);
+  });
+
+  test("estimated NIKDY nerenderuje source link (zadání bod 26)", () => {
+    assert.match(source, /!isEstimated && item\.sourceUrl/);
+  });
+
+  test("čistě odhadovaný profil dostane heading 'Jakou techniku může {jméno} používat?' (hard rule, zadání bod 22)", () => {
+    assert.match(source, /Jakou techniku může \$\{creatorName\} používat\?/);
+  });
+
+  test("profil s doloženým gearem dostane heading 'Setup a technika'", () => {
+    assert.match(source, /Setup a technika/);
+  });
+
+  test("mix confidence: verified/historical se řadí před estimated (zadání bod 23)", () => {
+    assert.match(source, /CONFIDENCE_ORDER/);
+    assert.match(source, /verified:\s*0/);
+    assert.match(source, /historical:\s*1/);
+    assert.match(source, /estimated:\s*2/);
+  });
+
+  test("odhady jsou vizuálně oddělené pod 'Možné alternativy', jen když jsou zamíchané s doloženými", () => {
+    assert.match(source, /Možné alternativy/);
   });
 
   test("affiliate disclosure text je u celé sekce (jednou), ne u každé karty", () => {
@@ -42,6 +75,22 @@ describe("CreatorGearSection.tsx", () => {
   test("zdroj s rokem používá 'Zdroj z roku {rok}', jinak generické 'Zdroj'", () => {
     assert.match(source, /Zdroj z roku/);
   });
+
+  test("badge má i ikonu, ne jen text/barvu (zadání bod 4)", () => {
+    assert.match(source, /CONFIDENCE_ICON/);
+    assert.match(source, /CheckIcon/);
+    assert.match(source, /ClockIcon/);
+  });
+
+  test("responzivní grid bez fixních šířek — karty nesmí přetékat na mobilu (zadání bod 27)", () => {
+    assert.match(source, /grid gap-4 sm:grid-cols-2/);
+    assert.doesNotMatch(source, /w-\[\d+px\]/);
+  });
+
+  test("CTA má dostatečnou výšku pro tapnutí na mobilu (min-h)", () => {
+    const cta = readSource("../app/components/GearAffiliateCta.tsx");
+    assert.match(cta, /min-h-\[36px\]/);
+  });
 });
 
 describe("GearAffiliateCta.tsx", () => {
@@ -58,6 +107,10 @@ describe("GearAffiliateCta.tsx", () => {
 
   test("nepoužívá text 'Koupit'", () => {
     assert.doesNotMatch(source, />Koupit</);
+  });
+
+  test("CTA text je 'Najít na Allegro' nebo 'Zobrazit nabídku' (konzistentní copy, zadání bod 25)", () => {
+    assert.match(source, /getGearCtaLabel/);
   });
 
   test("loguje gear_affiliate_click při kliknutí", () => {

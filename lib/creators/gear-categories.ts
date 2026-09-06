@@ -17,6 +17,13 @@ export const GEAR_CATEGORY_LABEL: Record<string, string> = {
   gpu: "Grafická karta",
   cpu: "Procesor",
   pc: "Počítač",
+  ram: "Paměť (RAM)",
+  storage: "Úložiště",
+  cooling: "Chlazení",
+  motherboard: "Základní deska",
+  psu: "Zdroj",
+  case: "Skříň",
+  streamdeck: "Stream Deck",
 };
 
 export function getGearCategoryLabel(category: string): string {
