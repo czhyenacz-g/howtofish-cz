@@ -222,6 +222,13 @@ describe("druhá vlna nových CZ tvůrců (2026-09-09): dzeryyy21, kingosfn, Mal
     assert.ok(mentionedBy.some((c) => c.slug === "kingosfn"));
   });
 
+  test("jen dzeryyy21 má streamerSetupSlug (jediný se smysluplným obsahem/gearem na StreamerSetup.cz, zadání bod 21/22)", () => {
+    assert.equal(getCreatorProfile("dzeryyy21")?.streamerSetupSlug, "dzeryyy21");
+    for (const slug of NEW_SLUGS.filter((s) => s !== "dzeryyy21")) {
+      assert.equal(getCreatorProfile(slug)?.streamerSetupSlug, undefined, `${slug} by neměl mít streamerSetupSlug (žádný gear na StreamerSetup.cz)`);
+    }
+  });
+
   test("Malej_Erik/POtkanzoR/Goldyjede bio zmiňuje konkrétní stream titulek(y) a datum, ne obecnou frázi", () => {
     assert.match(getCreatorProfile("malej_erik")?.bio ?? "", /UČÍM SE RYBAŘIT/);
     assert.match(getCreatorProfile("potkanzor")?.bio ?? "", /Rybaříme s homies/);

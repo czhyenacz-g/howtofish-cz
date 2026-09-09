@@ -283,6 +283,22 @@ export default async function CreatorPage({ params }: Props) {
         {/* C) TECHNIKA STREAMERA (zadání bod 5C) — komponenta sama nic nevykreslí, když gear.length === 0. */}
         <CreatorGearSection gear={gear} creatorName={creator.name} />
 
+        {/* Crosslink na StreamerSetup.cz — jen detail → detail, POUZE
+            pokud tam má tvůrce smysluplný obsah (creator.streamerSetupSlug,
+            viz data/creators.ts). Sesterský projekt, jiná doména. */}
+        {creator.streamerSetupSlug && (
+          <p className="mt-3 text-sm text-cyan-100/70">
+            <a
+              href={`https://streamersetup.cz/streameri/${creator.streamerSetupSlug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-amber-300"
+            >
+              Podívat se na setup {creator.name} →
+            </a>
+          </p>
+        )}
+
         {otherCreators.length > 0 && (
           <section className="mt-10" aria-labelledby="other-creators-heading">
             <h2 id="other-creators-heading" className="text-sm font-semibold uppercase tracking-wide text-cyan-100/50">

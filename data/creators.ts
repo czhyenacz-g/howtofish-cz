@@ -34,6 +34,14 @@ export type CreatorProfile = {
   externalLink?: { label: string; href: string };
   /** Slug jiného tvůrce s doloženou souvislostí (např. společné hraní) — vykreslí se jako věta s interním odkazem. */
   relatedCreatorSlug?: string;
+  /**
+   * Slug odpovídajícího profilu na StreamerSetup.cz (`/streameri/{slug}`
+   * tam), POUZE pokud tam profil má smysluplný obsah (viz zadání "detail
+   * → detail propojení, jen pokud má StreamerSetup profil smysluplný
+   * obsah") — typicky ověřenou techniku. Nevyplňovat jen proto, že
+   * profil na StreamerSetup.cz existuje.
+   */
+  streamerSetupSlug?: string;
 };
 
 const creatorNames = Array.from(new Set(creatorVideos.map((v) => v.creator)));
@@ -57,11 +65,19 @@ const verifiedBioOverrides: Record<string, string> = {
     "dzeryyy21 je český Kick streamer, který se 2. 9. 2026 pustil do How to Fish společně s kingosfn — stream „PROFI RYBÁŘI w/ @kingosfn“ běžel v kategorii How to Fish a záznam měl přibližně 2 hodiny 40 minut.",
 };
 
+// Slug odpovídajícího profilu na StreamerSetup.cz — jen tam, kde má ten
+// profil smysluplný obsah (viz CreatorProfile.streamerSetupSlug výš).
+// dzeryyy21 tam má kompletní ověřený PC setup, proto jediný z nové vlny.
+const verifiedStreamerSetupSlugOverrides: Record<string, string> = {
+  dzeryyy21: "dzeryyy21",
+};
+
 const verifiedProfiles: CreatorProfile[] = creatorNames.map((name) => ({
   slug: name.toLowerCase(),
   name,
   country: creatorVideos.find((v) => v.creator === name)?.language === "sk" ? "SK" : "CZ",
   bio: verifiedBioOverrides[name],
+  streamerSetupSlug: verifiedStreamerSetupSlugOverrides[name],
   videos: creatorVideos
     .filter((v) => v.creator === name)
     .map((v) => ({ title: v.title, subtitle: v.subtitle, platform: v.platform, url: v.url, youtubeId: v.youtubeId, image: v.image })),
