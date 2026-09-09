@@ -165,3 +165,94 @@ describe("PixelorezLIVE (nový CZ Twitch tvůrce)", () => {
     assert.equal(getCreatorProfile("pixelorez"), undefined);
   });
 });
+
+describe("druhá vlna nových CZ tvůrců (2026-09-09): dzeryyy21, kingosfn, Malej_Erik, POtkanzoR, xdamkiraly, dajinka, Goldyjede", () => {
+  const NEW_SLUGS = ["dzeryyy21", "kingosfn", "malej_erik", "potkanzor", "xdamkiraly", "dajinka", "goldyjede"];
+
+  test("všech 7 nových profilů existuje pod očekávanými slugy", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.ok(getCreatorProfile(slug), `chybí profil ${slug}`);
+    }
+  });
+
+  test("žádný duplicitní profil pod jiným casingem/aliasem (Malej_erik/malej-erik, Potkanzor/POTKANZOR, Goldyjede/GoldyJede)", () => {
+    for (const bad of ["Malej_erik", "malej-erik", "MalejErik", "Potkanzor", "POTKANZOR", "GoldyJede", "GOLDYJEDE", "goldyjede21"]) {
+      assert.equal(getCreatorProfile(bad), undefined, `neočekávaný duplicitní slug "${bad}"`);
+    }
+    // Přesně 7 nových slugů, žádný navíc kvůli náhodné duplicitě.
+    const slugs = creatorProfiles.map((c) => c.slug);
+    assert.equal(new Set(slugs).size, slugs.length);
+  });
+
+  test("všech 7 je country CZ", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.country, "CZ", `${slug} by měl mít country CZ`);
+    }
+  });
+
+  test("zobrazované jméno zachovává stylizovaný casing (POtkanzoR, Malej_Erik, Goldyjede), slug je normalizovaný", () => {
+    assert.equal(getCreatorProfile("potkanzor")?.name, "POtkanzoR");
+    assert.equal(getCreatorProfile("malej_erik")?.name, "Malej_Erik");
+    assert.equal(getCreatorProfile("goldyjede")?.name, "Goldyjede");
+  });
+
+  test("dzeryyy21 je jediný z nové vlny s videos.length > 0 (carousel-eligible, viz creator-videos.ts)", () => {
+    assert.ok((getCreatorProfile("dzeryyy21")?.videos.length ?? 0) > 0);
+    for (const slug of NEW_SLUGS.filter((s) => s !== "dzeryyy21")) {
+      assert.equal(getCreatorProfile(slug)?.videos.length, 0, `${slug} by neměl mít žádné video (žádný ověřený VOD)`);
+    }
+  });
+
+  test("dzeryyy21 bio zmiňuje kingosfn, datum a kategorii, ale ŽÁDNÉ viewer statistiky (zadání bod 23)", () => {
+    const bio = getCreatorProfile("dzeryyy21")?.bio ?? "";
+    assert.match(bio, /kingosfn/);
+    assert.match(bio, /2\. 9\. 2026/);
+    assert.doesNotMatch(bio, /\d+[\s,.]?\d*\s*(peak|average|zhlédnutí|views|followers?|sledujících)/i);
+  });
+
+  test("kingosfn bio říká 'zahrál si společně s', NIKDY 'streamoval How to Fish' (zadání bod 7 — nemá vlastní ověřený stream)", () => {
+    const bio = getCreatorProfile("kingosfn")?.bio ?? "";
+    assert.match(bio, /zahrál.*společně s dzeryyy21/);
+    assert.doesNotMatch(bio, /kingosfn streamoval/i);
+  });
+
+  test("kingosfn -> dzeryyy21 vazba existuje obousměrně (relatedCreatorSlug + mentionedBy na dzeryyy21 stránce)", () => {
+    assert.equal(getCreatorProfile("kingosfn")?.relatedCreatorSlug, "dzeryyy21");
+    const mentionedBy = creatorProfiles.filter((c) => c.relatedCreatorSlug === "dzeryyy21");
+    assert.ok(mentionedBy.some((c) => c.slug === "kingosfn"));
+  });
+
+  test("Malej_Erik/POtkanzoR/Goldyjede bio zmiňuje konkrétní stream titulek(y) a datum, ne obecnou frázi", () => {
+    assert.match(getCreatorProfile("malej_erik")?.bio ?? "", /UČÍM SE RYBAŘIT/);
+    assert.match(getCreatorProfile("potkanzor")?.bio ?? "", /Rybaříme s homies/);
+    const goldyjedeBio = getCreatorProfile("goldyjede")?.bio ?? "";
+    assert.match(goldyjedeBio, /HOW TO FISH/);
+    assert.match(goldyjedeBio, /JDEME LOVIT RYBY/);
+  });
+
+  test("xdamkiraly/dajinka mají opatrnější (obecnější) formulaci — žádný konkrétní stream titulek k dispozici", () => {
+    assert.doesNotMatch(getCreatorProfile("xdamkiraly")?.bio ?? "", /„.+“/);
+    assert.doesNotMatch(getCreatorProfile("dajinka")?.bio ?? "", /„.+“/);
+  });
+
+  test("žádný z nových profilů netvrdí konkrétní viewer/follower statistiky v bio", () => {
+    for (const slug of NEW_SLUGS) {
+      const bio = getCreatorProfile(slug)?.bio ?? "";
+      assert.doesNotMatch(bio, /\d+[\s,.]?\d*\s*(peak|average|zhlédnutí|views|followers?|sledujících|tisíc)/i);
+    }
+  });
+
+  test("externalLink (Kick/Twitch) směřuje na skutečný handle uvedený v zadání, žádná vymyšlená URL", () => {
+    assert.equal(getCreatorProfile("kingosfn")?.externalLink?.href, "https://kick.com/kingosfn");
+    assert.equal(getCreatorProfile("malej_erik")?.externalLink?.href, "https://www.twitch.tv/malej_erik");
+    assert.equal(getCreatorProfile("potkanzor")?.externalLink?.href, "https://www.twitch.tv/potkanzor");
+    assert.equal(getCreatorProfile("xdamkiraly")?.externalLink?.href, "https://kick.com/xdamkiraly");
+    assert.equal(getCreatorProfile("dajinka")?.externalLink?.href, "https://kick.com/dajinka");
+    assert.equal(getCreatorProfile("goldyjede")?.externalLink?.href, "https://www.twitch.tv/goldyjede");
+  });
+
+  test("intro texty nejsou identická věta s vyměněným jménem (individuální fakta pro každého)", () => {
+    const texts = NEW_SLUGS.map((slug) => getCreatorProfile(slug)?.bio).filter((bio): bio is string => Boolean(bio));
+    assert.equal(new Set(texts).size, texts.length, "dva noví tvůrci mají doslova stejný bio text");
+  });
+});

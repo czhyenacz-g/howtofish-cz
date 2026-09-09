@@ -125,4 +125,17 @@ export const creatorVideos: CreatorVideo[] = [
     subtitle: "Slovenský streamer u How to Fish",
     ctaLabel: "Profil na Kicku",
   },
+  // dzeryyy21 (2026-09-09): stream "PROFI RYBÁŘI w/ @kingosfn" z 2. 9. 2026,
+  // kategorie How to Fish, záznam cca 2 h 40 min — stejný vzorec jako
+  // ostatní Kick tvůrci výš (žádný VOD embed/scraping, jen odkaz na
+  // profil). Žádné viewer statistiky (zadání bod 23).
+  {
+    creator: "dzeryyy21",
+    platform: "kick",
+    language: "cs",
+    url: "https://kick.com/dzeryyy21",
+    title: "dzeryyy21 hraje How to Fish",
+    subtitle: "PROFI RYBÁŘI w/ @kingosfn",
+    ctaLabel: "Profil na Kicku",
+  },
 ];

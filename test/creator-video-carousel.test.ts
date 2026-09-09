@@ -56,6 +56,22 @@ test("creatorVideos: každý slide má platnou language (cs/sk), SK tvůrci jsou
   }
 });
 
+test("creatorVideos: dzeryyy21 je featured (druhá vlna, 2026-09-09) — Kick profil, žádný vymyšlený VOD/youtubeId", () => {
+  const slide = creatorVideos.find((s) => s.creator === "dzeryyy21");
+  assert.ok(slide, "dzeryyy21 chybí v carouselu");
+  assert.equal(slide?.platform, "kick");
+  assert.equal(slide?.language, "cs");
+  assert.equal(slide?.youtubeId, undefined);
+  assert.equal(slide?.url, "https://kick.com/dzeryyy21");
+});
+
+test("creatorVideos: kingosfn/Malej_Erik/POtkanzoR/xdamkiraly/dajinka/Goldyjede NEJSOU v carouselu (jen dzeryyy21 je z druhé vlny featured, zadání bod 14)", () => {
+  const names = creatorVideos.map((slide) => slide.creator);
+  for (const notFeatured of ["kingosfn", "Malej_Erik", "POtkanzoR", "xdamkiraly", "dajinka", "Goldyjede"]) {
+    assert.ok(!names.includes(notFeatured), `${notFeatured} by neměl být v homepage carouselu`);
+  }
+});
+
 test("nextSlideIndex: postupuje o jednu vpřed", () => {
   assert.equal(nextSlideIndex(0, 5), 1);
   assert.equal(nextSlideIndex(3, 5), 4);

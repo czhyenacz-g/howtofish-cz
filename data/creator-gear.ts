@@ -466,6 +466,132 @@ const HERDYN_GEAR: CreatorGearItem[] = [
   },
 ];
 
+// DZERYYY21 — přímo z jeho vlastního veřejného Kick "About" profilu
+// (kick.com/dzeryyy21), ověřeno 2026-09-09. Primární zdroj (tvůrce sám o
+// sobě), confidence "verified" stejně jako AGRAELUS_GEAR výš. RAM: zdroj
+// doslova uvádí "32gb RAM 7400 Mhz" — číslo přebíráme beze změny/opravy
+// (viz zadání "neinterpretuj"), typ paměti ani výrobce zdroj neuvádí,
+// proto se nedoplňuje. Mouse je "Logitech G Pro" PŘESNĚ podle zdroje —
+// NIKDY nezaměňovat/nedoplňovat na "G Pro X Superlight" (jiný produkt,
+// zadání bod 24).
+const DZERYYY21_SOURCE_URL = "https://kick.com/dzeryyy21";
+const DZERYYY21_VERIFIED_AT = "2026-09-09";
+
+const DZERYYY21_GEAR: CreatorGearItem[] = [
+  {
+    creatorSlug: "dzeryyy21",
+    category: "cpu",
+    productName: "Intel Core i9-10850K",
+    brand: "Intel",
+    model: "i9-10850K",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    active: true,
+  },
+  {
+    creatorSlug: "dzeryyy21",
+    category: "gpu",
+    productName: "NVIDIA GeForce RTX 3080",
+    brand: "NVIDIA",
+    model: "RTX 3080",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    active: true,
+  },
+  {
+    creatorSlug: "dzeryyy21",
+    category: "ram",
+    productName: "32 GB RAM",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    note: "Zdroj uvádí doslova „32gb RAM 7400 Mhz“ — typ paměti ani výrobce nejsou uvedeny.",
+    active: true,
+  },
+  {
+    creatorSlug: "dzeryyy21",
+    category: "monitor",
+    productName: "AOC 27G4HA",
+    brand: "AOC",
+    model: "27G4HA",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    note: "Hlavní monitor, 200 Hz.",
+    active: true,
+  },
+  {
+    creatorSlug: "dzeryyy21",
+    category: "monitor",
+    productName: "HP E32k G5",
+    brand: "HP",
+    model: "E32k G5",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    note: "Druhý monitor, 4K, 60 Hz.",
+    active: true,
+  },
+  {
+    creatorSlug: "dzeryyy21",
+    category: "monitor",
+    productName: "AOC 24B2XHM2",
+    brand: "AOC",
+    model: "24B2XHM2",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    note: "Třetí monitor, 75 Hz.",
+    active: true,
+  },
+  {
+    creatorSlug: "dzeryyy21",
+    category: "keyboard",
+    productName: "Razer Huntsman Mini",
+    brand: "Razer",
+    model: "Huntsman Mini",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    note: "Red switches.",
+    active: true,
+  },
+  {
+    creatorSlug: "dzeryyy21",
+    category: "mouse",
+    productName: "Logitech G Pro",
+    brand: "Logitech",
+    model: "G Pro",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    active: true,
+  },
+  {
+    creatorSlug: "dzeryyy21",
+    category: "headset",
+    productName: "HyperX Cloud II",
+    brand: "HyperX",
+    model: "Cloud II",
+    sourceUrl: DZERYYY21_SOURCE_URL,
+    sourceType: "other",
+    verifiedAt: DZERYYY21_VERIFIED_AT,
+    confidence: "verified",
+    note: "Zdroj uvádí i variantu zápisu „HyperX Cloud 2“.",
+    active: true,
+  },
+];
+
 // ESTIMATED položky — u žádného z těchto tvůrců se při webovém research
 // (2026-09-06) nepodařilo dohledat žádný veřejně dostupný, konkrétní
 // zdroj (žádný gameo.cz/CZC.cz/kit.co apod. seznam vybavení pro dané
@@ -564,6 +690,7 @@ export const creatorGear: CreatorGearItem[] = [
   ...AGRAELUS_GEAR,
   ...FLYGUN_GEAR,
   ...HERDYN_GEAR,
+  ...DZERYYY21_GEAR,
   ...ESTIMATED_GEAR,
 ];
 
