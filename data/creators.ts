@@ -236,6 +236,66 @@ const cautiousProfiles: CreatorProfile[] = [
     seoDescription: "Goldyjede je český Twitch tvůrce, který se k How to Fish v září 2026 několikrát vrátil. Podívej se na jeho profil a další CZ/SK tvůrce hry na HowToFish.cz.",
     externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/goldyjede" },
   },
+  // Třetí vlna nových CZ tvůrců (2026-09-13): katulinkaaa/Nedric_/
+  // luckycharlie23 mají doložený vlastní How to Fish stream (viz research),
+  // ale žádný z nich žádný ověřený YouTube ID ani konkrétní zveřejněný Kick
+  // klip s nahraným thumbnailem, takže žádný z nich nejde do
+  // creatorVideos.ts/carouselu (zadání "žádné vymyšlené VOD ID") — stejný
+  // vzorec jako Malej_Erik/POtkanzoR/Goldyjede výš. Žádný z nich nemá
+  // ověřený gear na StreamerSetup.cz, proto bez streamerSetupSlug (na
+  // rozdíl od dzeryyy21).
+  {
+    slug: "katulinkaaa",
+    name: "katulinkaaa",
+    country: "CZ",
+    videos: [],
+    bio: "katulinkaaa je česká Twitch tvůrkyně, která věnovala několikahodinový stream přímo hře How to Fish.",
+    seoTitle: "katulinkaaa hraje How to Fish",
+    seoDescription: "Česká Twitch tvůrkyně katulinkaaa streamovala How to Fish. Podívej se na její profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/katulinkaaa" },
+  },
+  // oskartommy: Kick Partner, doložený How to Fish stream (22. 8. 2026),
+  // ale bez spolehlivě potvrzeného původního titulku VOD — proto stejná
+  // opatrná formulace a stejná "Profil na Kicku" konvence jako u
+  // anymall/boshoo/kingosfn/xdamkiraly/dajinka výš (žádný vymyšlený titulek).
+  {
+    slug: "oskartommy",
+    name: "oskartommy",
+    country: "CZ",
+    videos: [],
+    bio: "oskartommy patří mezi české Kick tvůrce, kteří streamovali How to Fish.",
+    seoTitle: "oskartommy hraje How to Fish",
+    seoDescription: "Český Kick streamer oskartommy streamoval How to Fish. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Profil na Kicku", href: "https://kick.com/oskartommy" },
+  },
+  // Nedric_: Twitch Partner, doložený ~4h How to Fish stream (24. 8. 2026),
+  // ale bez spolehlivě potvrzeného původního titulku VOD. Slug zachovává
+  // koncové podtržítko skutečného Twitch handlu (stejný vzorec jako
+  // malej_erik výš), ne kebab-case.
+  {
+    slug: "nedric_",
+    name: "Nedric_",
+    country: "CZ",
+    videos: [],
+    bio: "Nedric_ patří mezi české Twitch tvůrce, kteří věnovali How to Fish několikahodinové vysílání.",
+    seoTitle: "Nedric_ hraje How to Fish",
+    seoDescription: "Český Twitch streamer Nedric_ streamoval How to Fish. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/nedric_" },
+  },
+  // luckycharlie23: samostatný CZ/SK How to Fish stream (22. 8. 2026) se
+  // stream titulek pro VideoObject/embed nepoužíváme (žádné potvrzené
+  // VOD URL/YouTube ID) — jen bio, stejný vzorec jako ostatní Twitch
+  // profily bez videa výš.
+  {
+    slug: "luckycharlie23",
+    name: "luckycharlie23",
+    country: "CZ",
+    videos: [],
+    bio: "luckycharlie23 měl samostatný CZ/SK stream věnovaný How to Fish.",
+    seoTitle: "luckycharlie23 hraje How to Fish",
+    seoDescription: "Český Twitch streamer luckycharlie23 vysílal How to Fish pro CZ/SK publikum. Podívej se na jeho profil a další tvůrce hry.",
+    externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/luckycharlie23" },
+  },
 ];
 
 // Touken byl v předchozím research seznamu zmíněný jako možný slovenský

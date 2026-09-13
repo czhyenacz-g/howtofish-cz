@@ -105,7 +105,21 @@ describe("data/creator-gear.ts — reálná data (rozšíření na všechny prof
   // dat má přednost před úplností (viz zadání bod 30), viz i
   // getPublicGearForCreator komentář "prázdný výsledek => sekce se
   // nevykreslí, žádné 'techniku doplníme později'".
-  const NO_GEAR_EVIDENCE_SLUGS = ["kingosfn", "malej_erik", "potkanzor", "xdamkiraly", "dajinka", "goldyjede"];
+  // Třetí vlna (2026-09-13): katulinkaaa/oskartommy/nedric_/luckycharlie23
+  // mají stejnou situaci — žádný dohledaný zdroj vybavení, proto stejná
+  // výjimka, ne vymyšlený gear.
+  const NO_GEAR_EVIDENCE_SLUGS = [
+    "kingosfn",
+    "malej_erik",
+    "potkanzor",
+    "xdamkiraly",
+    "dajinka",
+    "goldyjede",
+    "katulinkaaa",
+    "oskartommy",
+    "nedric_",
+    "luckycharlie23",
+  ];
 
   test("úplně každý profil v data/creators.ts má aspoň jednu veřejnou gear položku, KROMĚ profilů bez jakéhokoli dohledaného zdroje (viz NO_GEAR_EVIDENCE_SLUGS)", () => {
     for (const creator of creatorProfiles) {

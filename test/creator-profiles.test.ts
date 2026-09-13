@@ -263,3 +263,71 @@ describe("druhá vlna nových CZ tvůrců (2026-09-09): dzeryyy21, kingosfn, Mal
     assert.equal(new Set(texts).size, texts.length, "dva noví tvůrci mají doslova stejný bio text");
   });
 });
+
+describe("třetí vlna nových CZ tvůrců (2026-09-13): katulinkaaa, oskartommy, Nedric_, luckycharlie23", () => {
+  const NEW_SLUGS = ["katulinkaaa", "oskartommy", "nedric_", "luckycharlie23"];
+
+  test("všechny 4 profily existují pod očekávanými slugy", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.ok(getCreatorProfile(slug), `chybí profil ${slug}`);
+    }
+  });
+
+  test("žádný duplicitní profil pod jiným casingem/spellingem", () => {
+    for (const bad of ["Katulinkaaa", "oskarTommy", "oskar-tommy", "nedric", "Nedric", "LuckyCharlie23"]) {
+      assert.equal(getCreatorProfile(bad), undefined, `neočekávaný duplicitní slug "${bad}"`);
+    }
+    const slugs = creatorProfiles.map((c) => c.slug);
+    assert.equal(new Set(slugs).size, slugs.length);
+  });
+
+  test("všichni 4 jsou country CZ", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.country, "CZ");
+    }
+  });
+
+  test("Nedric_ zachovává koncové podtržítko ve slugu i jméně (skutečný Twitch handle)", () => {
+    assert.equal(getCreatorProfile("nedric_")?.name, "Nedric_");
+    assert.equal(getCreatorProfile("nedric"), undefined);
+  });
+
+  test("žádný z nových profilů nemá vymyšlené video záznamy (žádný ověřený VOD/YouTube ID)", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.videos.length, 0, `${slug} by neměl mít žádné video`);
+    }
+  });
+
+  test("externalLink směřuje na skutečný handle, platforma odpovídá zadání (Twitch/Twitch/Twitch/Kick)", () => {
+    assert.equal(getCreatorProfile("katulinkaaa")?.externalLink?.href, "https://www.twitch.tv/katulinkaaa");
+    assert.equal(getCreatorProfile("nedric_")?.externalLink?.href, "https://www.twitch.tv/nedric_");
+    assert.equal(getCreatorProfile("luckycharlie23")?.externalLink?.href, "https://www.twitch.tv/luckycharlie23");
+    assert.equal(getCreatorProfile("oskartommy")?.externalLink?.href, "https://kick.com/oskartommy");
+    assert.equal(getCreatorProfile("oskartommy")?.externalLink?.label, "Profil na Kicku");
+  });
+
+  test("žádný z nových profilů netvrdí konkrétní viewer/peak/average statistiky v bio", () => {
+    for (const slug of NEW_SLUGS) {
+      const bio = getCreatorProfile(slug)?.bio ?? "";
+      assert.doesNotMatch(bio, /\d+[\s,.]?\d*\s*(peak|average|zhlédnutí|views|followers?|sledujících|tisíc)/i);
+    }
+  });
+
+  test("žádný z nových profilů nemá streamerSetupSlug (žádný ověřený gear na StreamerSetup.cz)", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.streamerSetupSlug, undefined, `${slug} by neměl mít streamerSetupSlug`);
+    }
+  });
+
+  test("intro texty nejsou identická věta s vyměněným jménem", () => {
+    const texts = NEW_SLUGS.map((slug) => getCreatorProfile(slug)?.bio).filter((bio): bio is string => Boolean(bio));
+    assert.equal(new Set(texts).size, texts.length, "dva noví tvůrci mají doslova stejný bio text");
+  });
+
+  test("seoTitle je nastavený a odlišný od generické šablony pro každého", () => {
+    assert.equal(getCreatorProfile("katulinkaaa")?.seoTitle, "katulinkaaa hraje How to Fish");
+    assert.equal(getCreatorProfile("oskartommy")?.seoTitle, "oskartommy hraje How to Fish");
+    assert.equal(getCreatorProfile("nedric_")?.seoTitle, "Nedric_ hraje How to Fish");
+    assert.equal(getCreatorProfile("luckycharlie23")?.seoTitle, "luckycharlie23 hraje How to Fish");
+  });
+});
