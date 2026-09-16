@@ -18,6 +18,8 @@ export type CreatorProfileVideo = {
 export type CreatorProfile = {
   slug: string;
   name: string;
+  /** Volitelný přepis H1 na detailu (výchozí je jen jméno tvůrce) — pro konkrétnější SEO H1 typu "Trychta a How to Fish". */
+  heading?: string;
   /** Odvozeno z creator-videos.ts `language` (sk -> SK, jinak CZ) u ověřených profilů, jinak nastaveno ručně — jen pro malý, nenápadný country badge (viz zadání). */
   country: "CZ" | "SK";
   videos: CreatorProfileVideo[];
@@ -295,6 +297,61 @@ const cautiousProfiles: CreatorProfile[] = [
     seoTitle: "luckycharlie23 hraje How to Fish",
     seoDescription: "Český Twitch streamer luckycharlie23 vysílal How to Fish pro CZ/SK publikum. Podívej se na jeho profil a další tvůrce hry.",
     externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/luckycharlie23" },
+  },
+  // Čtvrtá vlna (2026-09-16) — tři nově potvrzení CZ tvůrci s doloženou
+  // vazbou na How to Fish, ale bez konkrétního ověřeného VOD/klipu, proto
+  // zůstávají "cautious" (videos: [], žádný vymyšlený embed/VideoObject).
+  // Všichni tři mají i profil na StreamerSetup.cz → streamerSetupSlug
+  // (tam zatím bez ověřené techniky, proto se label crosslinku na
+  // StreamerSetup.cz vykresluje neutrálně, viz app/streameri/[slug]/page.tsx).
+  //
+  // Trychta — opakované How to Fish streamy 8., 11., 12. a 13. 9. 2026
+  // (poslední „How to Fish s Trychtou“, ~3 h 26 min). Žádné follower/
+  // viewer statistiky (zadání bod 23).
+  {
+    slug: "trychta",
+    name: "Trychta",
+    heading: "Trychta a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Trychta patří mezi české Twitch streamery, kteří se k How to Fish během září 2026 vraceli opakovaně. Hře věnoval několik samostatných vysílání, včetně streamu nazvaného „How to Fish s Trychtou“.",
+    seoTitle: "Trychta hraje How to Fish",
+    seoDescription: "Český Twitch streamer Trychta se k How to Fish opakovaně vracel. Podívej se na jeho Twitch profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/trychta" },
+    streamerSetupSlug: "trychta",
+  },
+  // Cre_ator — Kick handle zachovává podtržítko (stejná konvence jako
+  // malej_erik/nedric_ výš), slug proto "cre_ator", ne "cre-ator".
+  // Potvrzené streamy 1., 3. a 12. 9. 2026 (poslední ~2 h). Z jednoho
+  // názvu víme jen o zmínce speedrunu (45.57.749) — NEinterpretujeme ho
+  // jako rekord/personal best, viz zadání.
+  {
+    slug: "cre_ator",
+    name: "Cre_ator",
+    heading: "Cre_ator a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Cre_ator je český Kick streamer, který během září 2026 vysílal How to Fish opakovaně. Hru kombinoval s pohodovějšími streamy a v jednom z vysílání zmiňoval také How to Fish speedrun.",
+    seoTitle: "Cre_ator hraje How to Fish",
+    seoDescription: "Český Kick streamer Cre_ator se k How to Fish opakovaně vracel a zkoušel také speedrun. Objev jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/cre_ator" },
+    streamerSetupSlug: "cre_ator",
+  },
+  // Strelec07 — How to Fish zařadil do vysílání 10.–11. a 13. 9. 2026
+  // (13. 9. „Konečně nová webka! Dáme how to fish pak golf a reakce“).
+  // Zmínku o nové webkameře evidujeme jen jako bezpečné konstatování
+  // v intro textu, NIKOLIV jako konkrétní produkt (model neznáme).
+  {
+    slug: "strelec07",
+    name: "Strelec07",
+    heading: "Strelec07 a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Strelec07 patří mezi menší české Kick tvůrce, kteří během září 2026 několikrát zařadili How to Fish do svého vysílání.",
+    seoTitle: "Strelec07 hraje How to Fish",
+    seoDescription: "Český Kick streamer Strelec07 streamoval How to Fish během několika zářijových vysílání. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/strelec07" },
+    streamerSetupSlug: "strelec07",
   },
 ];
 

@@ -331,3 +331,89 @@ describe("třetí vlna nových CZ tvůrců (2026-09-13): katulinkaaa, oskartommy
     assert.equal(getCreatorProfile("luckycharlie23")?.seoTitle, "luckycharlie23 hraje How to Fish");
   });
 });
+
+describe("čtvrtá vlna nových CZ tvůrců (2026-09-16): Trychta, Cre_ator, Strelec07", () => {
+  const NEW_SLUGS = ["trychta", "cre_ator", "strelec07"];
+
+  test("všichni 3 existují pod očekávanými slugy", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.ok(getCreatorProfile(slug), `chybí profil ${slug}`);
+    }
+  });
+
+  test("žádný duplicitní profil pod jiným casingem/aliasem (Cre_ator/creator/cre-ator, Strelec-07)", () => {
+    for (const bad of ["Cre_ator", "CRE_ATOR", "cre-ator", "creator", "Creator", "Trychta", "strelec-07", "Strelec_07", "Strelec07"]) {
+      assert.equal(getCreatorProfile(bad), undefined, `neočekávaný duplicitní slug "${bad}"`);
+    }
+    const slugs = creatorProfiles.map((c) => c.slug);
+    assert.equal(new Set(slugs).size, slugs.length);
+  });
+
+  test("zobrazované jméno zachovává reálný handle (Cre_ator s podtržítkem), slug je lowercase", () => {
+    assert.equal(getCreatorProfile("cre_ator")?.name, "Cre_ator");
+    assert.equal(getCreatorProfile("trychta")?.name, "Trychta");
+    assert.equal(getCreatorProfile("strelec07")?.name, "Strelec07");
+  });
+
+  test("všichni 3 jsou country CZ", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.country, "CZ", `${slug} by měl mít country CZ`);
+    }
+  });
+
+  test("externalLink směřuje na skutečný profil (Twitch/Kick), žádná vymyšlená URL", () => {
+    assert.equal(getCreatorProfile("trychta")?.externalLink?.href, "https://www.twitch.tv/trychta");
+    assert.equal(getCreatorProfile("cre_ator")?.externalLink?.href, "https://kick.com/cre_ator");
+    assert.equal(getCreatorProfile("strelec07")?.externalLink?.href, "https://kick.com/strelec07");
+  });
+
+  test("platforma se odvodí z externalLink (trychta = twitch, cre_ator/strelec07 = kick)", () => {
+    assert.equal(getCreatorProfile("trychta")?.externalLink?.href.includes("twitch.tv"), true);
+    assert.equal(getCreatorProfile("cre_ator")?.externalLink?.href.startsWith("https://kick.com/"), true);
+    assert.equal(getCreatorProfile("strelec07")?.externalLink?.href.startsWith("https://kick.com/"), true);
+  });
+
+  test("nikdo z nových nemá vymyšlené video (žádný ověřený VOD) ani streamerSetupSlug bez profilu", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.videos.length, 0, `${slug} by neměl mít vymyšlené video`);
+      assert.equal(getCreatorProfile(slug)?.streamerSetupSlug, slug, `${slug}: streamerSetupSlug by měl odpovídat vlastnímu slugu`);
+    }
+  });
+
+  test("seoTitle/seoDescription jsou nastavené a bez follower/viewer statistik v bio", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.ok(getCreatorProfile(slug)?.seoTitle, `${slug} nemá seoTitle`);
+      assert.ok(getCreatorProfile(slug)?.seoDescription, `${slug} nemá seoDescription`);
+      const bio = getCreatorProfile(slug)?.bio ?? "";
+      assert.doesNotMatch(bio, /\d+[\s,.]?\d*\s*(peak|average|zhlédnutí|views|followers?|sledujících|tisíc)/i);
+    }
+  });
+
+  test("Trychta bio zmiňuje opakovaný návrat v září 2026, ne statistiky", () => {
+    const bio = getCreatorProfile("trychta")?.bio ?? "";
+    assert.match(bio, /září 2026/);
+    assert.match(bio, /opakovaně/);
+  });
+
+  test("Cre_ator bio zmiňuje speedrun a NETVRDÍ rekord/personal best", () => {
+    const bio = getCreatorProfile("cre_ator")?.bio ?? "";
+    assert.match(bio, /speedrun/);
+    assert.doesNotMatch(bio, /(světový|český)\s+rekord|personal best|osobní rekord/i);
+  });
+
+  test("Strelec07 NEUVÁDÍ konkrétní model webkamery (žádné vymyšlené vybavení)", () => {
+    const bio = getCreatorProfile("strelec07")?.bio ?? "";
+    assert.doesNotMatch(bio, /logitech|elgato|razer kiyo|c920|facecam/i);
+  });
+
+  test("intro texty nových tvůrců nejsou identická věta s vyměněným jménem", () => {
+    const texts = NEW_SLUGS.map((slug) => getCreatorProfile(slug)?.bio).filter((bio): bio is string => Boolean(bio));
+    assert.equal(new Set(texts).size, texts.length, "dva noví tvůrci mají doslova stejný bio text");
+  });
+
+  test("H1 override ('X a How to Fish') je nastavený pro každého", () => {
+    assert.equal(getCreatorProfile("trychta")?.heading, "Trychta a How to Fish");
+    assert.equal(getCreatorProfile("cre_ator")?.heading, "Cre_ator a How to Fish");
+    assert.equal(getCreatorProfile("strelec07")?.heading, "Strelec07 a How to Fish");
+  });
+});

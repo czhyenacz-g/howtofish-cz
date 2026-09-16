@@ -165,7 +165,7 @@ export default async function CreatorPage({ params }: Props) {
           <CreatorAvatar name={creator.name} size="lg" />
           <div className="min-w-0">
             <h1 className="font-serif text-3xl sm:text-4xl">
-              {creator.name} <span className="text-xl text-cyan-100/50">{creator.country === "SK" ? "🇸🇰" : "🇨🇿"}</span>
+              {creator.heading ?? creator.name} <span className="text-xl text-cyan-100/50">{creator.country === "SK" ? "🇸🇰" : "🇨🇿"}</span>
             </h1>
             {platforms.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -284,8 +284,11 @@ export default async function CreatorPage({ params }: Props) {
         <CreatorGearSection gear={gear} creatorName={creator.name} />
 
         {/* Crosslink na StreamerSetup.cz — jen detail → detail, POUZE
-            pokud tam má tvůrce smysluplný obsah (creator.streamerSetupSlug,
-            viz data/creators.ts). Sesterský projekt, jiná doména. */}
+            pokud tam tvůrce má profil (creator.streamerSetupSlug, viz
+            data/creators.ts). Sesterský projekt, jiná doména. Label se
+            liší podle toho, jestli tam máme i doloženou techniku: u
+            profilů bez potvrzeného gearu neslibujeme "setup", jen
+            neutrální "Profil na StreamerSetup.cz" (zadání bod 25). */}
         {creator.streamerSetupSlug && (
           <p className="mt-3 text-sm text-cyan-100/70">
             <a
@@ -294,7 +297,7 @@ export default async function CreatorPage({ params }: Props) {
               rel="noopener noreferrer"
               className="underline hover:text-amber-300"
             >
-              Podívat se na setup {creator.name} →
+              {hasConfirmedGear(creator.slug) ? `Podívat se na setup ${creator.name} →` : "Profil na StreamerSetup.cz"}
             </a>
           </p>
         )}
@@ -319,6 +322,11 @@ export default async function CreatorPage({ params }: Props) {
         <section className="mt-10 border-t border-white/10 pt-6">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-100/50">Průvodce How to Fish</h2>
           <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
+            <li>
+              <Link href="/stream" className="text-cyan-100/80 underline hover:text-amber-300">
+                Živé streamy
+              </Link>
+            </li>
             <li>
               <Link href="/ryby" className="text-cyan-100/80 underline hover:text-amber-300">
                 Ryby

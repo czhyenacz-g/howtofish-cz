@@ -66,6 +66,12 @@ describe("sitemap", () => {
     }
   });
 
+  test("obsahuje čtvrtou vlnu nových CZ creator pages na /streameri/{slug} (trychta, cre_ator, strelec07)", () => {
+    for (const slug of ["trychta", "cre_ator", "strelec07"]) {
+      assert.ok(urls.some((u) => u.endsWith(`/streameri/${slug}`)), `chybí /streameri/${slug}`);
+    }
+  });
+
   test("neobsahuje /streameri/touken (creator candidate, žádný ověřený důkaz)", () => {
     assert.ok(!urls.some((u) => u.endsWith("/streameri/touken")));
   });

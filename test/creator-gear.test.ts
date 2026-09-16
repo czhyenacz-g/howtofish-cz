@@ -108,6 +108,9 @@ describe("data/creator-gear.ts — reálná data (rozšíření na všechny prof
   // Třetí vlna (2026-09-13): katulinkaaa/oskartommy/nedric_/luckycharlie23
   // mají stejnou situaci — žádný dohledaný zdroj vybavení, proto stejná
   // výjimka, ne vymyšlený gear.
+  // Čtvrtá vlna (2026-09-16): trychta/cre_ator/strelec07 — stejná situace,
+  // žádný spolehlivě ověřený gear (u Strelec07 jen zmínka o nové webkameře
+  // bez modelu, viz bio).
   const NO_GEAR_EVIDENCE_SLUGS = [
     "kingosfn",
     "malej_erik",
@@ -119,6 +122,9 @@ describe("data/creator-gear.ts — reálná data (rozšíření na všechny prof
     "oskartommy",
     "nedric_",
     "luckycharlie23",
+    "trychta",
+    "cre_ator",
+    "strelec07",
   ];
 
   test("úplně každý profil v data/creators.ts má aspoň jednu veřejnou gear položku, KROMĚ profilů bez jakéhokoli dohledaného zdroje (viz NO_GEAR_EVIDENCE_SLUGS)", () => {
