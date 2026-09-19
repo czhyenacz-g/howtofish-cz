@@ -417,3 +417,76 @@ describe("čtvrtá vlna nových CZ tvůrců (2026-09-16): Trychta, Cre_ator, Str
     assert.equal(getCreatorProfile("strelec07")?.heading, "Strelec07 a How to Fish");
   });
 });
+
+describe("pátá vlna nových CZ/SK tvůrců (2026-09-19): Brejla, tada2015AA, Krteuk, Pivko6654, Skiller_cz22, Bobarix", () => {
+  const NEW_SLUGS = ["brejla", "tada2015aa", "krteuk", "pivko6654", "skiller_cz22", "bobarix"];
+
+  test("všech 6 existuje pod očekávanými slugy", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.ok(getCreatorProfile(slug), `chybí profil ${slug}`);
+    }
+  });
+
+  test("žádný duplicitní profil pod jiným casingem/aliasem", () => {
+    for (const bad of ["Brejla", "tada2015AA", "TADA2015AA", "Krteuk", "PIVKO6654", "Skiller_cz22", "SkillerCZ22", "skiller-cz22", "Bobarix"]) {
+      assert.equal(getCreatorProfile(bad), undefined, `neočekávaný duplicitní slug "${bad}"`);
+    }
+    const slugs = creatorProfiles.map((c) => c.slug);
+    assert.equal(new Set(slugs).size, slugs.length);
+  });
+
+  test("country CZ/SK dle ověření (Pivko6654 = SK, ostatní CZ)", () => {
+    for (const slug of NEW_SLUGS) {
+      const expected = slug === "pivko6654" ? "SK" : "CZ";
+      assert.equal(getCreatorProfile(slug)?.country, expected, `${slug}: country`);
+    }
+  });
+
+  test("zobrazované jméno zachovává reálný casing (tada2015AA, Skiller_cz22), slug je lowercase", () => {
+    assert.equal(getCreatorProfile("tada2015aa")?.name, "tada2015AA");
+    assert.equal(getCreatorProfile("skiller_cz22")?.name, "Skiller_cz22");
+    assert.equal(getCreatorProfile("brejla")?.name, "Brejla");
+  });
+
+  test("externalLink míří na ověřený profil, vč. reálného Kick handlu u Skillera (pomlčka)", () => {
+    assert.equal(getCreatorProfile("brejla")?.externalLink?.href, "https://kick.com/brejla");
+    assert.equal(getCreatorProfile("tada2015aa")?.externalLink?.href, "https://kick.com/tada2015aa");
+    assert.equal(getCreatorProfile("krteuk")?.externalLink?.href, "https://kick.com/krteuk");
+    assert.equal(getCreatorProfile("pivko6654")?.externalLink?.href, "https://www.twitch.tv/pivko6654");
+    assert.equal(getCreatorProfile("skiller_cz22")?.externalLink?.href, "https://kick.com/skiller-cz22");
+    assert.equal(getCreatorProfile("bobarix")?.externalLink?.href, "https://kick.com/bobarix");
+  });
+
+  test("nikdo nemá vymyšlené video (žádný ověřený VOD)", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.videos.length, 0, `${slug} by neměl mít vymyšlené video`);
+    }
+  });
+
+  test("všichni mají streamerSetupSlug (profil existuje i na StreamerSetup.cz)", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.streamerSetupSlug, slug, `${slug}: streamerSetupSlug`);
+    }
+  });
+
+  test("H1 heading override je nastavený pro každého", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.match(getCreatorProfile(slug)?.heading ?? "", /How to Fish/, `${slug}: heading`);
+    }
+  });
+
+  test("bio ani meta description neobsahují follower/viewer statistiky", () => {
+    for (const slug of NEW_SLUGS) {
+      const profile = getCreatorProfile(slug);
+      const text = `${profile?.bio ?? ""} ${profile?.seoDescription ?? ""}`;
+      assert.doesNotMatch(text, /\d+[\s,.]?\d*\s*(peak|average|zhlédnutí|views|followers?|sledujících|tisíc)/i);
+    }
+  });
+
+  test("bio hlavních tvůrců zmiňuje konkrétní ověřený fakt, ne obecnou frázi", () => {
+    assert.match(getCreatorProfile("brejla")?.bio ?? "", /jedné hodiny/);
+    assert.match(getCreatorProfile("tada2015aa")?.bio ?? "", /rybareni/);
+    assert.match(getCreatorProfile("krteuk")?.bio ?? "", /Jirkou/);
+    assert.match(getCreatorProfile("pivko6654")?.bio ?? "", /slovenský/);
+  });
+});

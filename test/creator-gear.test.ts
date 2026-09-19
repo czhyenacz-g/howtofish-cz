@@ -125,6 +125,15 @@ describe("data/creator-gear.ts — reálná data (rozšíření na všechny prof
     "trychta",
     "cre_ator",
     "strelec07",
+    // Pátá vlna (2026-09-19): brejla/tada2015aa/krteuk/pivko6654/
+    // skiller_cz22/bobarix — žádný veřejně ověřený gear (Kick about/
+    // panely nic neuvádějí, Twitch bez veřejného setupu).
+    "brejla",
+    "tada2015aa",
+    "krteuk",
+    "pivko6654",
+    "skiller_cz22",
+    "bobarix",
   ];
 
   test("úplně každý profil v data/creators.ts má aspoň jednu veřejnou gear položku, KROMĚ profilů bez jakéhokoli dohledaného zdroje (viz NO_GEAR_EVIDENCE_SLUGS)", () => {

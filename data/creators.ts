@@ -353,6 +353,91 @@ const cautiousProfiles: CreatorProfile[] = [
     externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/strelec07" },
     streamerSetupSlug: "strelec07",
   },
+  // Pátá vlna (2026-09-19) — šest ověřených CZ/SK tvůrců (4 hlavní + 2
+  // mikrokanály). U všech je vazba na How to Fish doložená veřejně
+  // (Kick „recent_categories“ obsahuje How to Fish u brejla/tada2015aa/
+  // krteuk/skiller-cz22/bobarix, resp. ověřený Twitch profil + stream
+  // titulky u pivko6654). Bez konkrétního ověřeného VOD/klipu → videos:
+  // [], žádný vymyšlený embed/VideoObject. Všichni mají profil i na
+  // StreamerSetup.cz → streamerSetupSlug (tam bez ověřené techniky, proto
+  // neutrální label crosslinku). Žádné follower/viewer statistiky.
+  // CANONICAL KE STREAMERSETUP: kick.com/skiller-cz22 (reálný handle má
+  // pomlčku), slug našeho webu je ale skiller_cz22 = name.toLowerCase().
+  {
+    slug: "brejla",
+    name: "Brejla",
+    heading: "Brejla a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Brejla streamoval How to Fish opakovaně a v jednom z vysílání se pokoušel hru dokončit do jedné hodiny.",
+    seoTitle: "Brejla hraje How to Fish",
+    seoDescription: "Český Kick streamer Brejla streamoval How to Fish opakovaně a pokoušel se hru dokončit do jedné hodiny. Podívej se na jeho profil a další CZ/SK tvůrce.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/brejla" },
+    streamerSetupSlug: "brejla",
+  },
+  {
+    slug: "tada2015aa",
+    name: "tada2015AA",
+    heading: "tada2015AA a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "tada2015AA vysílal How to Fish dva dny po sobě v sérii nazvané „rybareni“.",
+    seoTitle: "tada2015AA hraje How to Fish",
+    seoDescription: "Český Kick tvůrce tada2015AA vysílal How to Fish ve dvou navazujících streamech. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/tada2015aa" },
+    streamerSetupSlug: "tada2015aa",
+  },
+  {
+    slug: "krteuk",
+    name: "Krteuk",
+    heading: "Krteuk a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Krteuk během září 2026 věnoval How to Fish několik vysílání, včetně společného hraní s Jirkou.",
+    seoTitle: "Krteuk hraje How to Fish",
+    seoDescription: "Český Kick streamer Krteuk věnoval How to Fish několik zářijových vysílání. Podívej se na jeho profil a další české a slovenské tvůrce.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/krteuk" },
+    streamerSetupSlug: "krteuk",
+  },
+  {
+    slug: "pivko6654",
+    name: "Pivko6654",
+    heading: "Pivko6654 a How to Fish",
+    country: "SK",
+    videos: [],
+    bio: "Pivko6654 je slovenský Twitch tvůrce, který se k How to Fish vrátil v několika vysíláních.",
+    seoTitle: "Pivko6654 hraje How to Fish",
+    seoDescription: "Slovenský Twitch tvůrce Pivko6654 streamoval How to Fish opakovaně. Podívej se na jeho Twitch profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/pivko6654" },
+    streamerSetupSlug: "pivko6654",
+  },
+  // Mikrokanály — malé publikum není důvod k odmítnutí, vazba na How to
+  // Fish je doložená veřejně (Kick recent_categories). Slug skiller_cz22
+  // = name.toLowerCase(), profilová URL má reálný handle s pomlčkou.
+  {
+    slug: "skiller_cz22",
+    name: "Skiller_cz22",
+    heading: "Skiller_cz22 a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Skiller_cz22 je český Kick tvůrce, v jehož streamované historii se objevuje také How to Fish.",
+    seoTitle: "Skiller_cz22 hraje How to Fish",
+    seoDescription: "Český Kick tvůrce Skiller_cz22 streamoval How to Fish. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/skiller-cz22" },
+    streamerSetupSlug: "skiller_cz22",
+  },
+  {
+    slug: "bobarix",
+    name: "Bobarix",
+    heading: "Bobarix a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Bobarix je český Kick tvůrce, který zařadil How to Fish mezi hry na svém streamu.",
+    seoTitle: "Bobarix hraje How to Fish",
+    seoDescription: "Český Kick tvůrce Bobarix streamoval How to Fish. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/bobarix" },
+    streamerSetupSlug: "bobarix",
+  },
 ];
 
 // Touken byl v předchozím research seznamu zmíněný jako možný slovenský

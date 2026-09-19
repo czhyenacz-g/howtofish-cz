@@ -72,6 +72,12 @@ describe("sitemap", () => {
     }
   });
 
+  test("obsahuje pátou vlnu nových CZ/SK creator pages (brejla, tada2015aa, krteuk, pivko6654, skiller_cz22, bobarix)", () => {
+    for (const slug of ["brejla", "tada2015aa", "krteuk", "pivko6654", "skiller_cz22", "bobarix"]) {
+      assert.ok(urls.some((u) => u.endsWith(`/streameri/${slug}`)), `chybí /streameri/${slug}`);
+    }
+  });
+
   test("neobsahuje /streameri/touken (creator candidate, žádný ověřený důkaz)", () => {
     assert.ok(!urls.some((u) => u.endsWith("/streameri/touken")));
   });
