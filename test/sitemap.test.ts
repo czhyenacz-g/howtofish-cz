@@ -78,6 +78,12 @@ describe("sitemap", () => {
     }
   });
 
+  test("obsahuje šestou vlnu nových CZ creator pages (klukbezkacek, tomasekqw, miwaldo, thatvace, kubex_27, mlynek1)", () => {
+    for (const slug of ["klukbezkacek", "tomasekqw", "miwaldo", "thatvace", "kubex_27", "mlynek1"]) {
+      assert.ok(urls.some((u) => u.endsWith(`/streameri/${slug}`)), `chybí /streameri/${slug}`);
+    }
+  });
+
   test("neobsahuje /streameri/touken (creator candidate, žádný ověřený důkaz)", () => {
     assert.ok(!urls.some((u) => u.endsWith("/streameri/touken")));
   });

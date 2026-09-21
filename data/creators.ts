@@ -438,6 +438,89 @@ const cautiousProfiles: CreatorProfile[] = [
     externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/bobarix" },
     streamerSetupSlug: "bobarix",
   },
+  // Šestá vlna (2026-09-21) — šest ověřených CZ tvůrců (4 Kick + 2 Twitch).
+  // Vazba na How to Fish doložená veřejně (Kick „recent_categories“ obsahuje
+  // How to Fish u klukbezkacek/tomasekqw/miwaldo/thatvace; u Kubex_27 a
+  // Mlynek1 vlastní streamy s How to Fish v titulku). Bez konkrétního
+  // ověřeného VOD → videos: [], žádný vymyšlený embed/VideoObject. Všichni
+  // mají profil i na StreamerSetup.cz → streamerSetupSlug. Žádné follower
+  // statistiky. Featured/carousel = false (nejsou v creator-videos.ts).
+  {
+    slug: "klukbezkacek",
+    name: "Klukbezkacek",
+    heading: "Klukbezkacek a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Klukbezkacek zařadil How to Fish do svého zářijového Kick vysílání.",
+    seoTitle: "Klukbezkacek hraje How to Fish",
+    seoDescription: "Český Kick tvůrce Klukbezkacek zařadil How to Fish do svého zářijového vysílání. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/klukbezkacek" },
+    streamerSetupSlug: "klukbezkacek",
+  },
+  {
+    slug: "tomasekqw",
+    name: "Tomasekqw",
+    heading: "Tomasekqw a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Tomasekqw streamoval How to Fish v rámci CZ/SK vysílání zaměřeného na rybaření.",
+    seoTitle: "Tomasekqw hraje How to Fish",
+    seoDescription: "Český Kick streamer Tomasekqw streamoval How to Fish v rámci CZ/SK vysílání zaměřeného na rybaření. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/tomasekqw" },
+    streamerSetupSlug: "tomasekqw",
+  },
+  {
+    slug: "miwaldo",
+    name: "Miwaldo",
+    heading: "Miwaldo a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Miwaldo je český Kick streamer zaměřený hlavně na CS2, který zařadil How to Fish do svého zářijového vysílání.",
+    seoTitle: "Miwaldo hraje How to Fish",
+    seoDescription: "Český Kick streamer Miwaldo zařadil How to Fish do svého zářijového vysílání. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/miwaldo" },
+    streamerSetupSlug: "miwaldo",
+  },
+  {
+    slug: "thatvace",
+    name: "ThatVace",
+    heading: "ThatVace a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "ThatVace se k How to Fish během několika zářijových streamů opakovaně vracel a věnoval hře výraznou část vysílání.",
+    seoTitle: "ThatVace hraje How to Fish",
+    seoDescription: "Český Kick streamer ThatVace se k How to Fish opakovaně vracel během několika zářijových streamů. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/thatvace" },
+    streamerSetupSlug: "thatvace",
+  },
+  // Kubex_27 — dva explicitní How to Fish streamy (1. a 3. 9. 2026),
+  // druhý jako speedrun proti Kraltoustu. NEtvrdíme výsledek/rekord.
+  {
+    slug: "kubex_27",
+    name: "Kubex_27",
+    heading: "Kubex_27 a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Kubex_27 streamoval How to Fish opakovaně a v jednom z vysílání zkoušel speedrun proti Kraltoustu.",
+    seoTitle: "Kubex_27 hraje How to Fish",
+    seoDescription: "Český Twitch streamer Kubex_27 streamoval How to Fish opakovaně a zkoušel také speedrun. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/kubex_27" },
+    streamerSetupSlug: "kubex_27",
+  },
+  // Mlynek1 — velmi malý/nový kanál, první potvrzený HTF stream 19. 9. 2026.
+  // Malé publikum není důvod k odmítnutí (vhodné pro budoucí outreach pilot).
+  {
+    slug: "mlynek1",
+    name: "Mlynek1",
+    heading: "Mlynek1 a How to Fish",
+    country: "CZ",
+    videos: [],
+    bio: "Mlynek1 patří mezi novější české Twitch tvůrce, kteří v září 2026 streamovali How to Fish.",
+    seoTitle: "Mlynek1 hraje How to Fish",
+    seoDescription: "Český Twitch tvůrce Mlynek1 streamoval How to Fish v září 2026. Podívej se na jeho profil a další CZ/SK tvůrce hry.",
+    externalLink: { label: "Otevřít Twitch profil", href: "https://www.twitch.tv/mlynek1" },
+    streamerSetupSlug: "mlynek1",
+  },
 ];
 
 // Touken byl v předchozím research seznamu zmíněný jako možný slovenský

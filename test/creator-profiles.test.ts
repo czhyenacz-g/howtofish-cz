@@ -490,3 +490,68 @@ describe("pátá vlna nových CZ/SK tvůrců (2026-09-19): Brejla, tada2015AA, K
     assert.match(getCreatorProfile("pivko6654")?.bio ?? "", /slovenský/);
   });
 });
+
+describe("šestá vlna nových CZ tvůrců (2026-09-21): Klukbezkacek, Tomasekqw, Miwaldo, ThatVace, Kubex_27, Mlynek1", () => {
+  const NEW_SLUGS = ["klukbezkacek", "tomasekqw", "miwaldo", "thatvace", "kubex_27", "mlynek1"];
+
+  test("všech 6 existuje pod očekávanými slugy", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.ok(getCreatorProfile(slug), `chybí profil ${slug}`);
+    }
+  });
+
+  test("žádný duplicitní profil pod jiným casingem/aliasem (Kubex_27 vs kubex-27)", () => {
+    for (const bad of ["Klukbezkacek", "Tomasekqw", "Miwaldo", "ThatVace", "Kubex_27", "kubex-27", "Kubex27", "Mlynek1"]) {
+      assert.equal(getCreatorProfile(bad), undefined, `neočekávaný duplicitní slug "${bad}"`);
+    }
+    const slugs = creatorProfiles.map((c) => c.slug);
+    assert.equal(new Set(slugs).size, slugs.length);
+  });
+
+  test("všichni jsou country CZ", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.country, "CZ", `${slug}: country`);
+    }
+  });
+
+  test("externalLink míří na ověřený profil (Kick/Twitch), vč. Kubex_27 s podtržítkem", () => {
+    assert.equal(getCreatorProfile("klukbezkacek")?.externalLink?.href, "https://kick.com/klukbezkacek");
+    assert.equal(getCreatorProfile("tomasekqw")?.externalLink?.href, "https://kick.com/tomasekqw");
+    assert.equal(getCreatorProfile("miwaldo")?.externalLink?.href, "https://kick.com/miwaldo");
+    assert.equal(getCreatorProfile("thatvace")?.externalLink?.href, "https://kick.com/thatvace");
+    assert.equal(getCreatorProfile("kubex_27")?.externalLink?.href, "https://www.twitch.tv/kubex_27");
+    assert.equal(getCreatorProfile("mlynek1")?.externalLink?.href, "https://www.twitch.tv/mlynek1");
+  });
+
+  test("nikdo nemá vymyšlené video a všichni mají streamerSetupSlug", () => {
+    for (const slug of NEW_SLUGS) {
+      assert.equal(getCreatorProfile(slug)?.videos.length, 0);
+      assert.equal(getCreatorProfile(slug)?.streamerSetupSlug, slug);
+    }
+  });
+
+  test("bio i meta jsou unikátní a obsahují konkrétní fakt (ne jen vyměněné jméno)", () => {
+    const bios = NEW_SLUGS.map((s) => getCreatorProfile(s)?.bio).filter((b): b is string => Boolean(b));
+    assert.equal(new Set(bios).size, bios.length);
+    assert.match(getCreatorProfile("tomasekqw")?.bio ?? "", /rybaření/);
+    assert.match(getCreatorProfile("miwaldo")?.bio ?? "", /CS2/);
+    assert.match(getCreatorProfile("thatvace")?.bio ?? "", /opakovaně/);
+    assert.match(getCreatorProfile("kubex_27")?.bio ?? "", /speedrun/);
+    assert.match(getCreatorProfile("mlynek1")?.bio ?? "", /novější/);
+  });
+
+  test("H1 heading override + žádné follower/viewer statistiky", () => {
+    for (const slug of NEW_SLUGS) {
+      const profile = getCreatorProfile(slug);
+      assert.match(profile?.heading ?? "", /How to Fish/);
+      const text = `${profile?.bio ?? ""} ${profile?.seoDescription ?? ""}`;
+      assert.doesNotMatch(text, /\d+[\s,.]?\d*\s*(peak|average|zhlédnutí|views|followers?|sledujících|tisíc)/i);
+    }
+  });
+
+  test("Kubex_27 bio netvrdí vítězství/rekord v speedrunu", () => {
+    const bio = getCreatorProfile("kubex_27")?.bio ?? "";
+    assert.match(bio, /speedrun/);
+    assert.doesNotMatch(bio, /vyhrál|rekord|světový|oficiální/i);
+  });
+});

@@ -134,6 +134,14 @@ describe("data/creator-gear.ts — reálná data (rozšíření na všechny prof
     "pivko6654",
     "skiller_cz22",
     "bobarix",
+    // Šestá vlna (2026-09-21): klukbezkacek/tomasekqw/miwaldo/thatvace/
+    // kubex_27/mlynek1 — bez veřejně ověřené techniky.
+    "klukbezkacek",
+    "tomasekqw",
+    "miwaldo",
+    "thatvace",
+    "kubex_27",
+    "mlynek1",
   ];
 
   test("úplně každý profil v data/creators.ts má aspoň jednu veřejnou gear položku, KROMĚ profilů bez jakéhokoli dohledaného zdroje (viz NO_GEAR_EVIDENCE_SLUGS)", () => {
