@@ -363,7 +363,7 @@ describe("čtvrtá vlna nových CZ tvůrců (2026-09-16): Trychta, Cre_ator, Str
 
   test("externalLink směřuje na skutečný profil (Twitch/Kick), žádná vymyšlená URL", () => {
     assert.equal(getCreatorProfile("trychta")?.externalLink?.href, "https://www.twitch.tv/trychta");
-    assert.equal(getCreatorProfile("cre_ator")?.externalLink?.href, "https://kick.com/cre_ator");
+    assert.equal(getCreatorProfile("cre_ator")?.externalLink?.href, "https://kick.com/cre-ator");
     assert.equal(getCreatorProfile("strelec07")?.externalLink?.href, "https://kick.com/strelec07");
   });
 

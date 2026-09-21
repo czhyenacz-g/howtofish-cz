@@ -334,7 +334,9 @@ const cautiousProfiles: CreatorProfile[] = [
     bio: "Cre_ator je český Kick streamer, který během září 2026 vysílal How to Fish opakovaně. Hru kombinoval s pohodovějšími streamy a v jednom z vysílání zmiňoval také How to Fish speedrun.",
     seoTitle: "Cre_ator hraje How to Fish",
     seoDescription: "Český Kick streamer Cre_ator se k How to Fish opakovaně vracel a zkoušel také speedrun. Objev jeho profil a další CZ/SK tvůrce hry.",
-    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/cre_ator" },
+    // Reálný Kick handle má pomlčku (Kick normalizuje podtržítko): kick.com/cre-ator.
+    // Náš interní slug zůstává "cre_ator" (= name.toLowerCase()).
+    externalLink: { label: "Otevřít Kick profil", href: "https://kick.com/cre-ator" },
     streamerSetupSlug: "cre_ator",
   },
   // Strelec07 — How to Fish zařadil do vysílání 10.–11. a 13. 9. 2026
