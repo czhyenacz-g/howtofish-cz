@@ -4,9 +4,9 @@ import FishSilhouette from "./FishSilhouette";
 /**
  * Cover karty hry — stejný princip jako FishImage.tsx: dokud nemáme
  * vlastní/legální obrázek, vykreslí se stylový placeholder, ne rozbitý
- * obrázek ani cizí hotlink (žádné artworky ze Steamu/IGDB/wiki). Jakmile
- * se `image` doplní do data/games.ts (ideálně soubor v public/games/covers/),
- * použije se skutečný cover.
+ * obrázek ani cizí hotlink (žádné artworky ze Steamu/IGDB/wiki). Vlastní
+ * artworky bydlí v `public/images/games/<slug>.webp` a do hry se zapisují
+ * přes `image` v data/games.ts — tam je jediný zdroj pravdy.
  *
  * Placeholder je záměrně bohatší než dřív, aby karty nepůsobily prázdně:
  * barevná varianta podle slugu + světelný akcent + jemná vlnková textura
@@ -42,7 +42,11 @@ export default function GameCover({
   className?: string;
 }) {
   if (image) {
-    return <Image src={image} alt={name} fill className={`object-cover ${className}`} />;
+    // `object-[50%_55%]` — artworky jsou na výšku a subjekt (rybář) sedí
+    // kolem středu, mírně pod ním; tenhle výřez drží oblohu, vodu i postavu.
+    return (
+      <Image src={image} alt={`${name} – rybaření ve hře`} fill sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 340px" className={`object-cover object-[50%_55%] ${className}`} />
+    );
   }
 
   const initial = name.trim().charAt(0).toUpperCase();

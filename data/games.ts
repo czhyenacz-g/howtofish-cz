@@ -27,11 +27,11 @@ export type GameEntry = {
   /** Herní série (např. "Pokémon") — undefined = samostatná hra / vlastní série. */
   series?: string;
   /**
-   * Cover obrázek. Vyplněný jen tam, kde máme vlastní/legální asset —
-   * oficiální cover art zatím NEMÁME (žádné hotlinky na cizí CDN, viz
-   * zadání bod 6). Ostatní karty vykreslují jednotný stylový placeholder
-   * (app/components/GameCover.tsx); jakmile bude licencovaný cover
-   * k dispozici, stačí ho dát do public/games/covers/ a sem doplnit cestu.
+   * Cover obrázek — cesta k našemu vlastnímu assetu v `public/images/games/`
+   * (např. `/images/games/minecraft.webp`). Vyplněný jen tam, kde vlastní
+   * artwork existuje; hry bez něj vykreslují stylový placeholder
+   * (app/components/GameCover.tsx). Nikdy sem nepatří hotlink na cizí CDN
+   * (Steam/IGDB/wiki) — viz zadání.
    */
   image?: string;
   fishingImportance: GameFishingImportance;
@@ -149,6 +149,7 @@ export const gameEntries: GameEntry[] = [
     isFeatured: true,
     hasDetail: true,
     detailHref: "/games/minecraft",
+    image: "/images/games/minecraft.webp",
     quotes: ["Chtěl jsi jen rybu. Vytáhl jsi enchanted book."],
     aliases: ["Minecraft", "Minecraft Java", "Minecraft Bedrock", "Minecraft: Java Edition", "Minecraft: Bedrock Edition"],
     searchKeywords: ["fishing", "fishing rod", "AFK fishing", "treasure fishing", "Luck of the Sea", "Lure", "fishing challenge"],
@@ -158,6 +159,7 @@ export const gameEntries: GameEntry[] = [
     series: "Stardew Valley",
     hasDetail: true,
     detailHref: "/games/stardew-valley",
+    image: "/images/games/stardew-valley.webp",
     quotes: ["Šel jsi pro jednu rybu. Vrátil ses za tři hodiny."],
     aliases: ["Stardew Valley", "Stardew"],
     searchKeywords: ["fishing", "legendary fish", "fishing guide", "fishing level", "fish pond", "best fishing spot", "fishing challenge"],
@@ -175,6 +177,7 @@ export const gameEntries: GameEntry[] = [
     series: "Pokémon",
     hasDetail: true,
     detailHref: "/games/pokemon-brilliant-diamond-shining-pearl",
+    image: "/images/games/pokemon-brilliant-diamond-shining-pearl.webp",
     quotes: ["Pamatuješ na Old Rod, se kterým jsi pořád tahal Magikarpy?"],
     aliases: [
       "Pokemon",
@@ -206,6 +209,7 @@ export const gameEntries: GameEntry[] = [
   game("Terraria", "terraria", "major", ["Sandbox", "Survival", "RPG"], ["PC", "Switch", "PlayStation", "Xbox", "Mobil"], "evergreen", "medium", {
     hasDetail: true,
     detailHref: "/games/terraria",
+    image: "/images/games/terraria.webp",
     searchKeywords: ["fishing", "Angler quests", "fishing power", "bait", "fishing guide"],
   }),
   game("Sea of Thieves", "sea-of-thieves", "major", ["Pirátství", "Open world", "Co-op"], ["PC", "PlayStation", "Xbox"], "current", "high", {
@@ -213,6 +217,7 @@ export const gameEntries: GameEntry[] = [
     isFeatured: true,
     hasDetail: true,
     detailHref: "/games/sea-of-thieves",
+    image: "/images/games/sea-of-thieves.webp",
     quotes: ["Mířili jsme za pokladem — a skončili s prutem u Hunter's Callu."],
     aliases: ["Sea of Thieves", "SoT"],
     searchKeywords: ["fishing", "Hunter's Call", "rare fish", "trophy fish", "fishing guide", "fishing challenge"],
@@ -225,6 +230,7 @@ export const gameEntries: GameEntry[] = [
     series: "Final Fantasy",
     hasDetail: true,
     detailHref: "/games/final-fantasy-xiv",
+    image: "/images/games/final-fantasy-xiv.webp",
     aliases: ["Final Fantasy XIV", "FFXIV", "FF14", "Final Fantasy 14"],
     searchKeywords: ["fishing", "Fisher job", "Ocean Fishing", "Big Fish", "fishing guide"],
     relatedGames: ["Final Fantasy XV", "Final Fantasy XI", "Final Fantasy VII Remake"],
@@ -232,12 +238,14 @@ export const gameEntries: GameEntry[] = [
   game("World of Warcraft", "world-of-warcraft", "major", ["MMO", "RPG", "Nostalgie"], ["PC"], "current", "high", {
     hasDetail: true,
     detailHref: "/games/world-of-warcraft",
+    image: "/images/games/world-of-warcraft.webp",
     aliases: ["World of Warcraft", "WoW", "Warcraft"],
     searchKeywords: ["fishing", "fishing profession", "Angler", "rare fish", "fishing guide"],
   }),
   game("Old School RuneScape", "old-school-runescape", "major", ["MMO", "RPG", "Nostalgie"], ["PC", "Mobil"], "evergreen", "medium", {
     hasDetail: true,
     detailHref: "/games/old-school-runescape",
+    image: "/images/games/old-school-runescape.webp",
     aliases: ["Old School RuneScape", "OSRS", "RuneScape"],
     searchKeywords: ["fishing", "fishing skill", "fishing level", "money making", "fishing guide"],
   }),
@@ -263,6 +271,7 @@ export const gameEntries: GameEntry[] = [
     series: "Fallout",
     hasDetail: true,
     detailHref: "/games/fallout-76",
+    image: "/images/games/fallout-76.webp",
     relatedGames: ["Fallout 4", "Fallout: New Vegas", "Fallout 3"],
     aliases: ["Fallout 76", "FO76"],
     searchKeywords: ["fishing", "Gone Fission", "fishing rod", "fish challenge", "fishing guide"],
@@ -276,6 +285,7 @@ export const gameEntries: GameEntry[] = [
   game("Palia", "palia", "major", ["Cozy", "MMO", "Life sim"], ["PC", "Switch"], "current", "high", {
     hasDetail: true,
     detailHref: "/games/palia",
+    image: "/images/games/palia.webp",
     searchKeywords: ["fishing", "rare fish", "fishing locations", "fishing guide"],
   }),
   game("Black Desert Online", "black-desert-online", "major", ["MMO", "RPG", "Life skills"], ["PC", "PlayStation", "Xbox"], "current", "medium"),
@@ -344,6 +354,7 @@ export const gameEntries: GameEntry[] = [
     status: "preparing",
     hasDetail: true,
     detailHref: "/games/fishing-planet",
+    image: "/images/games/fishing-planet.webp",
     searchKeywords: ["fishing", "fishing guide", "fishing tips", "beginner guide"],
   }),
   game("Russian Fishing 4", "russian-fishing-4", "core", ["Simulátor", "Free to play"], ["PC"], "fishing-core", "medium", { status: "preparing" }),
@@ -391,6 +402,7 @@ export const gameEntries: GameEntry[] = [
     series: "Warframe",
     hasDetail: true,
     detailHref: "/games/warframe",
+    image: "/images/games/warframe.webp",
     aliases: ["Warframe"],
     searchKeywords: [
       "fishing",

@@ -35,6 +35,12 @@ export default function GameCard({ entry }: { entry: GameEntry }) {
         <div className="absolute inset-0 transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none">
           <GameCover name={entry.name} slug={entry.slug} image={entry.image} className="absolute inset-0" />
         </div>
+        {/* Jemný gradient shora — badge musí zůstat čitelné i na světlém
+            artworku (západ slunce), ale nesmí překrýt hlavní motiv. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/45 to-transparent"
+        />
         <span className="absolute left-2 top-2 rounded border border-white/20 bg-[#0a2438]/80 px-2 py-0.5 font-serif text-[11px] tracking-wide text-[#f4ead9] backdrop-blur-sm">
           {FISHING_IMPORTANCE_LABEL[entry.fishingImportance]}
         </span>

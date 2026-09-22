@@ -126,7 +126,7 @@ export default async function GameDetailPage({ params }: Props) {
           />
 
           <div className="relative grid gap-6 sm:grid-cols-[minmax(0,340px)_1fr] sm:items-start">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30">
               <GameCover name={game.name} slug={game.slug} image={game.image} className="absolute inset-0" />
             </div>
 

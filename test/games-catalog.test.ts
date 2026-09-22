@@ -165,7 +165,24 @@ describe("data/games.ts — integrita katalogu", () => {
 
   test("cover mají jen hry s reálným (vlastním) assetem a ten na disku existuje", () => {
     const withImage = gameEntries.filter((g) => g.image);
-    assert.deepEqual(withImage.map((g) => g.slug), ["how-to-fish"]);
+    assert.deepEqual(
+      withImage.map((g) => g.slug).sort(),
+      [
+        "fallout-76",
+        "final-fantasy-xiv",
+        "fishing-planet",
+        "how-to-fish",
+        "minecraft",
+        "old-school-runescape",
+        "palia",
+        "pokemon-brilliant-diamond-shining-pearl",
+        "sea-of-thieves",
+        "stardew-valley",
+        "terraria",
+        "warframe",
+        "world-of-warcraft",
+      ]
+    );
     for (const game of withImage) {
       assert.match(game.image!, /^\/[a-z0-9/_-]+\.(webp|avif|png|jpg)$/i, `${game.slug}: podezřelá cesta k obrázku`);
       assert.ok(existsSync(fileURLToPath(new URL(`../public${game.image}`, import.meta.url))), `${game.slug}: ${game.image} neexistuje`);
@@ -216,8 +233,10 @@ describe("pilotní hry (zadání bod 4)", () => {
     assert.ok(keywords.includes("Giant Piranha"));
   });
 
-  test("žádná pilotní hra nemá vymyšlený cover — jen How to Fish má vlastní asset", () => {
-    assert.deepEqual(pilots.filter((g) => g.image).map((g) => g.slug), ["how-to-fish"]);
+  test("pilotní hry mají vlastní artwork (jediná bez něj by byla chyba)", () => {
+    for (const slug of PILOT_GAME_SLUGS) {
+      assert.ok(gameEntries.find((g) => g.slug === slug)?.image, `${slug}: chybí artwork`);
+    }
   });
 });
 

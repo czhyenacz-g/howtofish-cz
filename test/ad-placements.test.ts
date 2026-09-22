@@ -70,6 +70,8 @@ describe("cover placeholder zůstává bez licenčního rizika", () => {
   });
 
   test("když je v datech image, použije se next/image (žádný placeholder)", () => {
-    assert.match(source, /if \(image\) \{\s*return <Image src=\{image\}/);
+    assert.match(source, /if \(image\) \{[\s\S]*?<Image src=\{image\}/);
+    assert.match(source, /alt=\{`\$\{name\} – rybaření ve hře`\}/);
+    assert.match(source, /sizes=/);
   });
 });
