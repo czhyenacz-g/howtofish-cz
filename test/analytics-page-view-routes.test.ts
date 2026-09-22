@@ -15,6 +15,7 @@ test("isPageViewRoute: hlavní veřejné stránky ze zadání jsou povolené", (
     "/hra",
     "/multiplayer",
     "/o-hre",
+    "/hry-s-rybarenim",
   ]) {
     assert.equal(isPageViewRoute(path), true, `${path} by mělo být povolené`);
   }

@@ -26,6 +26,11 @@ export const HRA_LINK: SimpleNavLink = { href: "/hra", label: "Krabí invaze" };
 // v mobilním panelu vložená do hlavního seznamu.
 export const O_HRE_LINK: SimpleNavLink = { href: "/o-hre", label: "O hře" };
 export const MULTIPLAYER_LINK: SimpleNavLink = { href: "/multiplayer", label: "Multiplayer ostrov" };
+// "Hry s rybařením" (/hry-s-rybarenim) je nový veřejný katalog her, ve
+// kterých se dá rybařit — začátek širšího fishing/gaming hubu, proto
+// samostatná hlavní položka (ne další sekce "Světa How to Fish", ten
+// zůstává encyklopedií konkrétně pro How to Fish).
+export const HRY_LINK: SimpleNavLink = { href: "/hry-s-rybarenim", label: "Hry" };
 
 // "Svět How to Fish" sloučí VŠECHNY dřívější samostatné encyklopedické
 // hlavní položky (Ryby, Předměty, Návody, Lokace, Achievementy, Bossové)
@@ -37,12 +42,12 @@ export const WORLD_GROUP: NavGroup = {
   children: [...NAV_LINKS],
 };
 
-// Streameři/Živě/Svět/Krabí invaze/Multiplayer — 5 top-level položek
-// místo dřívějších 8 (viz zadání "výrazně jednodušší menu"). "O hře"
+// Streameři/Živě/Svět/Hry/Multiplayer/Krabí invaze — 6 top-level položek
+// (dřív 5; "Hry" přibylo s novým katalogem /hry-s-rybarenim). "O hře"
 // zůstává mimo hlavní pill-navigaci (viz O_HRE_LINK výš).
 export function buildLinks(basePath: string): NavEntry[] {
   if (basePath !== "") return [...NAV_LINKS];
-  return [STREAMERI_LINK, LIVE_LINK, WORLD_GROUP, MULTIPLAYER_LINK, HRA_LINK];
+  return [STREAMERI_LINK, LIVE_LINK, WORLD_GROUP, HRY_LINK, MULTIPLAYER_LINK, HRA_LINK];
 }
 
 // Jen pro mobilní panel — "O hře" vložené před poslední položku (Krabí

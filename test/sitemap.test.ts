@@ -38,6 +38,10 @@ describe("sitemap", () => {
     assert.ok(urls.some((u) => u.endsWith("/stream")));
   });
 
+  test("obsahuje nový katalog her /hry-s-rybarenim", () => {
+    assert.ok(urls.some((u) => u.endsWith("/hry-s-rybarenim")));
+  });
+
   test("obsahuje detail alespoň jedné ryby", () => {
     assert.ok(urls.some((u) => u.includes("/ryby/") && !u.endsWith("/ryby/")));
   });

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
   HRA_LINK,
+  HRY_LINK,
   MULTIPLAYER_LINK,
   O_HRE_LINK,
   STREAMERI_LINK,
@@ -42,10 +43,19 @@ test("Svět How to Fish je skupina obsahující VŠECHNY encyklopedické sekce z
   assert.deepEqual(hrefs, [...NAV_LINKS.map((l) => l.href)].sort());
 });
 
-test("produkční desktop menu (basePath='') obsahuje Streameři, Živě, Svět, Multiplayer, Krabí invaze — a NE samostatné encyklopedické položky", () => {
+test("Hry vedou na nový katalog /hry-s-rybarenim", () => {
+  assert.equal(HRY_LINK.href, "/hry-s-rybarenim");
+  assert.equal(HRY_LINK.label, "Hry");
+});
+
+test("obsahuje Hry s vlastní ikonou v ICON_BY_HREF (GameIcon)", () => {
+  assert.match(headerSource, /"\/hry-s-rybarenim":\s*GameIcon/);
+});
+
+test("produkční desktop menu (basePath='') obsahuje Streameři, Živě, Svět, Hry, Multiplayer, Krabí invaze — a NE samostatné encyklopedické položky", () => {
   const links = buildLinks("");
   const labels = links.map((l) => l.label);
-  assert.deepEqual(labels, ["Streameři", "Živě", "Svět How to Fish", "Multiplayer ostrov", "Krabí invaze"]);
+  assert.deepEqual(labels, ["Streameři", "Živě", "Svět How to Fish", "Hry", "Multiplayer ostrov", "Krabí invaze"]);
   for (const encyclopediaLabel of NAV_LINKS.map((l) => l.label)) {
     assert.ok(!labels.includes(encyclopediaLabel), `${encyclopediaLabel} nesmí být samostatná top-level položka`);
   }
@@ -61,9 +71,9 @@ test("Krabí invaze zůstává v hlavním produkčním menu", () => {
   assert.ok(links.some((l) => !isNavGroup(l) && l.href === HRA_LINK.href));
 });
 
-test("produkční desktop menu je výrazně jednodušší než dřív — 5 top-level položek místo dřívějších 8 (zadání)", () => {
+test("produkční desktop menu má 6 top-level položek (5 původních + nové Hry)", () => {
   const links = buildLinks("");
-  assert.equal(links.length, 5);
+  assert.equal(links.length, 6);
 });
 
 test("demo sekce (basePath!=='') zůstává beze změny — plochý seznam z NAV_LINKS, bez Svět/Streameři/Multiplayer/Krabí invaze", () => {

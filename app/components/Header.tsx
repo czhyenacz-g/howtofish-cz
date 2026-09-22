@@ -21,6 +21,7 @@ import {
   BossIcon,
   CrabIcon,
   FishIcon,
+  GameIcon,
   GuideIcon,
   InfoIcon,
   ItemIcon,
@@ -35,6 +36,7 @@ import {
 const ICON_BY_HREF: Record<string, (props: IconProps) => React.ReactElement> = {
   "/streameri": StreamerIcon,
   "/stream": LiveIcon,
+  "/hry-s-rybarenim": GameIcon,
   "/ryby": FishIcon,
   "/navody": GuideIcon,
   "/predmety": ItemIcon,
