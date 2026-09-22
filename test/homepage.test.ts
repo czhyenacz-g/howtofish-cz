@@ -17,16 +17,44 @@ const PAGE = "../app/page.tsx";
 describe("homepage — positioning a obsah", () => {
   const source = readSource(PAGE);
 
-  test("H1 a podnadpis odpovídají novému směru (rybaření ve hrách)", () => {
-    assert.match(source, /Rybaření ve hrách\./);
-    assert.match(source, /Od Magikarpů přes Stardew Valley až po Sea of Thieves\./);
+  test("H1 a hero text odpovídají osobnímu tónu (první osoba)", () => {
+    assert.match(source, /Rybaření ve hrách<\/h1>/);
+    assert.match(source, /Mám rád rybaření\./);
+    assert.match(source, /skončím\s+někde u vody\./);
+    assert.match(source, /HowToFish\.cz jsem původně udělal kvůli jedné hře\./);
+    assert.match(source, /Tak je dávám dohromady tady\./);
   });
 
-  test("má CTA na katalog her i na živé streamy", () => {
+  test("hero CTA vedou na katalog her a na živé vysílání", () => {
     assert.match(source, /href="\/hry-s-rybarenim"/);
-    assert.match(source, /Prozkoumat hry/);
-    assert.match(source, /href="\/streameri"/);
+    assert.match(source, /Procházet hry/);
     assert.match(source, /href="\/stream"/);
+    assert.match(source, /Kdo právě vysílá/);
+  });
+
+  test("hero nemluví marketingově (žádné zakázané fráze)", () => {
+    const banned = [
+      /místo pro komunitu/i,
+      /objevujte fascinující/i,
+      /vášeň pro hry/i,
+      /spojujeme hráče/i,
+      /jedinečný projekt/i,
+      /pro všechny, kteří milují/i,
+    ];
+    for (const phrase of banned) {
+      assert.doesNotMatch(source, phrase, `homepage obsahuje marketingovou frázi ${phrase}`);
+    }
+  });
+
+  test("osobní blok „Proč tenhle web existuje“ je mezi hrami a videi", () => {
+    assert.match(source, /Proč tenhle web existuje/);
+    assert.match(source, /Původně jsem si chtěl jen sepsat věci kolem How to Fish/);
+    assert.match(source, /Takže jsem z toho udělal web\./);
+    const games = source.indexOf("Hry, ve kterých se rybaří");
+    const block = source.indexOf("Proč tenhle web existuje");
+    const videos = source.indexOf("Rybářská videa ze světa her");
+    assert.ok(games !== -1 && block !== -1 && videos !== -1, "chybí některá ze sekcí");
+    assert.ok(games < block && block < videos, "osobní blok má být mezi hrami a videi");
   });
 
   test("featured hry bere z existujících dat (žádný druhý dataset)", () => {
@@ -67,7 +95,7 @@ describe("homepage — positioning a obsah", () => {
   test("canonical, title a description odpovídají novému positioningu", () => {
     assert.match(source, /alternates:\s*\{\s*canonical:\s*["']\/["']\s*\}/);
     assert.match(source, /HowToFish\.cz – rybaření ve hrách/);
-    assert.match(source, /Hry, ve kterých se rybaří, návody, videa a streamers\./);
+    assert.match(source, /Web o hrách, ve kterých se dá rybařit\./);
     assert.match(source, /title:\s*\{\s*absolute:\s*TITLE\s*\}/);
   });
 

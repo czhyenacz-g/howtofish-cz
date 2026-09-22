@@ -22,8 +22,7 @@ import { findLiveStreamForCreator } from "../lib/creators/live-match.ts";
 // tvůrci a pod tím původní How to Fish obsah, ze kterého web vznikl.
 // Vlastní canonical na "/" (viz app/sitemap.ts, app/ryby/page.tsx).
 const TITLE = "HowToFish.cz – rybaření ve hrách";
-const DESCRIPTION =
-  "Hry, ve kterých se rybaří, návody, videa a streamers. Minecraft, Stardew Valley, Pokémon, Sea of Thieves a desítky dalších.";
+const DESCRIPTION = "Web o hrách, ve kterých se dá rybařit. Minecraft, Stardew Valley, Pokémon, Sea of Thieves a další.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -76,23 +75,31 @@ export default async function Home() {
         {/* A) HERO — během pár sekund musí být jasné, že web je o rybaření ve hrách. */}
         <section className="relative overflow-hidden bg-gradient-to-b from-[#0e3347] via-[#0a2438] to-[#146b78] px-4 pb-20 pt-14 text-center text-white sm:pt-20">
           <div className="relative mx-auto max-w-3xl">
-            <h1 className="font-serif text-4xl sm:text-6xl">Rybaření ve hrách.</h1>
-            <p className="mx-auto mt-4 max-w-2xl text-cyan-100/85 sm:text-lg">
-              Od Magikarpů přes Stardew Valley až po Sea of Thieves. Hry, videa a lidé, kteří rádi nahazují i ve
-              virtuálním světě.
+            <h1 className="font-serif text-4xl sm:text-6xl">Rybaření ve hrách</h1>
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-cyan-50/90 sm:text-xl">
+              Mám rád rybaření. A když nějaká hra obsahuje prut, je dost velká šance, že místo hlavního questu skončím
+              někde u vody.
             </p>
+            <div className="mx-auto mt-5 max-w-2xl space-y-3 text-sm text-cyan-100/75 sm:text-base">
+              <p>
+                HowToFish.cz jsem původně udělal kvůli jedné hře. Postupně jsem ale začal hledat další — Minecraft,
+                Stardew Valley, Pokémon, Sea of Thieves… a zjistil jsem, že her, kde se dá rybařit, je překvapivě
+                hodně.
+              </p>
+              <p>Tak je dávám dohromady tady.</p>
+            </div>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/hry-s-rybarenim"
                 className="min-h-[44px] rounded-full bg-amber-400 px-6 py-2.5 font-serif text-gray-900 transition hover:bg-amber-300"
               >
-                Prozkoumat hry
+                Procházet hry
               </Link>
               <Link
-                href="/streameri"
+                href="/stream"
                 className="min-h-[44px] rounded-full border border-white/20 bg-white/5 px-6 py-2.5 font-serif text-white transition hover:border-amber-300/60 hover:text-amber-200"
               >
-                Sledovat streamery
+                Kdo právě vysílá
               </Link>
             </div>
             <p className="mt-4 text-sm text-cyan-100/60">
@@ -128,6 +135,25 @@ export default async function Home() {
               >
                 Všech {gameEntries.length} her →
               </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* B2) PROČ TENHLE WEB EXISTUJE — krátký osobní blok mezi hrami a videi. */}
+        <section className="bg-[#0a2438] px-4 pb-14 text-white">
+          <div className="mx-auto max-w-3xl">
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0e3347]/70 via-[#0a2438]/60 to-[#146b78]/30 p-6 sm:p-8">
+              <FishIcon className="h-7 w-7 text-amber-300/80" />
+              <h2 className="mt-3 font-serif text-xl text-amber-300 sm:text-2xl">Proč tenhle web existuje</h2>
+              <div className="mt-3 space-y-3 text-sm text-cyan-100/80 sm:text-base">
+                <p>Původně jsem si chtěl jen sepsat věci kolem How to Fish — ryby, předměty, bossy a návody.</p>
+                <p>Pak jsem zjistil, že mě baví hledat rybaření i v úplně jiných hrách.</p>
+                <p>
+                  Někde je to jen malá minihra na pár minut. Jinde u toho člověk stráví půl večera, protože chce ještě
+                  jednu vzácnou rybu.
+                </p>
+                <p>Takže jsem z toho udělal web.</p>
+              </div>
             </div>
           </div>
         </section>
