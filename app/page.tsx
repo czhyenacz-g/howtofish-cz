@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -204,33 +205,59 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* F) PŮVODNÍ HOW TO FISH — web na téhle hře vznikl, takže má na homepage vlastní blok. */}
+        {/* F) PŮVODNÍ HOW TO FISH — web na téhle hře vznikl, takže má na homepage vlastní blok.
+            Obrázek je lokální asset projektu (žádný cizí artwork). */}
         <section className="bg-[#0e3347] px-4 py-14 text-white">
-          <div className="mx-auto max-w-5xl text-center">
-            <h2 className="font-serif text-2xl text-amber-300 sm:text-3xl">Původní How to Fish</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-cyan-100/80">
-              Tady to celé začalo. Česká encyklopedie hry How to Fish — ryby, bossové, lokace, návody a achievementy,
-              které postupně doplňujeme i s komunitou.
-            </p>
-            <ul className="mt-7 grid gap-3 sm:grid-cols-3">
-              {WORLD_CARDS.map(({ href, label, icon: Icon }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-4 text-center transition hover:border-amber-400/40 hover:bg-white/10"
-                  >
-                    <Icon className="h-6 w-6 text-amber-300" />
-                    <span className="font-serif text-sm text-white">{label}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/o-hre"
-              className="mt-7 inline-flex min-h-[44px] items-center rounded-full border border-amber-400/40 bg-amber-400/10 px-5 py-2.5 font-serif text-amber-300 transition hover:bg-amber-400/20"
-            >
-              Vše o How to Fish →
-            </Link>
+          <div className="mx-auto max-w-5xl">
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0a2438]/85 via-[#0e3347]/60 to-[#146b78]/40 px-6 py-8 text-center sm:px-10 sm:py-10">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 400 60"
+                preserveAspectRatio="none"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-14 w-full text-[#1c8a95]/25"
+              >
+                <polygon points="0,34 70,22 140,36 210,20 280,34 350,22 400,32 400,60 0,60" fill="currentColor" />
+                <polygon points="0,46 90,36 180,48 270,34 360,46 400,40 400,60 0,60" fill="currentColor" opacity="0.6" />
+              </svg>
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-16 top-0 h-48 w-48 rounded-full bg-amber-200/10 blur-3xl"
+              />
+
+              <div className="relative">
+                <Image
+                  src="/images/howtofish-header-logo.webp"
+                  alt="How to Fish"
+                  width={899}
+                  height={299}
+                  className="mx-auto h-14 w-auto sm:h-20"
+                />
+                <h2 className="mt-4 font-serif text-2xl text-amber-300 sm:text-3xl">Původní How to Fish</h2>
+                <p className="mx-auto mt-3 max-w-2xl text-cyan-100/80">
+                  Tady to celé začalo. Česká encyklopedie hry How to Fish — ryby, bossové, lokace, návody a
+                  achievementy, které postupně doplňujeme i s komunitou.
+                </p>
+                <ul className="mt-7 grid gap-3 sm:grid-cols-3">
+                  {WORLD_CARDS.map(({ href, label, icon: Icon }) => (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-4 text-center transition hover:border-amber-400/40 hover:bg-white/10"
+                      >
+                        <Icon className="h-6 w-6 text-amber-300" />
+                        <span className="font-serif text-sm text-white">{label}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/o-hre"
+                  className="mt-7 inline-flex min-h-[44px] items-center rounded-full border border-amber-400/40 bg-amber-400/10 px-5 py-2.5 font-serif text-amber-300 transition hover:bg-amber-400/20"
+                >
+                  Vše o How to Fish →
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
 

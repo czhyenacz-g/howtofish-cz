@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AdSlot from "../../../components/AdSlot";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../../components/Breadcrumbs.tsx";
 import GameCover from "../../../components/GameCover";
 import GameStreamersSection from "../../../components/GameStreamersSection";
@@ -107,43 +108,61 @@ export default async function GameDetailPage({ params }: Props) {
         </Link>
 
         {/* --- HERO --- */}
-        <div className="mt-6 grid gap-6 sm:grid-cols-[minmax(0,320px)_1fr] sm:items-start">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-white/10">
-            <GameCover name={game.name} slug={game.slug} image={game.image} className="absolute inset-0" />
-          </div>
+        <div className="relative mt-6 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0e3347]/90 via-[#0a2438]/75 to-[#146b78]/50 p-5 sm:p-7">
+          {/* Jemné dekorativní pozadí (statické vlny + světelný akcent) —
+              stránka nemá působit jako čistě textový blok. */}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 400 60"
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-12 w-full text-[#1c8a95]/25 sm:h-16"
+          >
+            <polygon points="0,34 70,22 140,36 210,20 280,34 350,22 400,32 400,60 0,60" fill="currentColor" />
+            <polygon points="0,46 90,36 180,48 270,34 360,46 400,40 400,60 0,60" fill="currentColor" opacity="0.6" />
+          </svg>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-amber-200/10 blur-3xl"
+          />
 
-          <div>
-            <h1 className="font-serif text-3xl sm:text-4xl">{game.name}</h1>
+          <div className="relative grid gap-6 sm:grid-cols-[minmax(0,340px)_1fr] sm:items-start">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30">
+              <GameCover name={game.name} slug={game.slug} image={game.image} className="absolute inset-0" />
+            </div>
 
-            <ul className="mt-3 flex flex-wrap gap-1.5">
-              <li className="rounded border border-cyan-200/30 bg-white/5 px-2 py-0.5 font-serif text-[11px] tracking-wide text-cyan-100">
-                {AUDIENCE_TYPE_LABEL[game.audienceType]}
-              </li>
-              <li className="rounded border border-white/15 bg-white/5 px-2 py-0.5 font-serif text-[11px] tracking-wide text-[#f4ead9]">
-                {FISHING_IMPORTANCE_LABEL[game.fishingImportance]}
-              </li>
-              <li
-                className={`rounded border px-2 py-0.5 font-serif text-[11px] tracking-wide ${
-                  game.status === "available"
-                    ? "border-amber-300 bg-amber-400 text-gray-900"
-                    : "border-white/15 bg-white/5 text-cyan-100/70"
-                }`}
-              >
-                {GAME_STATUS_LABEL[game.status]}
-              </li>
-            </ul>
+            <div>
+              <h1 className="font-serif text-3xl sm:text-4xl">{game.name}</h1>
 
-            <p className="mt-2 text-xs uppercase tracking-wide text-cyan-100/45">{game.platforms.join(" · ")}</p>
+              <ul className="mt-3 flex flex-wrap gap-1.5">
+                <li className="rounded-full border border-cyan-200/30 bg-white/5 px-2.5 py-0.5 font-serif text-[11px] tracking-wide text-cyan-100">
+                  {AUDIENCE_TYPE_LABEL[game.audienceType]}
+                </li>
+                <li className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 font-serif text-[11px] tracking-wide text-[#f4ead9]">
+                  {FISHING_IMPORTANCE_LABEL[game.fishingImportance]}
+                </li>
+                <li
+                  className={`rounded-full border px-2.5 py-0.5 font-serif text-[11px] tracking-wide ${
+                    game.status === "available"
+                      ? "border-amber-300 bg-amber-400 text-gray-900"
+                      : "border-white/15 bg-white/5 text-cyan-100/70"
+                  }`}
+                >
+                  {GAME_STATUS_LABEL[game.status]}
+                </li>
+              </ul>
 
-            {content?.tagline && <p className="mt-4 text-cyan-100/85">{content.tagline}</p>}
+              <p className="mt-3 text-xs uppercase tracking-wide text-cyan-100/45">{game.platforms.join(" · ")}</p>
 
-            {quotes.length > 0 && (
-              <blockquote className="mt-4 border-l-2 border-amber-400/50 pl-3 font-serif text-base italic text-amber-100/90">
-                {quotes.map((quote) => (
-                  <p key={quote}>„{quote}“</p>
-                ))}
-              </blockquote>
-            )}
+              {content?.tagline && <p className="mt-4 text-cyan-100/85">{content.tagline}</p>}
+
+              {quotes.length > 0 && (
+                <blockquote className="mt-4 rounded-xl border border-amber-400/25 bg-amber-400/[0.07] px-4 py-3 font-serif text-base italic text-amber-100/90">
+                  {quotes.map((quote) => (
+                    <p key={quote}>„{quote}“</p>
+                  ))}
+                </blockquote>
+              )}
+            </div>
           </div>
         </div>
 
@@ -180,6 +199,12 @@ export default async function GameDetailPage({ params }: Props) {
             </ul>
           </section>
         )}
+
+        {/* Reklamní banner mezi obsahovými bloky (stejný AdSlot jako jinde,
+            kontext = cesta detailu hry). */}
+        <div className="mt-10">
+          <AdSlot pathname={`/games/${game.slug}`} />
+        </div>
 
         {/* --- C) DALŠÍ HRY ZE SÉRIE (jen text, žádné fake routy) --- */}
         {game.relatedGames && game.relatedGames.length > 0 && (

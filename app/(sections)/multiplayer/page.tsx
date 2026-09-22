@@ -4,6 +4,7 @@ import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getActivePresences } from "../../../lib/universal-content-api/presence";
 import { getIncomingWaves } from "../../../lib/universal-content-api/waves";
 import OceanWaves from "../../components/OceanWaves";
+import AdSlot from "../../components/AdSlot";
 import MultiplayerBoard from "./MultiplayerBoard";
 
 const TITLE = "Multiplayer How to Fish – najdi spoluhráče";
@@ -73,20 +74,27 @@ export default async function MultiplayerPage() {
     }
 
     return (
-      <Hero activeCount={activeCount}>
-        <AnonymousBeach />
-        <div className="mt-8 text-center">
-          <Link
-            href="/api/auth/steam/login?returnTo=/multiplayer"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-amber-500 px-8 py-3 font-serif text-base text-gray-900 shadow-lg shadow-amber-900/20 transition hover:bg-amber-400"
-          >
-            Přihlásit přes Steam
-          </Link>
-          <p className="mx-auto mt-4 max-w-sm text-sm text-[#0a2438]/70">
-            Po přihlášení uvidíš, kdo je právě na ostrově, a můžeš se také přidat.
-          </p>
+      <>
+        <Hero activeCount={activeCount}>
+          <AnonymousBeach />
+          <div className="mt-8 text-center">
+            <Link
+              href="/api/auth/steam/login?returnTo=/multiplayer"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-amber-500 px-8 py-3 font-serif text-base text-gray-900 shadow-lg shadow-amber-900/20 transition hover:bg-amber-400"
+            >
+              Přihlásit přes Steam
+            </Link>
+            <p className="mx-auto mt-4 max-w-sm text-sm text-[#0a2438]/70">
+              Po přihlášení uvidíš, kdo je právě na ostrově, a můžeš se také přidat.
+            </p>
+          </div>
+        </Hero>
+
+        {/* Reklama až POD herním blokem, aby nezasahovala do samotné hry. */}
+        <div className="mx-auto mt-10 max-w-3xl px-4">
+          <AdSlot pathname="/multiplayer" />
         </div>
-      </Hero>
+      </>
     );
   }
 
@@ -106,6 +114,11 @@ export default async function MultiplayerPage() {
           initialPresences={presences}
           initialIncomingWaves={incomingWaves}
         />
+
+        {/* Reklama až POD herním blokem, aby nezasahovala do samotné hry. */}
+        <div className="mx-auto mt-10 max-w-3xl px-4">
+          <AdSlot pathname="/multiplayer" />
+        </div>
       </>
     );
   } catch (error) {

@@ -5,6 +5,7 @@ import { findLiveStreamForCreator } from "../../lib/creators/live-match.ts";
 import { SITE_URL } from "../config/site.ts";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../components/Breadcrumbs.tsx";
 import CreatorCard from "../components/CreatorCard.tsx";
+import AdSlot from "../components/AdSlot";
 
 const PATHNAME = "/streameri";
 const TITLE = "Streameři, kteří hrají How to Fish – profily a videa | HowToFish.cz";
@@ -63,6 +64,11 @@ export default async function StreameriPage() {
             </li>
           ))}
         </ul>
+
+        {/* Reklama mezi obsahem — kontext = cesta katalogu tvůrců. */}
+        <div className="mx-auto mt-10 max-w-3xl">
+          <AdSlot pathname={PATHNAME} />
+        </div>
       </div>
     </div>
   );

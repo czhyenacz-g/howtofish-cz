@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { STEAM_URL } from "../../config/site";
+import AdSlot from "../../components/AdSlot";
 
 const TITLE = "O hře";
 const DESCRIPTION =
@@ -90,6 +91,11 @@ export default function OHrePage() {
           Zahrát Krabí invazi
         </Link>
       </section>
+
+      {/* Reklama mezi obsahovými bloky (kontext = /o-hre). */}
+      <div className="mt-8">
+        <AdSlot pathname="/o-hre" />
+      </div>
 
       <section className="mt-8 border-t border-white/10 pt-6">
         <h2 className="font-serif text-xl text-amber-300">Neoficiální fan web</h2>

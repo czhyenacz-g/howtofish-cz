@@ -31,8 +31,10 @@ export default function GameCard({ entry }: { entry: GameEntry }) {
 
   const content = (
     <>
-      <div className="relative aspect-[16/10] w-full">
-        <GameCover name={entry.name} slug={entry.slug} image={entry.image} className="absolute inset-0" />
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
+        <div className="absolute inset-0 transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none">
+          <GameCover name={entry.name} slug={entry.slug} image={entry.image} className="absolute inset-0" />
+        </div>
         <span className="absolute left-2 top-2 rounded border border-white/20 bg-[#0a2438]/80 px-2 py-0.5 font-serif text-[11px] tracking-wide text-[#f4ead9] backdrop-blur-sm">
           {FISHING_IMPORTANCE_LABEL[entry.fishingImportance]}
         </span>
@@ -42,7 +44,7 @@ export default function GameCard({ entry }: { entry: GameEntry }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4 text-left">
-        <h3 className="font-serif text-base leading-snug text-white group-hover:text-amber-300">{entry.name}</h3>
+        <h3 className="font-serif text-base leading-snug text-white group-hover:text-amber-300 sm:text-lg">{entry.name}</h3>
 
         {entry.tags.length > 0 && (
           <ul className="flex flex-wrap gap-1.5">
@@ -64,7 +66,7 @@ export default function GameCard({ entry }: { entry: GameEntry }) {
     </>
   );
 
-  const shellClass = `flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0e3347]/60 transition duration-150 motion-reduce:transition-none${featuredRing}`;
+  const shellClass = `group flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0e3347]/60 transition duration-150 motion-reduce:transition-none${featuredRing}`;
 
   if (!clickable) {
     return <article className={shellClass}>{content}</article>;
@@ -74,7 +76,7 @@ export default function GameCard({ entry }: { entry: GameEntry }) {
     <Link
       href={entry.detailHref!}
       aria-label={`${entry.name} — otevřít obsah na webu`}
-      className={`group ${shellClass} hover:-translate-y-0.5 hover:border-amber-400/60 hover:bg-[#0e3347] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 motion-reduce:hover:translate-y-0`}
+      className={`${shellClass} hover:-translate-y-0.5 hover:border-amber-400/60 hover:bg-[#0e3347] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 motion-reduce:hover:translate-y-0`}
     >
       {content}
     </Link>

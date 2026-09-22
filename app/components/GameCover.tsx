@@ -3,14 +3,15 @@ import FishSilhouette from "./FishSilhouette";
 
 /**
  * Cover karty hry — stejný princip jako FishImage.tsx: dokud nemáme
- * vlastní/legální obrázek, vykreslí se stylový placeholder (oceánský
- * gradient + vodní silueta + iniciála hry), ne rozbitý obrázek ani cizí
- * hotlink. Jakmile se `image` doplní do data/games.ts (ideálně soubor v
- * public/games/covers/), použije se skutečný cover.
+ * vlastní/legální obrázek, vykreslí se stylový placeholder, ne rozbitý
+ * obrázek ani cizí hotlink (žádné artworky ze Steamu/IGDB/wiki). Jakmile
+ * se `image` doplní do data/games.ts (ideálně soubor v public/games/covers/),
+ * použije se skutečný cover.
  *
- * Placeholder má několik barevných variant odvozených z `slug`, aby grid
- * nepůsobil jako 48 identických dlaždic — pořád jde o náš vlastní
- * dekorativní prvek, ne o cizí artwork.
+ * Placeholder je záměrně bohatší než dřív, aby karty nepůsobily prázdně:
+ * barevná varianta podle slugu + světelný akcent + jemná vlnková textura
+ * + „hladina“ dole + velká iniciála hry. Pořád jde o náš vlastní
+ * dekorativní prvek.
  */
 const COVER_PALETTES = [
   "from-[#0e4f66] via-[#146b78] to-[#1c8a95]",
@@ -45,6 +46,7 @@ export default function GameCover({
   }
 
   const initial = name.trim().charAt(0).toUpperCase();
+  const patternId = `cover-waves-${slug.replace(/[^a-z0-9-]/g, "")}`;
 
   return (
     <div
@@ -52,16 +54,42 @@ export default function GameCover({
       aria-label={`${name} — cover zatím chybí`}
       className={`relative flex items-center justify-center overflow-hidden bg-gradient-to-br ${paletteFor(slug)} shadow-[inset_0_0_30px_rgba(0,0,0,0.35)] ${className}`}
     >
-      {/* Jemný světelný akcent nahoře — "hladina" — ať placeholder
-          nepůsobí jako prázdný šedý blok. */}
+      {/* Jemná vlnková textura přes celou plochu — aby cover nebyl jen
+          plochý gradient. */}
+      <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.12]">
+        <defs>
+          <pattern id={patternId} width="28" height="14" patternUnits="userSpaceOnUse">
+            <path d="M0 7 Q 7 0 14 7 T 28 7" fill="none" stroke="#f4ead9" strokeWidth="1" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill={`url(#${patternId})`} />
+      </svg>
+
+      {/* Světelný akcent shora („hladina“) + dozáření zleva. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/12 to-transparent"
       />
-      <FishSilhouette className="pointer-events-none absolute -bottom-2 -right-2 h-20 w-20 -rotate-6 text-amber-300/15 motion-reduce:rotate-0" />
       <span
         aria-hidden="true"
-        className="font-serif text-5xl font-bold text-[#f4ead9]/85 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+        className="pointer-events-none absolute -left-6 -top-8 h-32 w-32 rounded-full bg-amber-200/10 blur-2xl"
+      />
+
+      {/* „Hladina“ dole — jemná silueta vln, stejný motiv jako jinde na webu. */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 400 40"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-8 w-full text-[#f4ead9]/10 sm:h-10"
+      >
+        <polygon points="0,22 50,14 100,24 150,12 200,22 250,13 300,23 350,14 400,22 400,40 0,40" fill="currentColor" />
+      </svg>
+
+      <FishSilhouette className="pointer-events-none absolute -bottom-2 -right-2 h-20 w-20 -rotate-6 text-amber-300/15 motion-reduce:rotate-0" />
+
+      <span
+        aria-hidden="true"
+        className="relative font-serif text-6xl font-bold text-[#f4ead9]/85 drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
       >
         {initial}
       </span>
