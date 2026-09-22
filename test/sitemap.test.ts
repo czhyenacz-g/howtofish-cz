@@ -42,6 +42,27 @@ describe("sitemap", () => {
     assert.ok(urls.some((u) => u.endsWith("/hry-s-rybarenim")));
   });
 
+  test("obsahuje detaily her s vlastní /games stránkou (12 her) a ne How to Fish", () => {
+    for (const slug of [
+      "minecraft",
+      "stardew-valley",
+      "pokemon-brilliant-diamond-shining-pearl",
+      "sea-of-thieves",
+      "terraria",
+      "final-fantasy-xiv",
+      "world-of-warcraft",
+      "old-school-runescape",
+      "warframe",
+      "palia",
+      "fallout-76",
+      "fishing-planet",
+    ]) {
+      assert.ok(urls.some((u) => u.endsWith(`/games/${slug}`)), `chybí /games/${slug}`);
+    }
+    assert.ok(!urls.some((u) => u.endsWith("/games/how-to-fish")), "/games/how-to-fish nemá existovat");
+    assert.ok(!urls.some((u) => u.endsWith("/games/dredge")), "/games/dredge nemá existovat (hra bez dat)");
+  });
+
   test("obsahuje detail alespoň jedné ryby", () => {
     assert.ok(urls.some((u) => u.includes("/ryby/") && !u.endsWith("/ryby/")));
   });

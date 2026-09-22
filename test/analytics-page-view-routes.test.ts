@@ -26,6 +26,11 @@ test("isPageViewRoute: dynamické detaily ryb/návodů jsou povolené", () => {
   assert.equal(isPageViewRoute("/navody/jak-chytit-parazita"), true);
 });
 
+test("isPageViewRoute: detaily her (/games/[slug]) jsou povolené", () => {
+  assert.equal(isPageViewRoute("/games/minecraft"), true);
+  assert.equal(isPageViewRoute("/games/stardew-valley"), true);
+});
+
 test("isPageViewRoute: submission utility stránky (/navrhnout) jsou vyloučené", () => {
   assert.equal(isPageViewRoute("/ryby/navrhnout"), false);
   assert.equal(isPageViewRoute("/navody/navrhnout"), false);

@@ -1,11 +1,14 @@
 import type { LiveStream, ProviderResult } from "./types";
+import { youTubeApiGet } from "../youtube/client.ts";
 
 // Oficiální YouTube Data API v3. search.list stojí 100 quota jednotek za
 // volání (proto jen jedno, cachované 60s), videos.list na doplnění
 // viewerCount/startedAt stojí jen 1 jednotku. Dokumentace:
 // https://developers.google.com/youtube/v3/docs
-const SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
-const VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos";
+//
+// Samotné HTTP volání (klíč, URL, timeout, chyby) žije v lib/youtube/
+// client.ts — používá ho i discovery videí k hrám (lib/games/*), aby v
+// projektu nebyla druhá implementace YouTube volání.
 const GAMING_CATEGORY_ID = "20";
 const SEARCH_QUERY = "How to Fish game Dazed Games";
 const MAX_RESULTS = 15;
@@ -86,22 +89,18 @@ export async function getYouTubeStreams(): Promise<ProviderResult> {
   }
 
   try {
-    const searchParams = new URLSearchParams({
-      part: "snippet",
-      eventType: "live",
-      type: "video",
-      videoCategoryId: GAMING_CATEGORY_ID,
-      q: SEARCH_QUERY,
-      maxResults: String(MAX_RESULTS),
-      key: apiKey,
-    });
-    const searchRes = await fetch(`${SEARCH_URL}?${searchParams.toString()}`, {
-      next: { revalidate: 60 },
-    });
-    if (!searchRes.ok) {
-      throw new Error(`YouTube search failed: ${searchRes.status}`);
-    }
-    const searchData = (await searchRes.json()) as { items: SearchItem[] };
+    const searchData = await youTubeApiGet<{ items: SearchItem[] }>(
+      "search",
+      {
+        part: "snippet",
+        eventType: "live",
+        type: "video",
+        videoCategoryId: GAMING_CATEGORY_ID,
+        q: SEARCH_QUERY,
+        maxResults: String(MAX_RESULTS),
+      },
+      { revalidateSeconds: 60 }
+    );
 
     const relevant = searchData.items.filter((item) =>
       looksRelevant(item.snippet.title, item.snippet.description)
@@ -110,19 +109,14 @@ export async function getYouTubeStreams(): Promise<ProviderResult> {
       return { platform: "youtube", status: "ok", streams: [] };
     }
 
-    const ids = relevant.map((item) => item.id.videoId).join(",");
-    const videosParams = new URLSearchParams({
-      part: "liveStreamingDetails,snippet",
-      id: ids,
-      key: apiKey,
-    });
-    const videosRes = await fetch(`${VIDEOS_URL}?${videosParams.toString()}`, {
-      next: { revalidate: 60 },
-    });
-    if (!videosRes.ok) {
-      throw new Error(`YouTube videos lookup failed: ${videosRes.status}`);
-    }
-    const videosData = (await videosRes.json()) as { items: VideoItem[] };
+    const videosData = await youTubeApiGet<{ items: VideoItem[] }>(
+      "videos",
+      {
+        part: "liveStreamingDetails,snippet",
+        id: relevant.map((item) => item.id.videoId).join(","),
+      },
+      { revalidateSeconds: 60 }
+    );
     const detailsById = new Map(videosData.items.map((v) => [v.id, v]));
 
     const streams: LiveStream[] = relevant.map((item) => {

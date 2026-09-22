@@ -22,7 +22,15 @@ const EXACT_ROUTES = new Set([
 // stránky, ne obsahové detaily — vyloučené (negative lookahead), viz zadání.
 const FISH_DETAIL_PATTERN = /^\/ryby\/(?!navrhnout$)[^/]+$/;
 const GUIDE_DETAIL_PATTERN = /^\/navody\/(?!navrhnout$)[^/]+$/;
+// Detaily her (/games/minecraft, ...) — stejná logika, žádná /games
+// submission routa zatím neexistuje.
+const GAME_DETAIL_PATTERN = /^\/games\/[^/]+$/;
 
 export function isPageViewRoute(pathname: string): boolean {
-  return EXACT_ROUTES.has(pathname) || FISH_DETAIL_PATTERN.test(pathname) || GUIDE_DETAIL_PATTERN.test(pathname);
+  return (
+    EXACT_ROUTES.has(pathname) ||
+    FISH_DETAIL_PATTERN.test(pathname) ||
+    GUIDE_DETAIL_PATTERN.test(pathname) ||
+    GAME_DETAIL_PATTERN.test(pathname)
+  );
 }

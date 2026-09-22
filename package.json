@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --conditions=react-server --test test/*.test.ts"
+    "test": "node --conditions=react-server --test test/*.test.ts",
+    "game-videos:discover": "node --conditions=react-server --env-file-if-exists=.env.local scripts/game-videos-discover.ts",
+    "game-videos:list": "node --conditions=react-server --env-file-if-exists=.env.local scripts/game-videos-review.ts list",
+    "game-videos:approve": "node --conditions=react-server --env-file-if-exists=.env.local scripts/game-videos-review.ts approve",
+    "game-videos:reject": "node --conditions=react-server --env-file-if-exists=.env.local scripts/game-videos-review.ts reject"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

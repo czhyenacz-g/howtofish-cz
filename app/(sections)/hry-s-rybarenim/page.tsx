@@ -5,7 +5,7 @@ import GameCard from "../../components/GameCard";
 import { SITE_URL } from "../../config/site";
 import { getGamesWithDetail, getOrderedGames } from "../../../data/games";
 import GameSuggestForm from "./GameSuggestForm";
-import RotatingQuote from "./RotatingQuote";
+import RotatingQuote, { type RotatingQuoteItem } from "../../components/RotatingQuote.tsx";
 
 const PATHNAME = "/hry-s-rybarenim";
 const TITLE = "Hry, ve kterých se rybaří | HowToFish.cz";
@@ -14,12 +14,12 @@ const DESCRIPTION =
 
 // Citáty v hero sekci — střídají se jemným fade efektem (viz
 // RotatingQuote.tsx), pořadí je pevné, ne náhodné.
-const QUOTES = [
-  "Pamatuješ na Old Rod, se kterým jsi pořád tahal Magikarpy?",
-  "Kolik hodin jsi strávil u Fishing Pond místo zachraňování Hyrule?",
-  "Ve Stardew Valley jsi šel pro jednu rybu. Vrátil ses za tři hodiny.",
-  "V Minecraftu jsi chtěl rybu. Vytáhl jsi enchanted book.",
-  "Noctis možná zachraňoval svět, ale stejně nejradši rybařil.",
+const QUOTES: RotatingQuoteItem[] = [
+  { text: "Pamatuješ na Old Rod, se kterým jsi pořád tahal Magikarpy?" },
+  { text: "Kolik hodin jsi strávil u Fishing Pond místo zachraňování Hyrule?" },
+  { text: "Ve Stardew Valley jsi šel pro jednu rybu. Vrátil ses za tři hodiny." },
+  { text: "V Minecraftu jsi chtěl rybu. Vytáhl jsi enchanted book." },
+  { text: "Noctis možná zachraňoval svět, ale stejně nejradši rybařil." },
 ];
 
 export const metadata: Metadata = {

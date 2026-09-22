@@ -10,7 +10,7 @@ function readSource(relPath: string): string {
 }
 
 const PAGE = "../app/(sections)/hry-s-rybarenim/page.tsx";
-const ROTATING_QUOTE = "../app/(sections)/hry-s-rybarenim/RotatingQuote.tsx";
+const ROTATING_QUOTE = "../app/components/RotatingQuote.tsx";
 const FORM = "../app/(sections)/hry-s-rybarenim/GameSuggestForm.tsx";
 const ACTION = "../app/(sections)/hry-s-rybarenim/submit-game-suggestion-action.ts";
 const CARD = "../app/components/GameCard.tsx";

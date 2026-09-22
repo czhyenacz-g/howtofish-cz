@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { FISHING_IMPORTANCE_LABEL, GAME_STATUS_LABEL, type GameEntry } from "../../data/games";
+import {
+  AUDIENCE_TYPE_LABEL,
+  FISHING_IMPORTANCE_LABEL,
+  GAME_STATUS_LABEL,
+  type GameEntry,
+} from "../../data/games";
 import GameCover from "./GameCover";
 
 // Barvy stavu — "Máme obsah" je jediná výrazná (jantarová, stejná jako
@@ -15,22 +20,25 @@ const STATUS_CLASS: Record<GameEntry["status"], string> = {
  * hra skutečně má na webu obsah (`hasDetail` + `detailHref`) — hry bez
  * detailu jsou záměrně neklikací, aby žádná karta nevedla na 404 (stav
  * komunikuje badge "Připravujeme" / "Brzy").
+ *
+ * Karta záměrně nese jen čtyři informace navíc k názvu: důležitost
+ * rybaření (vlevo nahoře na coveru), publikum (vpravo nahoře), štítky a
+ * stav (dole) — víc by ji přeplnilo.
  */
 export default function GameCard({ entry }: { entry: GameEntry }) {
   const clickable = entry.hasDetail && Boolean(entry.detailHref);
+  const featuredRing = entry.isFeatured ? " border-amber-400/30" : "";
 
   const content = (
     <>
       <div className="relative aspect-[16/10] w-full">
-        <GameCover name={entry.name} image={entry.image} className="absolute inset-0" />
+        <GameCover name={entry.name} slug={entry.slug} image={entry.image} className="absolute inset-0" />
         <span className="absolute left-2 top-2 rounded border border-white/20 bg-[#0a2438]/80 px-2 py-0.5 font-serif text-[11px] tracking-wide text-[#f4ead9] backdrop-blur-sm">
           {FISHING_IMPORTANCE_LABEL[entry.fishingImportance]}
         </span>
-        {entry.isFeatured && (
-          <span className="absolute right-2 top-2 -rotate-2 rounded border border-amber-300 bg-amber-400 px-2 py-0.5 font-serif text-[11px] uppercase tracking-wide text-gray-900 shadow-sm">
-            Tip
-          </span>
-        )}
+        <span className="absolute right-2 top-2 rounded border border-cyan-200/30 bg-[#0a2438]/80 px-2 py-0.5 font-serif text-[11px] tracking-wide text-cyan-100 backdrop-blur-sm">
+          {AUDIENCE_TYPE_LABEL[entry.audienceType]}
+        </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4 text-left">
@@ -56,8 +64,7 @@ export default function GameCard({ entry }: { entry: GameEntry }) {
     </>
   );
 
-  const shellClass =
-    "flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0e3347]/60 transition duration-150 motion-reduce:transition-none";
+  const shellClass = `flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0e3347]/60 transition duration-150 motion-reduce:transition-none${featuredRing}`;
 
   if (!clickable) {
     return <article className={shellClass}>{content}</article>;

@@ -52,10 +52,10 @@ test("obsahuje Hry s vlastní ikonou v ICON_BY_HREF (GameIcon)", () => {
   assert.match(headerSource, /"\/hry-s-rybarenim":\s*GameIcon/);
 });
 
-test("produkční desktop menu (basePath='') obsahuje Streameři, Živě, Svět, Hry, Multiplayer, Krabí invaze — a NE samostatné encyklopedické položky", () => {
+test("produkční desktop menu (basePath='') vede Hry, Streameři, Živě, Svět, Multiplayer, Krabí invaze — a NE samostatné encyklopedické položky", () => {
   const links = buildLinks("");
   const labels = links.map((l) => l.label);
-  assert.deepEqual(labels, ["Streameři", "Živě", "Svět How to Fish", "Hry", "Multiplayer ostrov", "Krabí invaze"]);
+  assert.deepEqual(labels, ["Hry", "Streameři", "Živě", "Svět How to Fish", "Multiplayer ostrov", "Krabí invaze"]);
   for (const encyclopediaLabel of NAV_LINKS.map((l) => l.label)) {
     assert.ok(!labels.includes(encyclopediaLabel), `${encyclopediaLabel} nesmí být samostatná top-level položka`);
   }
@@ -115,9 +115,10 @@ test("mobilní seznam pořád obsahuje skupinu Svět How to Fish (všechny encyk
   assert.ok(mobileLinks.some((l) => l.label === "Svět How to Fish"));
 });
 
-test("mobilní seznam obsahuje Streameři jako první položku", () => {
+test("mobilní seznam začíná Hry (nová hlavní osa webu) a Streameři v něm zůstávají", () => {
   const mobileLinks = buildMobileLinks(buildLinks(""));
-  assert.ok(!isNavGroup(mobileLinks[0]) && mobileLinks[0].href === STREAMERI_LINK.href);
+  assert.ok(!isNavGroup(mobileLinks[0]) && mobileLinks[0].href === HRY_LINK.href);
+  assert.ok(mobileLinks.some((l) => !isNavGroup(l) && l.href === STREAMERI_LINK.href));
 });
 
 test("Header.tsx: desktop pill navigace nemá flex-wrap (zůstává v jednom řádku, jako dřív)", () => {

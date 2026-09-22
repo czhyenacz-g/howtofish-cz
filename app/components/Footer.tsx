@@ -23,8 +23,13 @@ export default function Footer({ basePath = "" }: { basePath?: string }) {
         >
           🏝️ Multiplayer ostrov — najdi spoluhráče
         </Link>
-        <nav aria-label="Streameři a živě v patičce" className="mt-4">
+        <nav aria-label="Hry a streameři v patičce" className="mt-4">
           <ul className="flex flex-wrap gap-x-4 gap-y-2 font-serif text-base">
+            <li>
+              <Link href={`${basePath}/hry-s-rybarenim`} className="underline hover:text-amber-400">
+                Hry s rybařením
+              </Link>
+            </li>
             <li>
               <Link href={`${basePath}/streameri`} className="underline hover:text-amber-400">
                 Streameři

@@ -42,12 +42,14 @@ export const WORLD_GROUP: NavGroup = {
   children: [...NAV_LINKS],
 };
 
-// Streameři/Živě/Svět/Hry/Multiplayer/Krabí invaze — 6 top-level položek
-// (dřív 5; "Hry" přibylo s novým katalogem /hry-s-rybarenim). "O hře"
-// zůstává mimo hlavní pill-navigaci (viz O_HRE_LINK výš).
+// Nová hlavní osa webu: Hry (katalog her, ve kterých se rybaří) jdou první,
+// pak tvůrci, pak původní How to Fish (encyklopedie) a vedlejší herní
+// obsah. "Živě" zůstává jako samostatná položka, protože reálná routa
+// /stream existuje. "Videa" tu záměrně nejsou — veřejný index /videa
+// neexistuje, jen detaily videí, takže by to byla prázdná routa.
 export function buildLinks(basePath: string): NavEntry[] {
   if (basePath !== "") return [...NAV_LINKS];
-  return [STREAMERI_LINK, LIVE_LINK, WORLD_GROUP, HRY_LINK, MULTIPLAYER_LINK, HRA_LINK];
+  return [HRY_LINK, STREAMERI_LINK, LIVE_LINK, WORLD_GROUP, MULTIPLAYER_LINK, HRA_LINK];
 }
 
 // Jen pro mobilní panel — "O hře" vložené před poslední položku (Krabí

@@ -4,6 +4,7 @@ import { guides as curatedGuides } from "../data/guides.ts";
 import { fishGuides } from "../data/fish-guides.ts";
 import { creatorProfiles } from "../data/creators.ts";
 import { getIndexableVideos } from "../data/how-to-fish-videos.ts";
+import { getGamesWithGameDetailPage } from "../data/games.ts";
 import { SITE_URL } from "./config/site.ts";
 
 // Homepage (`/`) má teď VLASTNÍ unikátní obsah (streameři/live/Krabí
@@ -24,6 +25,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/multiplayer`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.5 },
     { url: `${SITE_URL}/o-hre`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
   ];
+
+  // Detaily her, které mají vlastní /games/[slug] stránku (viz
+  // getGamesWithGameDetailPage v data/games.ts) — How to Fish tu záměrně
+  // není, jeho obsah je na /ryby a ta je v sitemap zvlášť.
+  for (const game of getGamesWithGameDetailPage()) {
+    entries.push({
+      url: `${SITE_URL}/games/${game.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    });
+  }
 
   for (const path of ["/predmety", "/bossove", "/lokace", "/navody", "/achievementy"]) {
     entries.push({ url: `${SITE_URL}${path}`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 });
