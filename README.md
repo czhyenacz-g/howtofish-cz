@@ -94,6 +94,12 @@ zůstávají:
 Bannery spravuje UCA collection `promotions` (pole `active`, `page_pattern`,
 `weight`) — bez deploye.
 
+Monetizace (říjen 2026): průvodce `/prvni-rybareni` se startovacím setem přes
+Dognet (`data/starter-kits.ts`, `d2=first-fishing`) a interní banner
+`RealFishingPromo` na homepage, detailech her a pod návody. Měření:
+eventy `real_fishing_banner_click` a `starter_kit_affiliate_click`. Detaily
+v `CLAUDE.md` (sekce J).
+
 ## Dokumentace
 
 - [`CLAUDE.md`](./CLAUDE.md) — kompletní dokumentace projektu: struktura,
