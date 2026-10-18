@@ -39,7 +39,7 @@ describe("sitemap", () => {
       assert.ok(Number.isFinite(time), `${entry.url}: neplatné datum`);
       assert.ok(now - time > 60_000, `${entry.url}: lastModified vypadá jako čas buildu`);
     }
-    for (const path of ["", "/streameri", "/hry-s-rybarenim", "/games/minecraft"]) {
+    for (const path of ["", "/streameri", "/hry-s-rybarenim", "/games/stardew-valley"]) {
       const entry = entries.find((e) => e.url === `${SITE_URL}${path}`);
       assert.equal(entry?.lastModified, undefined, `${path || "/"} nemá mít lastModified`);
     }

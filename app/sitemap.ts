@@ -5,6 +5,8 @@ import { fishGuides } from "../data/fish-guides.ts";
 import { creatorProfiles } from "../data/creators.ts";
 import { getIndexableVideos } from "../data/how-to-fish-videos.ts";
 import { getGamesWithGameDetailPage } from "../data/games.ts";
+import { getGameDetailContent } from "../data/game-details.ts";
+import { FIRST_FISHING_PATH, FIRST_FISHING_UPDATED_AT } from "../data/first-fishing.ts";
 import { SITE_URL } from "./config/site.ts";
 
 // Homepage (`/`) má vlastní obsah a canonical na "/". Mimo sitemap jsou:
@@ -13,7 +15,7 @@ import { SITE_URL } from "./config/site.ts";
 // a `/aktualizace` (odstraněný placeholder, redirect na /o-hre).
 //
 // `lastModified` se uvádí JEN tam, kde data nesou skutečné datum (ryby,
-// SEO návody, videa). U ostatních URL ho záměrně vynecháváme — dřív se
+// SEO návody, videa, /prvni-rybareni, herní detaily s `lastReviewed`). U ostatních URL ho záměrně vynecháváme — dřív se
 // tu posílal čas buildu, takže každý deploy hlásil změnu všech stránek
 // a vyhledávače pak lastmod ignorují úplně.
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -25,14 +27,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/hra`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/hry-s-rybarenim`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/o-hre`, changeFrequency: "monthly", priority: 0.5 },
+    // Průvodce prvním skutečným rybařením — lastModified = ruční datum
+    // poslední změny obsahu (data/first-fishing.ts), ne čas buildu.
+    {
+      url: `${SITE_URL}${FIRST_FISHING_PATH}`,
+      lastModified: new Date(FIRST_FISHING_UPDATED_AT),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
   ];
 
   // Detaily her, které mají vlastní /games/[slug] stránku (viz
   // getGamesWithGameDetailPage v data/games.ts) — How to Fish tu záměrně
   // není, jeho obsah je na /ryby a ta je v sitemap zvlášť.
   for (const game of getGamesWithGameDetailPage()) {
+    const lastReviewed = getGameDetailContent(game.slug)?.lastReviewed;
     entries.push({
       url: `${SITE_URL}/games/${game.slug}`,
+      ...(lastReviewed ? { lastModified: new Date(lastReviewed) } : {}),
       changeFrequency: "monthly",
       priority: 0.6,
     });
