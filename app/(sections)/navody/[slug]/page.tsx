@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGuideEntries } from "../../../../lib/universal-content-api/guides";
 import AuthorBadge from "../../../components/community/AuthorBadge";
+import RealFishingPromo from "../../../components/RealFishingPromo";
 import HowToCatchGuide, { getHowToCatchMetadata } from "../HowToCatchGuide";
 import WhereToFindGuide, { getWhereToFindMetadata } from "../WhereToFindGuide";
 
@@ -105,6 +106,8 @@ export default async function GuideDetailPage({ params }: Props) {
         {guide.content && (
           <div className="mt-8 space-y-4 whitespace-pre-line text-cyan-100/80">{guide.content}</div>
         )}
+
+        <RealFishingPromo placement="guide" className="mt-10" />
       </div>
     </div>
   );

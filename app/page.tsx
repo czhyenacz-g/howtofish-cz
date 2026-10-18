@@ -9,6 +9,7 @@ import CreatorCard from "./components/CreatorCard.tsx";
 import GameCard from "./components/GameCard.tsx";
 import GameVideoCard from "./components/GameVideoCard.tsx";
 import OceanWaves from "./components/OceanWaves";
+import RealFishingPromo from "./components/RealFishingPromo";
 import RotatingQuote from "./components/RotatingQuote.tsx";
 import { FishIcon, GuideIcon, ItemIcon, LocationIcon, AchievementIcon, BossIcon } from "./components/icons";
 import { getCurrentUser } from "../lib/auth/current-user";
@@ -137,6 +138,13 @@ export default async function Home() {
                 Všech {gameEntries.length} her →
               </Link>
             </div>
+          </div>
+        </section>
+
+        {/* INTERNÍ KAMPAŇ — "první skutečné rybaření", hned za hrami (ne v hero). Max. 1 na stránku. */}
+        <section className="bg-[#0a2438] px-4 pb-14">
+          <div className="mx-auto max-w-4xl">
+            <RealFishingPromo placement="homepage" />
           </div>
         </section>
 

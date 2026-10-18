@@ -5,6 +5,7 @@ import { fishEntries } from "../../../data/fish";
 import { fishGuides, getFishGuidesForFish } from "../../../data/fish-guides";
 import { SITE_URL } from "../../config/site";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../components/Breadcrumbs";
+import RealFishingPromo from "../../components/RealFishingPromo";
 
 // Vykresluje /navody/jak-chytit-{fishSlug} — volané z app/(sections)/navody/[slug]/page.tsx
 // (viz komentář tam pro proč: `jak-chytit-[slug]` jako VLASTNÍ sourozenecká
@@ -197,6 +198,8 @@ export default function HowToCatchGuide({ fishSlug }: { fishSlug: string }) {
             {new Date(guide.lastReviewed).toLocaleDateString("cs-CZ", { day: "numeric", month: "numeric", year: "numeric" })}
           </p>
         )}
+
+        <RealFishingPromo placement="guide" className="mt-10" />
       </div>
     </div>
   );

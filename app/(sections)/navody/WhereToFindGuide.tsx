@@ -5,6 +5,7 @@ import { fishEntries } from "../../../data/fish";
 import { fishGuides, getFishGuidesForFish } from "../../../data/fish-guides";
 import { SITE_URL } from "../../config/site";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../components/Breadcrumbs";
+import RealFishingPromo from "../../components/RealFishingPromo";
 
 // Vykresluje /navody/kde-najit-{fishSlug} — volané z app/(sections)/navody/[slug]/page.tsx,
 // viz komentář v HowToCatchGuide.tsx pro důvod (route-level konflikt se
@@ -129,6 +130,8 @@ export default function WhereToFindGuide({ fishSlug }: { fishSlug: string }) {
             {new Date(guide.lastReviewed).toLocaleDateString("cs-CZ", { day: "numeric", month: "numeric", year: "numeric" })}
           </p>
         )}
+
+        <RealFishingPromo placement="guide" className="mt-10" />
       </div>
     </div>
   );
