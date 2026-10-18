@@ -6,6 +6,7 @@ import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../../components/Breadcru
 import GameCover from "../../../components/GameCover";
 import GameStreamersSection from "../../../components/GameStreamersSection";
 import GameVideosSection from "../../../components/GameVideosSection";
+import RealFishingPromo from "../../../components/RealFishingPromo";
 import { SITE_URL } from "../../../config/site.ts";
 import {
   AUDIENCE_TYPE_LABEL,
@@ -14,7 +15,7 @@ import {
   getGamesWithGameDetailPage,
   hasGameDetailPage,
 } from "../../../../data/games.ts";
-import { getGameDetailContent, getGameStreamers } from "../../../../data/game-details.ts";
+import { getGameDetailContent, getGameStreamers, type GameGuideTable } from "../../../../data/game-details.ts";
 import { getApprovedGameVideos } from "../../../../lib/games/game-videos.ts";
 
 // Univerzální detail hry. Vzniká POUZE pro hry, které mají `hasDetail` a
@@ -65,6 +66,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+function GuideTable({ table }: { table: GameGuideTable }) {
+  return (
+    <div className="mt-4 overflow-x-auto rounded-lg border border-white/10">
+      <table className="w-full min-w-[20rem] text-left text-sm">
+        <caption className="bg-white/5 px-3 py-2 text-left font-serif text-sm text-amber-200">{table.caption}</caption>
+        <thead className="bg-white/5 text-xs uppercase tracking-wide text-cyan-100/50">
+          <tr>
+            {table.head.map((cell) => (
+              <th key={cell} scope="col" className="px-3 py-2">
+                {cell}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-white/10">
+          {table.rows.map((row) => (
+            <tr key={row.join("|")}>
+              {row.map((cell, index) => (
+                <td key={index} className={`px-3 py-2 ${index === 0 ? "text-white" : "text-cyan-100/80"}`}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default async function GameDetailPage({ params }: Props) {
   const { slug } = await params;
   const game = getGameBySlug(slug);
@@ -89,6 +120,21 @@ export default async function GameDetailPage({ params }: Props) {
     { label: game.name },
   ];
   const pageUrl = `${SITE_URL}/games/${game.slug}`;
+  const guide = content?.guide ?? [];
+  const faq = content?.faq ?? [];
+  // FAQPage JSON-LD jen když FAQ na stránce skutečně je (stejný text).
+  const faqJsonLd =
+    faq.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faq.map((item) => ({
+            "@type": "Question",
+            name: item.question,
+            acceptedAnswer: { "@type": "Answer", text: item.answer },
+          })),
+        }
+      : null;
 
   return (
     <div className="bg-gradient-to-b from-[#0a2438] via-[#0e4f66] to-[#081c2c] text-white">
@@ -96,6 +142,7 @@ export default async function GameDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems, SITE_URL, pageUrl)) }}
       />
+      {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
         <Breadcrumbs items={breadcrumbItems} />
@@ -131,7 +178,7 @@ export default async function GameDetailPage({ params }: Props) {
             </div>
 
             <div>
-              <h1 className="font-serif text-3xl sm:text-4xl">{game.name}</h1>
+              <h1 className="font-serif text-3xl sm:text-4xl">{content?.h1 ?? game.name}</h1>
 
               {/* Bez stavového štítku — stránka sama je ten obsah. Badge publika
                   se skryje, když je stejný jako důležitost rybaření. */}
@@ -172,6 +219,72 @@ export default async function GameDetailPage({ params }: Props) {
                 {paragraph}
               </p>
             ))}
+          </section>
+        )}
+
+        {/* --- A2) PLNÝ PRŮVODCE (volitelný, jen hry s `guide` v game-details.ts) --- */}
+        {guide.length > 0 && (
+          <>
+            <nav aria-label="Obsah průvodce" className="mt-8 rounded-xl border border-white/10 bg-[#0e3347]/60 p-4">
+              <p className="font-serif text-sm text-amber-300">Obsah průvodce</p>
+              <ol className="mt-2 grid gap-1 text-sm sm:grid-cols-2">
+                {guide.map((section, index) => (
+                  <li key={section.id}>
+                    <a href={`#${section.id}`} className="text-cyan-100/80 underline-offset-2 hover:text-amber-300 hover:underline">
+                      {index + 1}. {section.heading}
+                    </a>
+                  </li>
+                ))}
+                {faq.length > 0 && (
+                  <li>
+                    <a href="#caste-otazky" className="text-cyan-100/80 underline-offset-2 hover:text-amber-300 hover:underline">
+                      {guide.length + 1}. Časté otázky
+                    </a>
+                  </li>
+                )}
+              </ol>
+            </nav>
+            {guide.map((section) => (
+              <section key={section.id} id={section.id} className="mt-10 scroll-mt-6" aria-labelledby={`${section.id}-h`}>
+                <h2 id={`${section.id}-h`} className="font-serif text-xl sm:text-2xl">
+                  {section.heading}
+                </h2>
+                {section.paragraphs?.map((paragraph) => (
+                  <p key={paragraph} className="mt-3 text-cyan-100/80">
+                    {paragraph}
+                  </p>
+                ))}
+                {section.tables?.map((table) => <GuideTable key={table.caption} table={table} />)}
+                {section.bullets && (
+                  <ul className="mt-4 list-disc space-y-2 pl-5 text-cyan-100/80">
+                    {section.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                )}
+                {section.note && (
+                  <p className="mt-4 rounded-lg border border-amber-400/25 bg-amber-400/[0.07] px-4 py-3 text-sm text-amber-100/90">
+                    {section.note}
+                  </p>
+                )}
+              </section>
+            ))}
+          </>
+        )}
+
+        {faq.length > 0 && (
+          <section id="caste-otazky" className="mt-10 scroll-mt-6" aria-labelledby="caste-otazky-h">
+            <h2 id="caste-otazky-h" className="font-serif text-xl sm:text-2xl">
+              Časté otázky
+            </h2>
+            <dl className="mt-4 space-y-4">
+              {faq.map((item) => (
+                <div key={item.question}>
+                  <dt className="font-semibold text-white">{item.question}</dt>
+                  <dd className="mt-1 text-cyan-100/80">{item.answer}</dd>
+                </div>
+              ))}
+            </dl>
           </section>
         )}
 
@@ -230,6 +343,27 @@ export default async function GameDetailPage({ params }: Props) {
         {/* --- D) + E) Sekce bez dat se vůbec nevykreslí --- */}
         <GameStreamersSection streamers={streamers} />
         <GameVideosSection videos={videos} />
+
+        {content?.sources && content.sources.length > 0 && (
+          <section className="mt-10 border-t border-white/10 pt-6">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-cyan-100/50">Zdroje</h2>
+            <ul className="mt-2 space-y-1 text-sm">
+              {content.sources.map((source) => (
+                <li key={source.url}>
+                  <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-cyan-100/70 underline hover:text-amber-300">
+                    {source.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {content.lastReviewed && (
+              <p className="mt-3 text-xs text-cyan-100/50">Obsah ověřen podle zdrojů: {content.lastReviewed.split("-").reverse().map(Number).join(". ")}.</p>
+            )}
+          </section>
+        )}
+
+        {/* Interní kampaň "první skutečné rybaření" — max. 1 na stránku, až pod obsahem. */}
+        <RealFishingPromo placement="game" className="mt-12" />
       </div>
     </div>
   );

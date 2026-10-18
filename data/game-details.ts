@@ -21,21 +21,190 @@ export type GameDetailContent = {
   seoTitle?: string;
   /** SEO description; fallback je obecná věta z dat hry. */
   metaDescription?: string;
+  /** Vlastní H1 (fallback: název hry). */
+  h1?: string;
+  /** Datum poslední skutečné změny obsahu (YYYY-MM-DD) — sitemap lastModified. */
+  lastReviewed?: string;
+  /**
+   * Volitelný plný průvodce (zatím jen Minecraft) — strukturované sekce,
+   * které stránka vykreslí pod „Rybaření v této hře“. Každé věcné tvrzení
+   * má oporu v `sources`.
+   */
+  guide?: GameGuideSection[];
+  /** Časté otázky (vykreslí se i jako FAQPage JSON-LD — musí odpovídat textu). */
+  faq?: { question: string; answer: string }[];
+  /** Zdroje, ze kterých průvodce vychází. */
+  sources?: { label: string; url: string }[];
+};
+
+export type GameGuideTable = { caption: string; head: string[]; rows: string[][] };
+
+export type GameGuideSection = {
+  /** Kotva pro obsah stránky. */
+  id: string;
+  heading: string;
+  paragraphs?: string[];
+  bullets?: string[];
+  tables?: GameGuideTable[];
+  /** Zvýrazněná poznámka (např. rozdíl Java/Bedrock). */
+  note?: string;
 };
 
 export const gameDetails: GameDetailContent[] = [
   {
     slug: "minecraft",
+    h1: "Jak rybařit v Minecraftu",
+    seoTitle: "Rybaření v Minecraftu – prut, ryby, poklady a očarování | HowToFish.cz",
+    metaDescription:
+      "Jak rybařit v Minecraftu: výroba prutu, poznání záběru, ryby, poklady a junk, očarování Luck of the Sea, Lure, Unbreaking a Mending, déšť, otevřená voda a AFK farmy v Java i Bedrock Edition.",
+    lastReviewed: "2026-10-18",
     tagline:
-      "Rybaření je v Minecraftu nenápadná mechanika, ze které se stala vlastní disciplína — od prvního prutu až po farmy na vzácné looty.",
+      "Rybaření je v Minecraftu nenápadná mechanika, ze které se stala vlastní disciplína — od prvního prutu až po očarované knihy a sedla vytažená z vody.",
     fishing: [
-      "Prut vyrobíš ze tří klacků a dvou vláken a chytat se dá v podstatě v jakékoli vodě. Rybaření ale není jen o jídle: z vody se dají vytáhnout i poklady, a právě kvůli nim se kolem něj vyvinuly vlastní postupy.",
-      "Enchanty Luck of the Sea a Lure zvyšují šanci na poklad a zrychlují záběr — s nimi se z rybaření stane dlouhodobá činnost. Ryby se navíc dají použít na jídlo i na obchod s vesničany.",
-      "Samostatnou kapitolou jsou AFK farmy, kde za hráče chytá automatická konstrukce. V novějších verzích už to ale není tak snadné — loot se počítá jen z otevřené vody.",
+      "Prut vyrobíš ze tří klacků a dvou provázků a chytat se dá v jakékoli vodě. Kromě ryb můžeš vytáhnout i nepotřebné předměty (junk) a poklady — očarované knihy, luky, jmenovky nebo sedla.",
+      "Níže najdeš celý postup: jak poznat záběr, co se dá chytit, která očarování se vyplatí, jak na rybaření působí déšť a otevřená voda a proč staré návody na AFK farmy už nefungují. Kde se Java a Bedrock Edition liší, je to výslovně uvedené.",
+    ],
+    guide: [
+      {
+        id: "jak-zacit",
+        heading: "Jak začít rybařit",
+        bullets: [
+          "Rybářský prut vyrobíš na pracovním stole ze 3 klacků a 2 provázků: klacky šikmo přes mřížku, provázky svisle pod horním koncem prutu.",
+          "Prut můžeš i najít nebo získat jinak — vytáhnout ho z vody, najít v truhlách (např. ve zříceninách pod mořem) nebo koupit od vesničana rybáře.",
+          "Nahoď prut do vody (použití prutu, na PC pravé tlačítko myši). Velikost ani hloubka vody nerozhoduje, chytat se dá i v malé louži.",
+          "Po nahození běží náhodné čekání 5–30 sekund. Během něj se kolem splávku občas objeví drobné šplouchnutí.",
+          "Záběr poznáš tak, že se ke splávku začne vlnit stopa částic (bublinek) a za 1–4 sekundy splávek zajede pod hladinu.",
+          "V tu chvíli prut znovu použij a úlovek přitáhneš. Na reakci máš v Java Edition 1–2 sekundy, v Bedrock Edition jen asi půl sekundy. Když to nestihneš, čekání začne znovu.",
+          "Za každý úlovek dostaneš i 1–6 bodů zkušeností.",
+          "Prut se opotřebovává: v Java Edition vydrží 64 použití, v Bedrock Edition 385. Úlovek ubere 1 bod výdrže, vytažení splávku zaseknutého v bloku 2, přitažení předmětu 3 a moba 5; prázdné vytažení nic.",
+        ],
+      },
+      {
+        id: "druhy-ulovku",
+        heading: "Druhy úlovků: ryby, poklady a junk",
+        paragraphs: [
+          "Každý úlovek patří do jedné ze tří kategorií. Bez očarování je rozdělení v Java i Bedrock Edition stejné: 85 % ryby, 10 % junk a 5 % poklady. V každé kategorii pak rozhoduje další los.",
+        ],
+        tables: [
+          {
+            caption: "Ryby (mimo džungli, obě edice)",
+            head: ["Úlovek", "Šance v kategorii"],
+            rows: [
+              ["syrová treska (Raw Cod)", "60 %"],
+              ["syrový losos (Raw Salmon)", "25 %"],
+              ["čtverzubec (Pufferfish)", "13 %"],
+              ["tropická ryba (Tropical Fish)", "2 %"],
+            ],
+          },
+          {
+            caption: "Poklady (treasure)",
+            head: ["Úlovek", "Java Edition", "Bedrock Edition"],
+            rows: [
+              ["očarovaná kniha", "1/6 (16,67 %)", "6/31 (19,35 %)"],
+              ["luk (očarovaný, poškozený)", "1/6 (16,67 %)", "5/31 (16,13 %)"],
+              ["rybářský prut (očarovaný, poškozený)", "1/6 (16,67 %)", "5/31 (16,13 %)"],
+              ["jmenovka (Name Tag)", "1/6 (16,67 %)", "5/31 (16,13 %)"],
+              ["ulita nautila (Nautilus Shell)", "1/6 (16,67 %)", "5/31 (16,13 %)"],
+              ["sedlo (Saddle)", "1/6 (16,67 %)", "5/31 (16,13 %)"],
+            ],
+          },
+        ],
+        bullets: [
+          "Junk (nepotřebné předměty): leknín, kost, miska, kůže, kožené boty, shnilé maso, háček na nástražný drát, lahev vody, klacek, provázek, rybářský prut a inkoustový váček. Nejčastější je leknín (v Java Edition 17 % v rámci kategorie).",
+          "Luk a prut z pokladů jsou vždy očarované (jako na úrovni 22–30) a hodně poškozené. Prut a kožené boty z junku očarované nejsou.",
+          "V džungli přibude do junku bambus (v Bedrock Edition i kakaové boby) a v Bedrock Edition se tam trochu změní poměr ryb.",
+        ],
+      },
+      {
+        id: "ocarovani",
+        heading: "Očarování prutu",
+        bullets: [
+          "Luck of the Sea (I–III): zvyšuje šanci na poklad a snižuje šanci na junk. Pořadí předmětů uvnitř kategorie nemění.",
+          "Lure (I–III): každá úroveň zkrátí čekání na záběr o 5 sekund (z obou konců rozsahu 5–30 s). Na to, co chytíš, vliv nemá.",
+          "Unbreaking (I–III): dává šanci, že se při použití prut neopotřebuje, takže vydrží déle.",
+          "Mending (I): opravuje prut zkušenostmi, které sbíráš s prutem v ruce — 2 body výdrže za každý bod zkušeností. Na očarovacím stole ho nedostaneš; získáš ho jako očarovanou knihu (obchod s knihovníkem, truhly, rybaření) a na prut ho dáš na kovadlině.",
+        ],
+        tables: [
+          {
+            caption: "Luck of the Sea: šance na kategorii úlovku",
+            head: ["Úroveň", "Ryby", "Poklady", "Junk"],
+            rows: [
+              ["bez očarování", "85 %", "5 %", "10 %"],
+              ["I", "84,85 %", "7,07 %", "8,08 %"],
+              ["II", "84,69 %", "9,18 %", "6,12 %"],
+              ["III", "84,54 %", "11,34 %", "4,12 %"],
+            ],
+          },
+        ],
+        note:
+          "Doporučená kombinace pro běžné rybaření: Luck of the Sea III + Lure III + Unbreaking III + Mending. Lure zrychlí záběry, Luck of the Sea zvýší podíl pokladů a Mending s Unbreaking udrží prut v provozu díky zkušenostem z úlovků.",
+      },
+      {
+        id: "podminky",
+        heading: "Podmínky rybaření: voda, déšť a poklady",
+        bullets: [
+          "Chytat se dá v jakékoli vodě — rozhoduje jen to, že splávek leží ve vodě.",
+          "Když na splávek prší, čekání se zkrátí přibližně o 20 %. Musí pršet přímo nad ním a nad splávkem nesmí být blok, který déšť zastaví.",
+          "Když splávek nemá nad sebou volnou oblohu (střecha, led, listí), čekání se zhruba zdvojnásobí. Pod střechou a zároveň v dešti je čekání asi o třetinu delší.",
+          "Java Edition: poklady chytíš jen v otevřené vodě. Kolem splávku musí být oblast 5 × 5 bloků do šířky a 4 bloky do výšky, ve které každá vrstva obsahuje buď jen vzduch (případně lekníny), nebo jen vodní zdroje — bez tekoucí vody a bez bloků. Jinak padají jen ryby a junk.",
+          "Když se od splávku vzdálíš víc než na 32 bloků nebo přestaneš držet prut, vlasec se přetrhne (bez ztráty výdrže).",
+          "Tresku a lososa můžeš upéct a sníst; čtverzubec je jedovatý. Ryby se hodí i na obchod s vesničanem rybářem.",
+        ],
+        note:
+          "Rozdíl Java × Bedrock: pravidlo otevřené vody pro poklady je popsané pro Java Edition (zavedeno ve verzi 1.16, snapshot 20w12a). Pro Bedrock Edition ho Minecraft Wiki neuvádí. Bedrock má také kratší okno na zaseknutí (asi 0,5 s místo 1–2 s), vyšší výdrž prutu a o něco vyšší šanci na očarovanou knihu mezi poklady.",
+      },
+      {
+        id: "afk-rybareni",
+        heading: "AFK rybaření a rybářské farmy",
+        paragraphs: [
+          "AFK farma je konstrukce, u které hráč stojí s prutem a hra „rybaří sama“ — typicky se drží použití prutu namířeného na železné dveře s nástražným drátem a úlovky odvádí násypka do truhly.",
+          "Ve verzi 1.16 (snapshot 20w12a) Java Edition zavedla pravidlo otevřené vody pro poklady, a tím rozbila všechny staré AFK návrhy — pokud jde o poklady. Jednoduché farmy dál chytají ryby, junk a sbírají zkušenosti, ale poklady z nich nepadají. Novější návrhy proto používají otevřenou vodu, časovače a redstone nebo sculk senzory, které zaznamenají záběr.",
+          "V Bedrock Edition podle Minecraft Wiki nefunguje žádný z popsaných návrhů kvůli odlišnému chování dveří a nástražného drátu. Většina bedrockových AFK farem stojí na chybách, které se v dalších aktualizacích opravují.",
+        ],
+        note:
+          "Starší video návody (zejména z doby před verzí 1.16) proto ber s rezervou a farmu si nejdřív vyzkoušej v testovacím světě. Na serverech navíc platí pravidla serveru — některé AFK farmy zakazují.",
+      },
+    ],
+    faq: [
+      {
+        question: "Jak se vyrábí prut v Minecraftu?",
+        answer:
+          "Na pracovním stole ze 3 klacků a 2 provázků: klacky šikmo přes mřížku, provázky svisle pod horním koncem prutu.",
+      },
+      {
+        question: "Jak získat poklady?",
+        answer:
+          "Rybař s prutem s Luck of the Sea (na úrovni III je šance na poklad 11,34 % místo 5 %) a v Java Edition v otevřené vodě: kolem splávku oblast 5 × 5 bloků a 4 bloky do výšky bez pevných bloků a tekoucí vody.",
+      },
+      {
+        question: "Jaké očarování je nejlepší?",
+        answer:
+          "Luck of the Sea III + Lure III + Unbreaking III + Mending. Lure zrychlí záběry, Luck of the Sea přidá poklady a Mending s Unbreaking drží prut naživu.",
+      },
+      {
+        question: "Funguje rybaření v malém jezírku?",
+        answer:
+          "Ano, ryby a junk chytíš i v malé vodě. V Java Edition ale z malého jezírka nevytáhneš poklady, protože nesplní podmínku otevřené vody.",
+      },
+      {
+        question: "Pomáhá déšť?",
+        answer:
+          "Ano. Když na splávek prší, čekání na záběr se zkrátí přibližně o 20 %. Pod střechou naopak čekání zhruba zdvojnásobí.",
+      },
+      {
+        question: "Fungují AFK farmy?",
+        answer:
+          "V Java Edition jednoduché AFK farmy dál chytají ryby, junk a zkušenosti, poklady ale jen v otevřené vodě, takže staré návody (před verzí 1.16) na poklady nefungují. V Bedrock Edition podle Minecraft Wiki popsané návrhy nefungují.",
+      },
+    ],
+    sources: [
+      { label: "Minecraft Wiki: Fishing", url: "https://minecraft.wiki/w/Fishing" },
+      { label: "Minecraft Wiki: Fishing Rod", url: "https://minecraft.wiki/w/Fishing_Rod" },
+      { label: "Minecraft Wiki: Tutorial – Fish farming", url: "https://minecraft.wiki/w/Tutorial:Fish_farming" },
+      { label: "Minecraft Wiki: Lure", url: "https://minecraft.wiki/w/Lure" },
+      { label: "Minecraft Wiki: Mending", url: "https://minecraft.wiki/w/Mending" },
     ],
     whatToLookFor: ["Fishing rod", "Luck of the Sea", "Lure", "Treasure fishing", "AFK fishing"],
-    metaDescription:
-      "Rybaření v Minecraftu: jak vyrobit prut, co dělají enchanty Luck of the Sea a Lure, treasure fishing a AFK farmy.",
   },
   {
     slug: "stardew-valley",
