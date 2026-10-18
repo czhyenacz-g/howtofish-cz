@@ -44,9 +44,9 @@ export default function PravniInformacePage() {
       <section className="mt-8">
         <h2 className="font-serif text-xl text-amber-300">Uživatelský obsah</h2>
         <p className="mt-3 text-cyan-100/80">
-          Přihlášení uživatelé mohou na web nahrávat vlastní screenshoty a další obsah (např. návrhy nových
-          záznamů). Nahráním obsahu potvrzujete, že k němu máte právo ho sdílet. Web může nevhodný nebo
-          neoprávněný obsah odstranit.
+          Část obsahu (např. screenshoty úlovků a návrhy nových záznamů) přidali přihlášení uživatelé. Nahrávání
+          nového obsahu je momentálně pozastavené. Nahráním obsahu uživatel potvrdil, že k němu má právo ho
+          sdílet. Web může nevhodný nebo neoprávněný obsah odstranit.
         </p>
       </section>
 

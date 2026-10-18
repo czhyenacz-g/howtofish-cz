@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../config/features";
 import FeedbackEmailButton from "./FeedbackEmailButton";
 import { MessageBottleIcon } from "./icons";
 
@@ -11,6 +12,11 @@ import { MessageBottleIcon } from "./icons";
 // návštěvníka vůbec neobjeví v SSR HTML.
 export default function FeedbackCallout({ user }: { user: { nickname: string } | null }) {
   const pathname = usePathname();
+
+  // Anonymní varianta zve k přihlášení přes Steam kvůli doplňování obsahu —
+  // při pozastavených komunitních příspěvcích (app/config/features.ts) se
+  // nevykresluje; kontakt zůstává v patičce.
+  if (!user && !COMMUNITY_CONTRIBUTIONS_ENABLED) return null;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">

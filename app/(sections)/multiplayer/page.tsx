@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MULTIPLAYER_ENABLED } from "../../config/features";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import { getActivePresences } from "../../../lib/universal-content-api/presence";
 import { getIncomingWaves } from "../../../lib/universal-content-api/waves";
@@ -10,25 +11,46 @@ import MultiplayerBoard from "./MultiplayerBoard";
 const TITLE = "Multiplayer How to Fish – najdi spoluhráče";
 const DESCRIPTION = "Najdi další hráče How to Fish, ukaž že hledáš spoluhráče a spojte se přes Steam.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/multiplayer" },
-  openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
-};
+// Pozastavený multiplayer (app/config/features.ts): URL zůstává (200),
+// ale jen jako informační stránka s noindex a mimo sitemap.
+export const metadata: Metadata = MULTIPLAYER_ENABLED
+  ? {
+      title: TITLE,
+      description: DESCRIPTION,
+      alternates: { canonical: "/multiplayer" },
+      openGraph: { images: [{ url: `/api/og?title=${encodeURIComponent(TITLE)}`, width: 1200, height: 630 }] },
+    }
+  : {
+      title: "Multiplayer ostrov – pozastaveno",
+      description: "Multiplayer ostrov pro hledání spoluhráčů How to Fish je pozastavený.",
+      alternates: { canonical: "/multiplayer" },
+      robots: { index: false, follow: true },
+    };
 
 const UNAVAILABLE_MESSAGE = "Multiplayer ostrov je teď chvíli nedostupný. Zkus to prosím později.";
 
-function Hero({ activeCount, children }: { activeCount: number | null; children: React.ReactNode }) {
+function Hero({
+  activeCount,
+  showIntro = true,
+  children,
+}: {
+  activeCount: number | null;
+  showIntro?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-[#f3dfb0] via-[#e8cfa0] to-[#0e4f66] px-4 pb-20 pt-16 text-[#0a2438]">
       <div className="relative mx-auto max-w-2xl text-center">
         <h1 className="font-serif text-3xl sm:text-4xl">Multiplayer ostrov</h1>
-        <p className="mt-2 font-serif text-lg text-[#0a2438]/80">Najdi další hráče How to Fish</p>
-        <p className="mx-auto mt-4 max-w-xl text-sm text-[#0a2438]/70">
-          Hledáš někoho na společné rybaření? Přihlas se přes Steam, dej ostatním vědět, že hledáš spoluhráče, a
-          přidejte se navzájem mezi přátele.
-        </p>
+        {showIntro && (
+          <>
+            <p className="mt-2 font-serif text-lg text-[#0a2438]/80">Najdi další hráče How to Fish</p>
+            <p className="mx-auto mt-4 max-w-xl text-sm text-[#0a2438]/70">
+              Hledáš někoho na společné rybaření? Přihlas se přes Steam, dej ostatním vědět, že hledáš spoluhráče, a
+              přidejte se navzájem mezi přátele.
+            </p>
+          </>
+        )}
         {activeCount !== null && (
           <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#0a2438]/20 bg-white/40 px-4 py-1.5 font-serif text-sm text-[#0a2438]">
             Právě hledají spoluhráče: <strong>{activeCount}</strong> {activeCount === 1 ? "hráč" : "hráčů"}
@@ -60,7 +82,36 @@ function AnonymousBeach() {
   );
 }
 
+function PausedNotice() {
+  return (
+    <Hero activeCount={null} showIntro={false}>
+      <div className="mx-auto max-w-xl rounded-xl border border-[#0a2438]/15 bg-white/40 p-6 text-center">
+        <p className="font-serif text-lg">Hledání spoluhráčů je pozastavené.</p>
+        <p className="mt-2 text-sm text-[#0a2438]/75">
+          Kdo právě hraje How to Fish, uvidíš v živých streamech. Tipy ke hře najdeš v encyklopedii a návodech.
+        </p>
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/stream"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-amber-500 px-6 py-2.5 font-serif text-sm text-gray-900 transition hover:bg-amber-400"
+          >
+            Kdo právě hraje
+          </Link>
+          <Link
+            href="/navody"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[#0a2438]/30 bg-white/40 px-6 py-2.5 font-serif text-sm text-[#0a2438] transition hover:bg-white/60"
+          >
+            Návody
+          </Link>
+        </div>
+      </div>
+    </Hero>
+  );
+}
+
 export default async function MultiplayerPage() {
+  if (!MULTIPLAYER_ENABLED) return <PausedNotice />;
+
   const user = await getCurrentUser();
 
   if (!user) {

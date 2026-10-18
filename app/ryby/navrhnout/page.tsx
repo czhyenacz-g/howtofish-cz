@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../../config/features";
 import { getCurrentUser } from "../../../lib/auth/current-user";
 import FishSuggestionForm from "./FishSuggestionForm";
 
@@ -14,6 +16,10 @@ export const metadata: Metadata = {
 };
 
 export default async function NavrhnoutPage() {
+  // Komunitní příspěvky jsou pozastavené (app/config/features.ts) — formulář
+  // se nezobrazuje, dočasně přesměrujeme na sekci. Kód formuláře zůstává.
+  if (!COMMUNITY_CONTRIBUTIONS_ENABLED) redirect("/ryby");
+
   const user = await getCurrentUser();
 
   return (

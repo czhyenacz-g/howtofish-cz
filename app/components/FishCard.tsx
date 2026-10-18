@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { FishEntry } from "../../data/fish";
 import type { CommunityCatch } from "../../lib/universal-content-api/types";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../config/features";
 import FishImage from "./FishImage";
 import VerificationBadge from "./VerificationBadge";
 
@@ -43,7 +44,7 @@ export default function FishCard({
               </span>
             </div>
           </>
-        ) : (
+        ) : COMMUNITY_CONTRIBUTIONS_ENABLED ? (
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1.5 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-2 pb-2 pt-6 text-center">
             <span className="inline-block max-w-full -rotate-1 rounded border border-amber-300/70 bg-[#e8cfa0] px-2 py-1 font-serif text-[11px] leading-snug text-[#0a2438] shadow-sm">
               <span className="font-bold">Rybář:</span>{" "}
@@ -53,7 +54,7 @@ export default function FishCard({
               Nahraj první úlovek
             </span>
           </div>
-        )}
+        ) : null}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4 text-left">
         <div className="flex items-start justify-between gap-2">

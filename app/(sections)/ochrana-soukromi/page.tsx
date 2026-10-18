@@ -25,7 +25,7 @@ export default function OchranaSoukromiPage() {
         <p className="mt-3 text-cyan-100/80">
           Při přihlášení přes Steam (OpenID) z veřejného Steam profilu uložíme tvoje Steam ID, veřejnou přezdívku a
           URL profilového obrázku. Tyto údaje se ukládají v naší databázi a slouží k zobrazení tvého jména/avataru
-          u příspěvků a k případnému omezení přístupu při zneužívání webu.
+          u příspěvků a skóre v žebříčku Krabí invaze a k případnému omezení přístupu při zneužívání webu.
         </p>
         <p className="mt-3 text-cyan-100/80">
           Přihlášení drží podepsaná (ne šifrovaná) session cookie, která v sobě nese jen Steam ID a datum
@@ -37,6 +37,10 @@ export default function OchranaSoukromiPage() {
       <section className="mt-8">
         <h2 className="font-serif text-xl text-amber-300">Komunitní nahrávky (screenshoty, návrhy)</h2>
         <p className="mt-3 text-cyan-100/80">
+          Nahrávání screenshotů a posílání návrhů je momentálně pozastavené; u dříve odeslaných příspěvků platí
+          následující.
+        </p>
+        <p className="mt-3 text-cyan-100/80">
           Když jako přihlášený uživatel nahraješ screenshot úlovku nebo pošleš návrh nového záznamu (ryba, boss,
           předmět, lokace, návod), ukládáme obrázek, tvou volitelnou poznámku, tvoje Steam ID a přezdívku a čas
           odeslání. Návrh je nejdřív ve stavu &bdquo;čeká na schválení&ldquo; a veřejně se zobrazí až po schválení.
@@ -45,6 +49,9 @@ export default function OchranaSoukromiPage() {
 
       <section className="mt-8">
         <h2 className="font-serif text-xl text-amber-300">Multiplayer ostrov</h2>
+        <p className="mt-3 text-cyan-100/80">
+          Multiplayer ostrov je momentálně pozastavený; popis níže platí pro dobu, kdy byl v provozu.
+        </p>
         <p className="mt-3 text-cyan-100/80">
           Zobrazení na multiplayer ostrově (<em>/multiplayer</em>) je vždy dobrovolné — aktivuješ ho tlačítkem
           &bdquo;Hledám spoluhráče&ldquo;. Po aktivaci vidí ostatní přihlášení uživatelé tvůj Steam nickname, avatar,

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import FishImage from "../../components/FishImage";
 import ImageLightbox from "../../components/ImageLightbox";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../../config/features";
 import CatchUploadForm from "./CatchUploadForm";
 import type { CommunityCatch } from "../../../lib/universal-content-api/types";
 
@@ -41,7 +42,10 @@ export default function CommunityCatchSection({
 
   const returnTo = `/ryby/${fishSlug}`;
 
+  // Nahrávání úlovků je pozastavené (app/config/features.ts) — už schválené
+  // úlovky se dál zobrazují, jen bez výzev k nahrání.
   function UploadCta({ label }: { label: string }) {
+    if (!COMMUNITY_CONTRIBUTIONS_ENABLED) return null;
     if (!user) {
       return (
         <Link
@@ -112,7 +116,7 @@ export default function CommunityCatchSection({
           </div>
           <UploadCta label="Nahraj svůj úlovek" />
         </div>
-      ) : (
+      ) : COMMUNITY_CONTRIBUTIONS_ENABLED ? (
         <div className="mt-4 rounded-lg border border-dashed border-amber-400/40 bg-amber-400/5 p-4 text-center">
           <p className="font-serif text-amber-300">Máš screenshot? Nahraj první úlovek</p>
           <p className="mt-1 text-xs text-cyan-100/60">Buď první, kdo tuhle rybu ukáže ostatním.</p>
@@ -121,7 +125,7 @@ export default function CommunityCatchSection({
             <UploadCta label="Nahraj svůj úlovek" />
           </div>
         </div>
-      )}
+      ) : null}
 
       {formOpen && (
         <div
@@ -149,13 +153,6 @@ export default function CommunityCatchSection({
             <CatchUploadForm fishSlug={fishSlug} />
           </div>
         </div>
-      )}
-
-      {featuredCatch !== null && (
-        <section className="mt-8">
-          <h2 className="font-serif text-xl text-amber-300">Nejlepší úlovek</h2>
-          <p className="mt-2 text-sm text-cyan-100/50">Hodnocení komunity připravujeme.</p>
-        </section>
       )}
 
       {otherCatches.length > 0 && (

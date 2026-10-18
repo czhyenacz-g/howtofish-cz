@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../../../config/features";
 import { getCurrentUser } from "../../../../lib/auth/current-user";
 import CorrectionForm from "../../../components/community/CorrectionForm";
 import { submitItemCorrectionAction } from "./actions";
@@ -17,6 +19,10 @@ export default async function NavrhnoutPredmetPage({
 }: {
   searchParams: Promise<{ correction?: string }>;
 }) {
+  // Komunitní příspěvky jsou pozastavené (app/config/features.ts) — formulář
+  // se nezobrazuje, dočasně přesměrujeme na sekci. Kód formuláře zůstává.
+  if (!COMMUNITY_CONTRIBUTIONS_ENABLED) redirect("/predmety");
+
   const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
   const correctionTarget = params.correction?.trim();
 

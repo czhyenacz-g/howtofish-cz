@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../../config/features";
 
 export default function AddCommunityRecordButton({ href, label }: { href: string; label: string }) {
+  // Komunitní příspěvky jsou pozastavené (viz app/config/features.ts).
+  if (!COMMUNITY_CONTRIBUTIONS_ENABLED) return null;
+
   return (
     <Link
       href={href}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../../config/features";
 import type { CommunityContentBase } from "../../../lib/universal-content-api/types";
 import AuthorBadge from "./AuthorBadge";
 import CommunityThumbnail from "./CommunityThumbnail";
@@ -27,13 +28,19 @@ export default function CommunityDataTable<T extends CommunityContentBase>({
   cardSubtitle: (row: T) => (string | undefined)[];
   emptyMessage: string;
   // Nenápadná akce "Navrhnout opravu" u veřejných (ne pending) řádků —
-  // vrať undefined, pokud se pro daný řádek nemá zobrazit.
+  // vrať undefined, pokud se pro daný řádek nemá zobrazit. Při vypnutých
+  // komunitních příspěvcích (app/config/features.ts) se ignoruje.
   correctionHref?: (row: T) => string | undefined;
   // Volitelný odkaz na detail (např. návody mají /navody/[slug]).
   linkHref?: (row: T) => string | undefined;
 }) {
   if (rows.length === 0) {
     return <p className="mt-10 text-center text-cyan-100/60">{emptyMessage}</p>;
+  }
+
+  function getCorrection(row: T): string | undefined {
+    if (!COMMUNITY_CONTRIBUTIONS_ENABLED || row.pending) return undefined;
+    return correctionHref?.(row);
   }
 
   return (
@@ -56,7 +63,7 @@ export default function CommunityDataTable<T extends CommunityContentBase>({
           <tbody className="divide-y divide-white/10">
             {rows.map((row) => {
               const href = linkHref?.(row);
-              const correction = !row.pending ? correctionHref?.(row) : undefined;
+              const correction = getCorrection(row);
               return (
                 <tr key={row.id} className={row.pending ? "bg-amber-400/5" : "hover:bg-white/5"}>
                   <td className="px-4 py-3">
@@ -100,7 +107,7 @@ export default function CommunityDataTable<T extends CommunityContentBase>({
       <div className="space-y-3 md:hidden">
         {rows.map((row) => {
           const href = linkHref?.(row);
-          const correction = !row.pending ? correctionHref?.(row) : undefined;
+          const correction = getCorrection(row);
           const subtitle = cardSubtitle(row).filter((v): v is string => Boolean(v));
 
           const cardBody = (
