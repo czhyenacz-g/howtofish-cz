@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import AdSlot from "../../components/AdSlot";
 import Breadcrumbs, { buildBreadcrumbJsonLd } from "../../components/Breadcrumbs.tsx";
 import GameCard from "../../components/GameCard";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../../config/features";
 import { SITE_URL } from "../../config/site";
-import { getGamesWithDetail, getOrderedGames } from "../../../data/games";
+import { getOrderedGames } from "../../../data/games";
 import GameSuggestForm from "./GameSuggestForm";
 import RotatingQuote, { type RotatingQuoteItem } from "../../components/RotatingQuote.tsx";
 
@@ -33,7 +34,6 @@ export const metadata: Metadata = {
 
 export default function HrySRybarenimPage() {
   const games = getOrderedGames();
-  const gamesWithDetail = getGamesWithDetail();
 
   const breadcrumbItems = [{ label: "HowToFish.cz", href: "/" }, { label: "Hry, ve kterých se rybaří" }];
   const pageUrl = `${SITE_URL}${PATHNAME}`;
@@ -77,23 +77,14 @@ export default function HrySRybarenimPage() {
           <RotatingQuote quotes={QUOTES} />
         </div>
 
-        <div className="mt-8">
-          <AdSlot pathname={PATHNAME} />
-        </div>
-
         {/* --- TOP 50 --- */}
         <section className="mt-12" aria-labelledby="top-50">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <h2 id="top-50" className="font-serif text-2xl sm:text-3xl">
-              Top {games.length} her s rybařením
-            </h2>
-            <p className="text-xs text-cyan-100/50">
-              Pracovní katalog — pořadí není žebříček kvality.
-            </p>
-          </div>
+          <h2 id="top-50" className="font-serif text-2xl sm:text-3xl">
+            Top {games.length} her s rybařením
+          </h2>
           <p className="mt-3 max-w-3xl text-sm text-cyan-100/70">
-            U každé hry vidíš, jak velkou roli v ní rybaření hraje a jestli už k ní máme vlastní obsah. Další hry
-            postupně doplňujeme — od her, kde je rybaření jádrem, po ty, kde je milou vzpomínkou.
+            U každé hry vidíš, jak velkou roli v ní rybaření hraje. Hry označené „Máme obsah“ mají vlastní stránku
+            s tipy a videi.
           </p>
 
           <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
@@ -105,27 +96,28 @@ export default function HrySRybarenimPage() {
           </ul>
         </section>
 
-        {/* --- CTA: CHYBÍ TU TVOJE HRA? --- */}
-        <section
-          aria-labelledby="chybi-hra"
-          className="mt-14 rounded-2xl border border-amber-400/30 bg-[#0e3347]/70 p-6 sm:p-8"
-        >
-          <h2 id="chybi-hra" className="font-serif text-2xl">
-            Chybí tu tvoje oblíbená hra?
-          </h2>
-          <p className="mt-2 max-w-2xl text-cyan-100/80">
-            Znáš hru, ve které se dá rybařit, ale v seznamu ji nevidíš? Napiš nám ji.
-          </p>
-          <div className="mt-6 max-w-xl">
-            <GameSuggestForm />
-          </div>
-          {gamesWithDetail.length > 0 && (
-            <p className="mt-6 text-xs text-cyan-100/50">
-              Zatím máme vlastní obsah jen u {gamesWithDetail.length === 1 ? "jedné hry" : `${gamesWithDetail.length} her`} z
-              katalogu — u ostatních na něm pracujeme.
+        {/* Reklama až pod katalogem, ať nepřekáží. */}
+        <div className="mt-12">
+          <AdSlot pathname={PATHNAME} />
+        </div>
+
+        {/* --- CTA: CHYBÍ TU TVOJE HRA? --- (komunitní příspěvek, viz app/config/features.ts) */}
+        {COMMUNITY_CONTRIBUTIONS_ENABLED && (
+          <section
+            aria-labelledby="chybi-hra"
+            className="mt-14 rounded-2xl border border-amber-400/30 bg-[#0e3347]/70 p-6 sm:p-8"
+          >
+            <h2 id="chybi-hra" className="font-serif text-2xl">
+              Chybí tu tvoje oblíbená hra?
+            </h2>
+            <p className="mt-2 max-w-2xl text-cyan-100/80">
+              Znáš hru, ve které se dá rybařit, ale v seznamu ji nevidíš? Napiš nám ji.
             </p>
-          )}
-        </section>
+            <div className="mt-6 max-w-xl">
+              <GameSuggestForm />
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

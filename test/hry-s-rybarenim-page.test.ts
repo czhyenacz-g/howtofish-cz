@@ -42,10 +42,16 @@ describe("/hry-s-rybarenim — metadata a obsah", () => {
     assert.match(source, /Od Minecraftu přes Stardew Valley až po Pokémony\./);
   });
 
-  test("vykresluje rotující citát, katalog i CTA formulář", () => {
+  test("vykresluje rotující citát a katalog; CTA formulář jen se zapnutými komunitními příspěvky", () => {
     assert.match(source, /<RotatingQuote quotes=\{QUOTES\}/);
     assert.match(source, /<GameCard entry=\{game\} \/>/);
-    assert.match(source, /<GameSuggestForm \/>/);
+    assert.match(source, /\{COMMUNITY_CONTRIBUTIONS_ENABLED && \([\s\S]*<GameSuggestForm \/>/);
+  });
+
+  test("žádné texty o rozpracovanosti katalogu", () => {
+    assert.doesNotMatch(source, /Pracovní katalog/);
+    assert.doesNotMatch(source, /postupně doplňujeme/);
+    assert.doesNotMatch(source, /na něm pracujeme/);
   });
 
   test("CTA blok má nadpis i text ze zadání", () => {
@@ -93,9 +99,19 @@ describe("rotující citát", () => {
 describe("karty her", () => {
   test("karta bez detailu je neklikací (žádný odkaz na neexistující stránku)", () => {
     const source = readSource(CARD);
-    assert.match(source, /const clickable = entry\.hasDetail && Boolean\(entry\.detailHref\)/);
+    assert.match(source, /const clickable = isGameAvailable\(entry\)/);
     assert.match(source, /if \(!clickable\) \{\s*return <article/);
     assert.doesNotMatch(source, /href=\{`\/hry-s-rybarenim/);
+  });
+
+  test("veřejně jen štítek 'Máme obsah' u dostupných her — žádné Brzy/Připravujeme", () => {
+    const source = readSource(CARD);
+    assert.match(source, /\{clickable && \([\s\S]*?GAME_STATUS_LABEL\.available/);
+    assert.doesNotMatch(source, /GAME_STATUS_LABEL\[entry\.status\]/);
+  });
+
+  test("duplicitní badge publika se skryje, když se shoduje s důležitostí rybaření", () => {
+    assert.match(readSource(CARD), /\{audienceLabel !== importanceLabel && \(/);
   });
 
   test("placeholder cover je jednotný a počítá s pozdějším skutečným obrázkem", () => {

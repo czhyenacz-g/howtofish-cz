@@ -10,7 +10,6 @@ import { SITE_URL } from "../../../config/site.ts";
 import {
   AUDIENCE_TYPE_LABEL,
   FISHING_IMPORTANCE_LABEL,
-  GAME_STATUS_LABEL,
   getGameBySlug,
   getGamesWithGameDetailPage,
   hasGameDetailPage,
@@ -77,11 +76,12 @@ export default async function GameDetailPage({ params }: Props) {
   // bez schválených videí se sekce prostě nevykreslí.
   const videos = await getApprovedGameVideos(game.slug).catch(() => []);
 
-  // „Co hledat“ = ručně psané uživatelské labely, jinak fallback na
-  // searchKeywords z katalogu (interní query stringy se nikdy nezobrazují
-  // doslova, viz zadání bod 4B).
-  const whatToLookFor = content?.whatToLookFor ?? game.searchKeywords ?? [];
+  // „Co hledat“ = jen ručně psané uživatelské labely z game-details.ts.
+  // Interní monitoring data (searchKeywords) se veřejně nezobrazují.
+  const whatToLookFor = content?.whatToLookFor ?? [];
   const quotes = game.quotes ?? [];
+  const importanceLabel = FISHING_IMPORTANCE_LABEL[game.fishingImportance];
+  const audienceLabel = AUDIENCE_TYPE_LABEL[game.audienceType];
 
   const breadcrumbItems = [
     { label: "HowToFish.cz", href: "/" },
@@ -133,21 +133,16 @@ export default async function GameDetailPage({ params }: Props) {
             <div>
               <h1 className="font-serif text-3xl sm:text-4xl">{game.name}</h1>
 
+              {/* Bez stavového štítku — stránka sama je ten obsah. Badge publika
+                  se skryje, když je stejný jako důležitost rybaření. */}
               <ul className="mt-3 flex flex-wrap gap-1.5">
-                <li className="rounded-full border border-cyan-200/30 bg-white/5 px-2.5 py-0.5 font-serif text-[11px] tracking-wide text-cyan-100">
-                  {AUDIENCE_TYPE_LABEL[game.audienceType]}
-                </li>
+                {audienceLabel !== importanceLabel && (
+                  <li className="rounded-full border border-cyan-200/30 bg-white/5 px-2.5 py-0.5 font-serif text-[11px] tracking-wide text-cyan-100">
+                    {audienceLabel}
+                  </li>
+                )}
                 <li className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 font-serif text-[11px] tracking-wide text-[#f4ead9]">
-                  {FISHING_IMPORTANCE_LABEL[game.fishingImportance]}
-                </li>
-                <li
-                  className={`rounded-full border px-2.5 py-0.5 font-serif text-[11px] tracking-wide ${
-                    game.status === "available"
-                      ? "border-amber-300 bg-amber-400 text-gray-900"
-                      : "border-white/15 bg-white/5 text-cyan-100/70"
-                  }`}
-                >
-                  {GAME_STATUS_LABEL[game.status]}
+                  {importanceLabel}
                 </li>
               </ul>
 
@@ -186,7 +181,9 @@ export default async function GameDetailPage({ params }: Props) {
             <h2 id="game-look-for" className="font-serif text-xl sm:text-2xl">
               Co hledat
             </h2>
-            <p className="mt-2 text-sm text-cyan-100/70">Výrazy, které se u téhle hry vyplatí sledovat.</p>
+            <p className="mt-2 text-sm text-cyan-100/70">
+              Anglické výrazy, podle kterých k téhle hře najdeš návody a videa o rybaření.
+            </p>
             <ul className="mt-4 flex flex-wrap gap-2">
               {whatToLookFor.map((item) => (
                 <li
@@ -227,13 +224,10 @@ export default async function GameDetailPage({ params }: Props) {
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-xs text-cyan-100/50">
-              Tyhle hry zatím vlastní stránku nemají — doplníme je postupně.
-            </p>
           </section>
         )}
 
-        {/* --- D) + E) Připravené sekce: bez dat se vůbec nevykreslí --- */}
+        {/* --- D) + E) Sekce bez dat se vůbec nevykreslí --- */}
         <GameStreamersSection streamers={streamers} />
         <GameVideosSection videos={videos} />
       </div>

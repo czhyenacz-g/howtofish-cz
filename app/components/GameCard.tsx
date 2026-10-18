@@ -3,30 +3,27 @@ import {
   AUDIENCE_TYPE_LABEL,
   FISHING_IMPORTANCE_LABEL,
   GAME_STATUS_LABEL,
+  isGameAvailable,
   type GameEntry,
 } from "../../data/games";
 import GameCover from "./GameCover";
 
-// Barvy stavu — "Máme obsah" je jediná výrazná (jantarová, stejná jako
-// ostatní CTA na webu), "Připravujeme"/"Brzy" zůstávají tlumené.
-const STATUS_CLASS: Record<GameEntry["status"], string> = {
-  available: "border-amber-300 bg-amber-400 text-gray-900",
-  preparing: "border-cyan-200/50 bg-cyan-400/15 text-cyan-100",
-  planned: "border-white/15 bg-white/5 text-cyan-100/70",
-};
-
 /**
  * Karta hry v katalogu /hry-s-rybarenim. Karta odkazuje POUZE tehdy, když
- * hra skutečně má na webu obsah (`hasDetail` + `detailHref`) — hry bez
- * detailu jsou záměrně neklikací, aby žádná karta nevedla na 404 (stav
- * komunikuje badge "Připravujeme" / "Brzy").
+ * hra skutečně má na webu obsah (`isGameAvailable`) — hry bez detailu jsou
+ * záměrně neklikací, aby žádná karta nevedla na 404.
  *
- * Karta záměrně nese jen čtyři informace navíc k názvu: důležitost
- * rybaření (vlevo nahoře na coveru), publikum (vpravo nahoře), štítky a
- * stav (dole) — víc by ji přeplnilo.
+ * Stav: jen dostupné hry nesou jantarový štítek "Máme obsah". Hry bez
+ * detailu žádný štítek nemají — katalog nesmí slibovat budoucí dokončení
+ * (interní `status` se veřejně nezobrazuje).
+ *
+ * Badge publika se skryje, když je stejný jako badge důležitosti rybaření
+ * (např. dvakrát "Fishing core").
  */
 export default function GameCard({ entry }: { entry: GameEntry }) {
-  const clickable = entry.hasDetail && Boolean(entry.detailHref);
+  const clickable = isGameAvailable(entry);
+  const importanceLabel = FISHING_IMPORTANCE_LABEL[entry.fishingImportance];
+  const audienceLabel = AUDIENCE_TYPE_LABEL[entry.audienceType];
   const featuredRing = entry.isFeatured ? " border-amber-400/30" : "";
 
   const content = (
@@ -42,11 +39,13 @@ export default function GameCard({ entry }: { entry: GameEntry }) {
           className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/45 to-transparent"
         />
         <span className="absolute left-2 top-2 rounded border border-white/20 bg-[#0a2438]/80 px-2 py-0.5 font-serif text-[11px] tracking-wide text-[#f4ead9] backdrop-blur-sm">
-          {FISHING_IMPORTANCE_LABEL[entry.fishingImportance]}
+          {importanceLabel}
         </span>
-        <span className="absolute right-2 top-2 rounded border border-cyan-200/30 bg-[#0a2438]/80 px-2 py-0.5 font-serif text-[11px] tracking-wide text-cyan-100 backdrop-blur-sm">
-          {AUDIENCE_TYPE_LABEL[entry.audienceType]}
-        </span>
+        {audienceLabel !== importanceLabel && (
+          <span className="absolute right-2 top-2 rounded border border-cyan-200/30 bg-[#0a2438]/80 px-2 py-0.5 font-serif text-[11px] tracking-wide text-cyan-100 backdrop-blur-sm">
+            {audienceLabel}
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4 text-left">
@@ -64,9 +63,11 @@ export default function GameCard({ entry }: { entry: GameEntry }) {
 
         <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
           <span className="text-[11px] uppercase tracking-wide text-cyan-100/45">{entry.platforms.join(" · ")}</span>
-          <span className={`shrink-0 rounded border px-2 py-0.5 font-serif text-[11px] ${STATUS_CLASS[entry.status]}`}>
-            {GAME_STATUS_LABEL[entry.status]}
-          </span>
+          {clickable && (
+            <span className="shrink-0 rounded border border-amber-300 bg-amber-400 px-2 py-0.5 font-serif text-[11px] text-gray-900">
+              {GAME_STATUS_LABEL.available}
+            </span>
+          )}
         </div>
       </div>
     </>

@@ -75,7 +75,10 @@ export const FISHING_IMPORTANCE_LABEL: Record<GameFishingImportance, string> = {
   minigame: "Fishing minihra",
 };
 
-/** České labely stavu karty — "Brzy" je záměrně měkčí než "Připravujeme". */
+/**
+ * Interní labely stavu (evidence, ne veřejné UI) — veřejně se zobrazuje jen
+ * "Máme obsah" u her s funkční stránkou, viz isGameAvailable/GameCard.
+ */
 export const GAME_STATUS_LABEL: Record<GameCatalogStatus, string> = {
   available: "Máme obsah",
   preparing: "Připravujeme",
@@ -423,13 +426,29 @@ export const gameEntries: GameEntry[] = [
 const STATUS_RANK: Record<GameCatalogStatus, number> = { available: 0, preparing: 1, planned: 2 };
 
 /**
- * Katalog v pořadí pro vykreslení: nejdřív hry, kde máme/už brzy budeme mít
- * obsah, jinak zůstává pořadí seedu (seed NENÍ ranking kvality — viz zadání).
+ * Je hra na webu "dostupná" = má funkční stránku s obsahem, na kterou karta
+ * vede? Jediný zdroj pravdy pro veřejné zobrazení — interní `status`
+ * (available/preparing/planned) se veřejně nezobrazuje, aby katalog
+ * nesliboval budoucí dokončení.
+ */
+export function isGameAvailable(game: GameEntry): boolean {
+  return game.hasDetail && Boolean(game.detailHref);
+}
+
+/**
+ * Katalog v pořadí pro vykreslení: nejdřív hry s funkční stránkou, pak
+ * ostatní podle interního stavu; v rámci skupin zůstává pořadí seedu (seed
+ * NENÍ ranking kvality).
  */
 export function getOrderedGames(): GameEntry[] {
   return gameEntries
     .map((entry, index) => ({ entry, index }))
-    .sort((a, b) => STATUS_RANK[a.entry.status] - STATUS_RANK[b.entry.status] || a.index - b.index)
+    .sort(
+      (a, b) =>
+        Number(isGameAvailable(b.entry)) - Number(isGameAvailable(a.entry)) ||
+        STATUS_RANK[a.entry.status] - STATUS_RANK[b.entry.status] ||
+        a.index - b.index
+    )
     .map(({ entry }) => entry);
 }
 

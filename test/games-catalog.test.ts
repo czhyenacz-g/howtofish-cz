@@ -15,6 +15,7 @@ import {
   getGamesWithDetail,
   getGamesWithGameDetailPage,
   getOrderedGames,
+  isGameAvailable,
   getPilotGames,
   hasGameDetailPage,
 } from "../data/games.ts";
@@ -294,22 +295,25 @@ describe("getOrderedGames", () => {
     assert.equal(new Set(ordered.map((g) => g.slug)).size, gameEntries.length);
   });
 
-  test("hry s obsahem (available, preparing) jsou první, zbytek zůstává v pořadí seedu", () => {
+  test("hry s funkční stránkou (isGameAvailable) jsou první — Minecraft mezi nimi", () => {
     const ordered = getOrderedGames();
-    const firstPlannedIndex = ordered.findIndex((g) => g.status === "planned");
-    assert.ok(firstPlannedIndex > 0, "očekávám aspoň jednu hru s obsahem na začátku");
-    for (const game of ordered.slice(0, firstPlannedIndex)) {
-      assert.notEqual(game.status, "planned", `${game.slug} by měl být před planned sekcí`);
+    const firstUnavailableIndex = ordered.findIndex((g) => !isGameAvailable(g));
+    assert.equal(firstUnavailableIndex, getGamesWithDetail().length);
+    for (const game of ordered.slice(firstUnavailableIndex)) {
+      assert.ok(!isGameAvailable(game), `${game.slug} má detail, měl by být mezi prvními`);
     }
-    assert.equal(ordered[0].slug, "how-to-fish", "available hra má být první");
+    assert.equal(ordered[0].slug, "how-to-fish", "How to Fish (available) má být první");
+    assert.ok(ordered.slice(0, firstUnavailableIndex).some((g) => g.slug === "minecraft"));
   });
 
-  test("nezavádí ranking kvality — pořadí v rámci stejného stavu je pořadí seedu", () => {
-    const ordered = getOrderedGames().filter((g) => g.status === "planned");
-    const seedPlanned = gameEntries.filter((g) => g.status === "planned");
-    assert.deepEqual(
-      ordered.map((g) => g.slug),
-      seedPlanned.map((g) => g.slug)
-    );
+  test("nezavádí ranking kvality — v rámci skupiny (detail/bez detailu + stav) zůstává pořadí seedu", () => {
+    const ordered = getOrderedGames();
+    for (const available of [true, false]) {
+      for (const status of ["available", "preparing", "planned"] as const) {
+        const pick = (list: typeof gameEntries) =>
+          list.filter((g) => isGameAvailable(g) === available && g.status === status).map((g) => g.slug);
+        assert.deepEqual(pick(ordered), pick(gameEntries), `${available}/${status}`);
+      }
+    }
   });
 });
