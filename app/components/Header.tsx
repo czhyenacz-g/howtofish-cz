@@ -97,14 +97,36 @@ function WorldDropdown({
   onOpenChange: (open: boolean) => void;
 }) {
   const active = isEntryActive(pathname, basePath, WORLD_GROUP);
+  // Najetí myší menu otevře hned — následný klik (myš i dotyk na velkém
+  // displeji posílají mouseenter + click) ho proto NESMÍ přepnout zpět na
+  // zavřené. Dřív onClick dělal !open a menu se klikem zavřelo, takže
+  // tlačítko "nic nedělalo". Klávesnice (bez hoveru) dál přepíná.
+  const openedByHoverRef = useRef(false);
 
   return (
-    <li className="relative" onMouseEnter={() => onOpenChange(true)} onMouseLeave={() => onOpenChange(false)}>
+    <li
+      className="relative"
+      onMouseEnter={() => {
+        if (!open) openedByHoverRef.current = true;
+        onOpenChange(true);
+      }}
+      onMouseLeave={() => {
+        openedByHoverRef.current = false;
+        onOpenChange(false);
+      }}
+    >
       <button
         type="button"
         aria-haspopup="true"
         aria-expanded={open}
-        onClick={() => onOpenChange(!open)}
+        onClick={() => {
+          if (openedByHoverRef.current) {
+            openedByHoverRef.current = false;
+            onOpenChange(true);
+            return;
+          }
+          onOpenChange(!open);
+        }}
         className={tabClass(active)}
       >
         <FishIcon className="h-4 w-4 shrink-0" />
@@ -335,7 +357,10 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
   }
 
   return (
-    <header className="relative overflow-hidden bg-gradient-to-b from-[#0e3347] via-[#0a2438] to-[#081c2c] shadow-sm shadow-black/20">
+    // Bez overflow-hidden: rozbalovací menu "How to Fish" je absolutně pod
+    // hlavičkou a overflow-hidden ho ořezávalo (nebylo vidět). z-30 drží
+    // menu nad obsahem stránky.
+    <header className="relative z-30 bg-gradient-to-b from-[#0e3347] via-[#0a2438] to-[#081c2c] shadow-sm shadow-black/20">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e8cfa0]/25 to-transparent"

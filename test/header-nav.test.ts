@@ -138,3 +138,18 @@ test("Footer.tsx: Streameři a Živě jsou v patičce viditelné", () => {
   assert.match(footerSource, />\s*Streameři\s*</);
   assert.match(footerSource, />\s*Živě\s*</);
 });
+
+// Regrese (říjen 2026): tlačítko "How to Fish" v hlavním menu "nic nedělalo"
+// — overflow-hidden na <header> ořezával rozbalené menu a klik po najetí
+// myší menu hned zase zavřel (onClick = !open).
+test("Header.tsx: <header> nemá overflow-hidden (jinak ořízne rozbalovací menu)", () => {
+  const headerTag = /<header className="([^"]*)"/.exec(headerSource)?.[1] ?? "";
+  assert.ok(headerTag.length > 0, "nenalezen <header>");
+  assert.doesNotMatch(headerTag, /overflow-hidden/);
+});
+
+test("Header.tsx: klik po otevření najetím myši menu nezavře (hover guard)", () => {
+  assert.match(headerSource, /const openedByHoverRef = useRef\(false\);/);
+  assert.match(headerSource, /if \(openedByHoverRef\.current\) \{\s*openedByHoverRef\.current = false;\s*onOpenChange\(true\);/);
+  assert.doesNotMatch(headerSource, /onClick=\{\(\) => onOpenChange\(!open\)\}/);
+});
