@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: `/ryby/${entry.slug}` },
     openGraph: {
       description: entry.shortDescription,
-      images: [{ url: `/api/og?title=${encodeURIComponent(entry.name)}&sub=${encodeURIComponent("How to Fish CZ")}`, width: 1200, height: 630 }],
+      images: [{ url: `/api/og?title=${encodeURIComponent(entry.name)}&sub=${encodeURIComponent("HowToFish.cz")}`, width: 1200, height: 630 }],
     },
   };
 }
@@ -216,10 +216,6 @@ export default async function FishDetailPage({ params }: Props) {
             </ul>
           </section>
         )}
-
-        <div className="mt-10">
-          <AdSlot pathname={`/ryby/${entry.slug}`} />
-        </div>
       </div>
     </div>
   );

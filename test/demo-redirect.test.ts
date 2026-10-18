@@ -20,3 +20,19 @@ describe("/demo permanent redirect", () => {
     assert.equal(rule?.permanent, true);
   });
 });
+
+describe("legacy přesměrování zůstávají zachovaná", () => {
+  test("/stream/:slug -> /streameri/:slug (trvale)", async () => {
+    const redirects = await nextConfig.redirects!();
+    const rule = redirects.find((r) => r.source === "/stream/:slug");
+    assert.equal(rule?.destination, "/streameri/:slug");
+    assert.equal(rule?.permanent, true);
+  });
+
+  test("odstraněný placeholder /aktualizace -> /o-hre (trvale)", async () => {
+    const redirects = await nextConfig.redirects!();
+    const rule = redirects.find((r) => r.source === "/aktualizace");
+    assert.equal(rule?.destination, "/o-hre");
+    assert.equal(rule?.permanent, true);
+  });
+});

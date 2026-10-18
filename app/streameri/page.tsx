@@ -8,7 +8,7 @@ import CreatorCard from "../components/CreatorCard.tsx";
 import AdSlot from "../components/AdSlot";
 
 const PATHNAME = "/streameri";
-const TITLE = "Streameři, kteří hrají How to Fish – profily a videa | HowToFish.cz";
+const TITLE = "Streameři, kteří hrají How to Fish – profily a videa";
 const DESCRIPTION = "Přehled českých a slovenských tvůrců, kteří hráli nebo streamovali How to Fish. Profily, videa a odkazy na Twitch, YouTube a Kick.";
 
 export const metadata: Metadata = {

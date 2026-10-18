@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Chyť úlovek — původní minihra",
   description:
     "Rychlá browserová minihra Chyť úlovek — hoď háček a zkus ulovit rybu z české encyklopedie How to Fish.",
+  alternates: { canonical: "/hra/rybareni" },
 };
 
 export default function RybareniPage() {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import RybyPageContent from "./RybyPageContent";
 
-const TITLE = "Ryby a úlovky – How to Fish CZ";
+const TITLE = "Ryby a úlovky v How to Fish | HowToFish.cz";
 const DESCRIPTION =
   "Česká encyklopedie ryb, tvorů a úlovků ze hry How to Fish. Zjisti, kde je najít, jak je chytit a k čemu slouží.";
 

@@ -23,8 +23,26 @@ describe("sitemap", () => {
     assert.ok(!urls.some((u) => u.includes("/navrhnout")));
   });
 
-  test("neobsahuje /aktualizace (zatím jen placeholder)", () => {
+  test("neobsahuje /aktualizace (odstraněný placeholder)", () => {
     assert.ok(!urls.some((u) => u.endsWith("/aktualizace")));
+  });
+
+  test("neobsahuje pozastavený /multiplayer", () => {
+    assert.ok(!urls.some((u) => u.endsWith("/multiplayer")));
+  });
+
+  test("lastModified jen tam, kde je skutečné datum (žádný čas buildu)", () => {
+    const now = Date.now();
+    for (const entry of entries) {
+      if (entry.lastModified === undefined) continue;
+      const time = new Date(entry.lastModified).getTime();
+      assert.ok(Number.isFinite(time), `${entry.url}: neplatné datum`);
+      assert.ok(now - time > 60_000, `${entry.url}: lastModified vypadá jako čas buildu`);
+    }
+    for (const path of ["", "/streameri", "/hry-s-rybarenim", "/games/minecraft"]) {
+      const entry = entries.find((e) => e.url === `${SITE_URL}${path}`);
+      assert.equal(entry?.lastModified, undefined, `${path || "/"} nemá mít lastModified`);
+    }
   });
 
   test("obsahuje hlavní sekce (predmety, bossove, lokace, navody, achievementy)", () => {

@@ -97,7 +97,7 @@ export default async function VideoDetailPage({ params }: Props) {
         <h1 className="mt-4 font-serif text-2xl sm:text-3xl">{title}</h1>
         <p className="mt-2 text-sm text-cyan-100/60">
           Video: {video.author.creatorSlug ? (
-            <Link href={`/stream/${video.author.creatorSlug}`} className="underline hover:text-amber-300">
+            <Link href={`/streameri/${video.author.creatorSlug}`} className="underline hover:text-amber-300">
               {video.author.name}
             </Link>
           ) : (
@@ -123,7 +123,7 @@ export default async function VideoDetailPage({ params }: Props) {
             <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
               {involvedCreators.map((c) => (
                 <li key={c.slug}>
-                  <Link href={`/stream/${c.slug}`} className="text-cyan-100/80 underline hover:text-amber-300">
+                  <Link href={`/streameri/${c.slug}`} className="text-cyan-100/80 underline hover:text-amber-300">
                     {c.name}
                   </Link>
                 </li>

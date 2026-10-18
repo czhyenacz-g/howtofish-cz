@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: `/streameri/${creator.slug}` },
     openGraph: {
       description,
-      images: [{ url: `/api/og?title=${encodeURIComponent(creator.name)}&sub=${encodeURIComponent("How to Fish CZ")}`, width: 1200, height: 630 }],
+      images: [{ url: `/api/og?title=${encodeURIComponent(creator.name)}&sub=${encodeURIComponent("HowToFish.cz")}`, width: 1200, height: 630 }],
     },
   };
 }
@@ -272,9 +272,9 @@ export default async function CreatorPage({ params }: Props) {
 
         {creator.videos.length === 0 && authoredVideos.length === 0 && featuredVideos.length === 0 && primaryLink && !creator.externalLink && (
           <p className="mt-6 text-sm text-cyan-100/60">
-            Zatím tu nemáme žádné konkrétní video —{" "}
+            Zdroj informací najdeš{" "}
             <a href={primaryLink.href} target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-300">
-              zdroj k dispozici zde
+              tady
             </a>
             .
           </p>

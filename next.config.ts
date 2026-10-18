@@ -62,6 +62,14 @@ const nextConfig: NextConfig = {
         destination: "/streameri/:slug",
         permanent: true,
       },
+      // Bývalý placeholder /aktualizace (noindex, bez obsahu) byl odstraněn
+      // při přechodu do režimu minimální údržby — případné staré odkazy
+      // vedou na informační stránku o hře.
+      {
+        source: "/aktualizace",
+        destination: "/o-hre",
+        permanent: true,
+      },
     ];
   },
 };

@@ -7,23 +7,24 @@ import { getIndexableVideos } from "../data/how-to-fish-videos.ts";
 import { getGamesWithGameDetailPage } from "../data/games.ts";
 import { SITE_URL } from "./config/site.ts";
 
-// Homepage (`/`) má teď VLASTNÍ unikátní obsah (streameři/live/Krabí
-// invaze/Multiplayer, viz app/page.tsx) místo dřívější duplicity s
-// `/ryby` — patří proto do sitemap s vlastním canonical na "/", ne
-// s canonical na "/ryby" jako dřív. `/demo` je smazané (permanent
-// redirect na /ryby, viz next.config.ts), `/*/navrhnout` formuláře a
-// auth routes jsou trvale noindex na úrovni stránky, sem nepatří.
-// `/aktualizace` zůstává mimo — je to zatím jen prázdný placeholder.
+// Homepage (`/`) má vlastní obsah a canonical na "/". Mimo sitemap jsou:
+// `/demo` (permanent redirect na /ryby, viz next.config.ts), `/*/navrhnout`
+// formuláře a auth routes (noindex), `/multiplayer` (pozastavený, noindex)
+// a `/aktualizace` (odstraněný placeholder, redirect na /o-hre).
+//
+// `lastModified` se uvádí JEN tam, kde data nesou skutečné datum (ryby,
+// SEO návody, videa). U ostatních URL ho záměrně vynecháváme — dřív se
+// tu posílal čas buildu, takže každý deploy hlásil změnu všech stránek
+// a vyhledávače pak lastmod ignorují úplně.
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [
-    { url: SITE_URL, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
-    { url: `${SITE_URL}/streameri`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${SITE_URL}/stream`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.8 },
-    { url: `${SITE_URL}/ryby`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}/hra`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/hry-s-rybarenim`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}/multiplayer`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.5 },
-    { url: `${SITE_URL}/o-hre`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
+    { url: SITE_URL, changeFrequency: "daily", priority: 1 },
+    { url: `${SITE_URL}/streameri`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${SITE_URL}/stream`, changeFrequency: "hourly", priority: 0.8 },
+    { url: `${SITE_URL}/ryby`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/hra`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/hry-s-rybarenim`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/o-hre`, changeFrequency: "monthly", priority: 0.5 },
   ];
 
   // Detaily her, které mají vlastní /games/[slug] stránku (viz
@@ -32,14 +33,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const game of getGamesWithGameDetailPage()) {
     entries.push({
       url: `${SITE_URL}/games/${game.slug}`,
-      lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.6,
     });
   }
 
   for (const path of ["/predmety", "/bossove", "/lokace", "/navody", "/achievementy"]) {
-    entries.push({ url: `${SITE_URL}${path}`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 });
+    entries.push({ url: `${SITE_URL}${path}`, changeFrequency: "weekly", priority: 0.6 });
   }
 
   for (const fish of fishEntries) {
@@ -58,7 +58,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const guide of curatedGuides) {
     entries.push({
       url: `${SITE_URL}/navody/${guide.slug}`,
-      lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
     });
@@ -71,7 +70,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const prefix = guide.type === "how-to-catch" ? "jak-chytit" : "kde-najit";
     entries.push({
       url: `${SITE_URL}/navody/${prefix}-${guide.fishSlug}`,
-      lastModified: guide.lastReviewed ? new Date(guide.lastReviewed) : new Date(),
+      ...(guide.lastReviewed ? { lastModified: new Date(guide.lastReviewed) } : {}),
       changeFrequency: "monthly",
       priority: 0.5,
     });
@@ -84,7 +83,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const creator of creatorProfiles) {
     entries.push({
       url: `${SITE_URL}/streameri/${creator.slug}`,
-      lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.6,
     });
