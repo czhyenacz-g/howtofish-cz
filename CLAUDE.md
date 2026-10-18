@@ -282,8 +282,17 @@ No Man's Sky · další YouTube hry · Kick credentials · další startovací s
 - **Úpravy UCA promotions**: `PATCH …/collections/promotions/records/{id}`
   **nahrazuje celé `data`** — vždy načti záznam, ulož zálohu a pošli kompletní
   `data` jen se změněným polem. Deaktivace = `active: false`, nikdy mazání.
-- Audit odkazů: HTTP 403/429 (Allegro, Dognet anti-bot) není důvod k odstranění
-  → stav UNVERIFIED, ruční kontrola v prohlížeči.
+- Audit odkazů: curl dostane od Dognetu/Allegra 403/429 — to není důvod
+  k odstranění. Spolehlivé ověření = skutečný (headless) Chromium: správný
+  odkaz končí `302 go.dognet.com → 200 obchod` s `utm_source=dognet` v URL.
+  Mezi požadavky dělej pauzy (~30 s), jinak Cloudflare vrátí 429. Na stroji
+  je `playwright-core` v `~/.bun/install/cache/playwright-core@1.63.0@@@1`
+  a Chromium v `~/.cache/ms-playwright/chromium-1243/` (nic se neinstaluje
+  do projektu).
+- **Ověřené kampaně (10/2026):** OKfish, Tera.cz (s UTM), Swissten (bez
+  UTM), Allegro (Dognet → Tradedoubler funguje, Allegro samo botům vrací
+  403). **EMOS nefunguje** — Dognet vrací `410 Link is unavailable`, odkazy
+  na emos.cz nepoužívat (dřívější EMOS promotions nahrazeny OKfish).
 - **Měření** (first-party, `lib/analytics/events-shared.ts` → UCA
   `analytics_events`): `real_fishing_banner_click` (`placement`, zdrojová
   stránka v `path`), `starter_kit_affiliate_click` (`product_id`,
