@@ -3,17 +3,8 @@ import { Bree_Serif, Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
-import AmbientAudioToggle from "./components/AmbientAudioToggle";
-import CharacterCallout from "./components/CharacterCallout";
-import MultiplayerIslandTab from "./components/MultiplayerIslandTab";
 import PageViewTracker from "./components/PageViewTracker";
 import { GOATCOUNTER_CODE } from "./config/analytics";
-import { getAssetById } from "../lib/universal-content-api/assets";
-import { getActivePromotions } from "../lib/universal-content-api/promotions";
-
-// UCA asset #45 ("multiplayer badge") — ručně vybraná grafika pro boční
-// vstup na Multiplayer ostrov, viz MultiplayerIslandTab.tsx.
-const MULTIPLAYER_ISLAND_TAB_ASSET_ID = 45;
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -44,9 +35,8 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
-  // Žádný sitewide canonical default tady — každá stránka, která ho
-  // potřebuje jinak než "sama na sebe" (typicky jen `/`, viz
-  // app/page.tsx -> canonical "/ryby"), si ho nastavuje sama.
+  // Žádný sitewide canonical default tady — každá indexovatelná stránka
+  // si nastavuje vlastní `alternates.canonical`.
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
@@ -63,31 +53,26 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  // Žádný sitewide `robots` — default je index/follow a explicitní
+  // hodnota tady se na 404 stránkách vykreslila vedle Next.js "noindex"
+  // jako druhý, protichůdný <meta name="robots">. Stránky, které nemají
+  // být v indexu, si `robots` nastavují samy.
   // Seznam Webmaster Tools — ověření vlastnictví domény.
   other: { "seznam-wmt": "PRiOIxgiLA0zLXxcJVMJNWhTAb9VYWzv" },
 };
 
-export default async function RootLayout({
+// Globální overlaye (CharacterCallout = Profesor + Prodavač,
+// MultiplayerIslandTab, AmbientAudioToggle) se v režimu minimální údržby
+// nerenderují — jejich kód v app/components/ zůstává. Layout tím zároveň
+// přestal při každém renderu volat UCA (seller promotions + asset #45).
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Malý, ne-citlivý seznam (admin-psaný marketing text) — viz
-  // CharacterCallout.tsx pro proč se výběr podle route dělá až
-  // client-side (usePathname() dostupné až po mountu).
-  const sellerPromotions = await getActivePromotions("seller").catch(() => []);
-  const multiplayerIslandAsset = await getAssetById(MULTIPLAYER_ISLAND_TAB_ASSET_ID).catch(() => null);
-
   return (
     <html lang="cs" className={`${breeSerif.variable} ${inter.variable}`}>
       <body className="bg-gray-900 font-sans text-white antialiased">
         {children}
         <PageViewTracker />
-        <AmbientAudioToggle />
-        <MultiplayerIslandTab imageUrl={multiplayerIslandAsset?.imageUrl ?? null} />
-        <CharacterCallout sellerPromotions={sellerPromotions} />
         <Analytics />
         {GOATCOUNTER_CODE && (
           <Script

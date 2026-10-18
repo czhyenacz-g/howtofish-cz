@@ -3,12 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { isSteamLoginRelevant } from "../config/features";
 import {
   LIVE_LINK,
-  O_HRE_LINK,
   WORLD_GROUP,
   buildLinks,
-  buildMobileLinks,
   isActive,
   isEntryActive,
   isNavGroup,
@@ -19,7 +18,6 @@ import SteamIcon from "./SteamIcon";
 import {
   AchievementIcon,
   BossIcon,
-  CrabIcon,
   FishIcon,
   GameIcon,
   GuideIcon,
@@ -27,9 +25,7 @@ import {
   ItemIcon,
   LiveIcon,
   LocationIcon,
-  MultiplayerIcon,
   StreamerIcon,
-  UpdateIcon,
   type IconProps,
 } from "./icons";
 
@@ -43,10 +39,7 @@ const ICON_BY_HREF: Record<string, (props: IconProps) => React.ReactElement> = {
   "/bossove": BossIcon,
   "/lokace": LocationIcon,
   "/achievementy": AchievementIcon,
-  "/aktualizace": UpdateIcon,
-  "/hra": CrabIcon,
   "/o-hre": InfoIcon,
-  "/multiplayer": MultiplayerIcon,
 };
 
 function tabClass(active: boolean) {
@@ -88,7 +81,7 @@ function LivePulseDot() {
   );
 }
 
-// Jednoduchý přístupný dropdown pro "Svět" (Lokace + Bossové) — hover na
+// Jednoduchý přístupný dropdown pro "How to Fish" (encyklopedie + O hře) — hover na
 // myš, klik/Enter/Space na klávesnici (nativní chování <button>), zavírá
 // se při změně routy (`open` prop řízený z Header, ne lokální state, aby
 // šel resetovat spolu s mobilním panelem).
@@ -114,7 +107,7 @@ function WorldDropdown({
         onClick={() => onOpenChange(!open)}
         className={tabClass(active)}
       >
-        <LocationIcon className="h-4 w-4 shrink-0" />
+        <FishIcon className="h-4 w-4 shrink-0" />
         {WORLD_GROUP.label}
         <span aria-hidden="true" className={`text-[10px] transition-transform ${open ? "rotate-180" : ""}`}>
           ▾
@@ -190,7 +183,9 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
   const [worldOpen, setWorldOpen] = useState(false);
   const [mobileWorldOpen, setMobileWorldOpen] = useState(false);
   const links = buildLinks(basePath);
-  const mobileLinks = buildMobileLinks(links);
+  // Přihlášení přes Steam jen tam, kde ho viditelná funkce potřebuje
+  // (žebříček Krabí invaze) — přihlášený uživatel má odhlášení všude.
+  const showAuth = user !== null || isSteamLoginRelevant(pathname);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const openButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -263,7 +258,7 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
             }`}
           >
             <span className="flex items-center gap-2.5">
-              <LocationIcon className="h-5 w-5 shrink-0" />
+              <FishIcon className="h-5 w-5 shrink-0" />
               {entry.label}
             </span>
             <span aria-hidden="true" className={`text-xs transition-transform ${mobileWorldOpen ? "rotate-180" : ""}`}>
@@ -386,21 +381,11 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
           </ul>
         </nav>
 
-        {/* "O hře" jako méně výrazný sekundární odkaz (obyčejný podtržený
-            text, ne pill) — viz nav-config.ts, proč není v hlavní navigaci. */}
-        <Link
-          href={`${basePath}${O_HRE_LINK.href}`}
-          aria-current={isActive(pathname, `${basePath}${O_HRE_LINK.href}`) ? "page" : undefined}
-          className={`hidden font-serif text-sm underline-offset-2 transition hover:text-amber-300 hover:underline xl:inline ${
-            isActive(pathname, `${basePath}${O_HRE_LINK.href}`) ? "text-amber-300 underline" : "text-[#f4ead9]/70"
-          }`}
-        >
-          {O_HRE_LINK.label}
-        </Link>
-
-        <div className="hidden xl:block">
-          <SteamAuthControl user={user} pathname={pathname} />
-        </div>
+        {showAuth && (
+          <div className="hidden xl:block">
+            <SteamAuthControl user={user} pathname={pathname} />
+          </div>
+        )}
 
         <button
           ref={openButtonRef}
@@ -447,12 +432,14 @@ export default function Header({ basePath = "", user = null }: { basePath?: stri
             </div>
 
             <ul className="flex flex-col gap-2 font-serif text-base">
-              {mobileLinks.map((entry) => renderMobileEntry(entry))}
+              {links.map((entry) => renderMobileEntry(entry))}
             </ul>
 
-            <div className="mt-3 border-t border-white/10 pt-3">
-              <SteamAuthControl user={user} pathname={pathname} />
-            </div>
+            {showAuth && (
+              <div className="mt-3 border-t border-white/10 pt-3">
+                <SteamAuthControl user={user} pathname={pathname} />
+              </div>
+            )}
           </nav>
         </>
       )}

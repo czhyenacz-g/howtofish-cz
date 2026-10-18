@@ -10,7 +10,7 @@ import GameCard from "./components/GameCard.tsx";
 import GameVideoCard from "./components/GameVideoCard.tsx";
 import OceanWaves from "./components/OceanWaves";
 import RotatingQuote from "./components/RotatingQuote.tsx";
-import { CrabIcon, FishIcon, GuideIcon, ItemIcon, LocationIcon, AchievementIcon, BossIcon, MultiplayerIcon } from "./components/icons";
+import { FishIcon, GuideIcon, ItemIcon, LocationIcon, AchievementIcon, BossIcon } from "./components/icons";
 import { getCurrentUser } from "../lib/auth/current-user";
 import { creatorProfiles } from "../data/creators.ts";
 import { getGameBySlug, getGameQuotes, getGamesWithGameDetailPage, gameEntries } from "../data/games.ts";
@@ -18,8 +18,9 @@ import { getHomepageGameVideos } from "../lib/games/game-videos.ts";
 import { getLiveStreams } from "../lib/streams/get-live-streams.ts";
 import { findLiveStreamForCreator } from "../lib/creators/live-match.ts";
 
-// Homepage = rozcestník celého webu: rybaření ve hrách (katalog + videa),
-// tvůrci a pod tím původní How to Fish obsah, ze kterého web vznikl.
+// Homepage = rozcestník celého webu (režim minimální údržby, říjen 2026):
+// hero → hry s vlastní stránkou → původní How to Fish → videa → streameři
+// a živé vysílání. Krabí invaze je odkázaná z patičky.
 // Vlastní canonical na "/" (viz app/sitemap.ts, app/ryby/page.tsx).
 const TITLE = "HowToFish.cz – rybaření ve hrách";
 const DESCRIPTION = "Web o hrách, ve kterých se dá rybařit. Minecraft, Stardew Valley, Pokémon, Sea of Thieves a další.";
@@ -46,10 +47,10 @@ const HOMEPAGE_CREATOR_LIMIT = 6;
 
 const WORLD_CARDS = [
   { href: "/ryby", label: "Ryby", icon: FishIcon },
-  { href: "/predmety", label: "Předměty", icon: ItemIcon },
   { href: "/navody", label: "Návody", icon: GuideIcon },
-  { href: "/lokace", label: "Lokace", icon: LocationIcon },
+  { href: "/predmety", label: "Předměty", icon: ItemIcon },
   { href: "/bossove", label: "Bossové", icon: BossIcon },
+  { href: "/lokace", label: "Lokace", icon: LocationIcon },
   { href: "/achievementy", label: "Achievementy", icon: AchievementIcon },
 ];
 
@@ -139,99 +140,8 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* B2) PROČ TENHLE WEB EXISTUJE — krátký osobní blok mezi hrami a videi. */}
-        <section className="bg-[#0a2438] px-4 pb-14 text-white">
-          <div className="mx-auto max-w-3xl">
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0e3347]/70 via-[#0a2438]/60 to-[#146b78]/30 p-6 sm:p-8">
-              <FishIcon className="h-7 w-7 text-amber-300/80" />
-              <h2 className="mt-3 font-serif text-xl text-amber-300 sm:text-2xl">Proč tenhle web existuje</h2>
-              <div className="mt-3 space-y-3 text-sm text-cyan-100/80 sm:text-base">
-                <p>Původně jsem si chtěl jen sepsat věci kolem How to Fish — ryby, předměty, bossy a návody.</p>
-                <p>Pak jsem zjistil, že mě baví hledat rybaření i v úplně jiných hrách.</p>
-                <p>
-                  Někde je to jen malá minihra na pár minut. Jinde u toho člověk stráví půl večera, protože chce ještě
-                  jednu vzácnou rybu.
-                </p>
-                <p>Takže jsem z toho udělal web.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* C) VIDEA — výhradně z DB (schválená + aktivní), žádné YouTube volání při renderu. */}
-        {videos.length > 0 && (
-          <section className="bg-[#081c2c] px-4 py-14 text-white">
-            <div className="mx-auto max-w-6xl">
-              <h2 className="text-center font-serif text-2xl text-amber-300 sm:text-3xl">Rybářská videa ze světa her</h2>
-              <p className="mx-auto mt-3 max-w-2xl text-center text-cyan-100/75">
-                Ručně vybraná videa od tvůrců na YouTube — od návodů po rybářské výzvy.
-              </p>
-              <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {videos.map((video) => (
-                  <li key={video.externalId}>
-                    <GameVideoCard video={video} gameName={getGameBySlug(video.gameSlug)?.name} />
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 text-center">
-                <Link href="/hry-s-rybarenim" className="font-serif text-amber-300 underline hover:text-amber-200">
-                  Videa najdeš i u jednotlivých her →
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* AD) REKLAMNÍ BANNER — stejný AdSlot jako jinde (UCA promotions, placement "banner"). */}
-        <section className="bg-[#0a2438] px-4 py-8">
-          <div className="mx-auto max-w-3xl">
-            <AdSlot pathname="/" />
-          </div>
-        </section>
-
-        {/* D) STREAMEŘI */}
-        {homepageCreators.length > 0 && (
-          <section className="bg-[#0a2438] px-4 py-14 text-white">
-            <div className="mx-auto max-w-5xl">
-              <h2 className="text-center font-serif text-2xl text-amber-300 sm:text-3xl">Streameři a tvůrci</h2>
-              <p className="mx-auto mt-3 max-w-2xl text-center text-cyan-100/75">
-                Sleduj hráče, kteří hrají How to Fish i další hry, kde je rybaření součástí zážitku.
-              </p>
-              <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {homepageCreators.map(({ creator, liveStream }) => (
-                  <li key={creator.slug}>
-                    <CreatorCard creator={creator} liveStream={liveStream} />
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 text-center">
-                <Link href="/streameri" className="font-serif text-amber-300 underline hover:text-amber-200">
-                  Všichni streameři →
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* E) ŽIVĚ — malý, ale poctivý blok: živé pokrytí je dnes kolem How to Fish. */}
-        <section className="bg-[#081c2c] px-4 py-10 text-center text-white">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="font-serif text-xl text-amber-300 sm:text-2xl">Kdo je právě živě</h2>
-            <p className="mt-2 text-sm text-cyan-100/70">
-              {streams.length > 0
-                ? `Právě streamuje ${streams.length} ${streams.length === 1 ? "tvůrce" : "tvůrců"}. Živé pokrytí teď sledujeme hlavně kolem How to Fish.`
-                : "Teď zrovna nikdo nestreamuje. Živé pokrytí teď sledujeme hlavně kolem How to Fish."}
-            </p>
-            <Link
-              href="/stream"
-              className="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-white/20 bg-white/5 px-5 py-2.5 font-serif text-white transition hover:border-amber-300/60 hover:text-amber-200"
-            >
-              Otevřít Živě →
-            </Link>
-          </div>
-        </section>
-
-        {/* F) PŮVODNÍ HOW TO FISH — web na téhle hře vznikl, takže má na homepage vlastní blok.
+        {/* C) PŮVODNÍ HOW TO FISH — web na téhle hře vznikl a encyklopedie je
+            jeho hlavní organický vstup, proto hned za hrami.
             Obrázek je lokální asset projektu (žádný cizí artwork). */}
         <section className="bg-[#0e3347] px-4 py-14 text-white">
           <div className="mx-auto max-w-5xl">
@@ -260,8 +170,8 @@ export default async function Home() {
                 />
                 <h2 className="mt-4 font-serif text-2xl text-amber-300 sm:text-3xl">Původní How to Fish</h2>
                 <p className="mx-auto mt-3 max-w-2xl text-cyan-100/80">
-                  Tady to celé začalo. Česká encyklopedie hry How to Fish — ryby, bossové, lokace, návody a
-                  achievementy, které postupně doplňujeme i s komunitou.
+                  Tady to celé začalo. Česká encyklopedie hry How to Fish — ryby, návody, předměty, bossové, lokace
+                  a achievementy.
                 </p>
                 <ul className="mt-7 grid gap-3 sm:grid-cols-3">
                   {WORLD_CARDS.map(({ href, label, icon: Icon }) => (
@@ -287,32 +197,67 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* G) ZAHRAJ SI — vedlejší obsah, ne hlavní pilíř. */}
-        <section className="bg-[#0a2438] px-4 py-10 text-white">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="text-center font-serif text-xl text-amber-300">Zahraj si</h2>
-            <ul className="mt-6 grid gap-4 sm:grid-cols-2">
-              <li>
-                <Link
-                  href="/hra"
-                  className="flex h-full flex-col items-center gap-2 rounded-2xl border border-white/10 bg-gradient-to-b from-[#b8402c]/30 to-transparent p-6 text-center transition hover:border-amber-400/40"
-                >
-                  <CrabIcon className="h-8 w-8 text-amber-200" />
-                  <span className="font-serif text-lg text-white">Krabí invaze</span>
-                  <span className="text-sm text-cyan-100/70">Rychlá arkádová minihra na chvilku mezi streamy.</span>
+        {/* D) VIDEA — výhradně z DB (schválená + aktivní), žádné YouTube volání při renderu. */}
+        {videos.length > 0 && (
+          <section className="bg-[#081c2c] px-4 py-14 text-white">
+            <div className="mx-auto max-w-6xl">
+              <h2 className="text-center font-serif text-2xl text-amber-300 sm:text-3xl">Rybářská videa ze světa her</h2>
+              <p className="mx-auto mt-3 max-w-2xl text-center text-cyan-100/75">
+                Ručně vybraná videa od tvůrců na YouTube — od návodů po rybářské výzvy.
+              </p>
+              <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {videos.map((video) => (
+                  <li key={video.externalId}>
+                    <GameVideoCard video={video} gameName={getGameBySlug(video.gameSlug)?.name} />
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 text-center">
+                <Link href="/hry-s-rybarenim" className="font-serif text-amber-300 underline hover:text-amber-200">
+                  Videa najdeš i u jednotlivých her →
                 </Link>
-              </li>
-              <li>
-                <Link
-                  href="/multiplayer"
-                  className="flex h-full flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-6 text-center transition hover:border-amber-400/40"
-                >
-                  <MultiplayerIcon className="h-8 w-8 text-cyan-200" />
-                  <span className="font-serif text-lg text-white">Multiplayer ostrov</span>
-                  <span className="text-sm text-cyan-100/70">Najdi spoluhráče na How to Fish přes Steam.</span>
-                </Link>
-              </li>
-            </ul>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* REKLAMNÍ BANNER — jediný na homepage, mezi obsahovými bloky (UCA promotions, placement "banner"). */}
+        <section className="bg-[#0a2438] px-4 py-8">
+          <div className="mx-auto max-w-3xl">
+            <AdSlot pathname="/" />
+          </div>
+        </section>
+
+        {/* E) STREAMEŘI A ŽIVÉ VYSÍLÁNÍ — jeden blok místo dvou (karty tvůrců + stav živého vysílání). */}
+        <section className="bg-[#0a2438] px-4 py-14 text-white">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="text-center font-serif text-2xl text-amber-300 sm:text-3xl">Streameři a živé vysílání</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-center text-cyan-100/75">
+              Sleduj hráče, kteří hrají How to Fish i další hry, kde je rybaření součástí zážitku.{" "}
+              {streams.length > 0
+                ? `Právě streamuje ${streams.length} ${streams.length === 1 ? "tvůrce" : "tvůrců"}.`
+                : "Teď zrovna nikdo nestreamuje."}
+            </p>
+            {homepageCreators.length > 0 && (
+              <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {homepageCreators.map(({ creator, liveStream }) => (
+                  <li key={creator.slug}>
+                    <CreatorCard creator={creator} liveStream={liveStream} />
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/stream"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-white/20 bg-white/5 px-5 py-2.5 font-serif text-white transition hover:border-amber-300/60 hover:text-amber-200"
+              >
+                Kdo je právě živě →
+              </Link>
+              <Link href="/streameri" className="font-serif text-amber-300 underline hover:text-amber-200">
+                Všichni streameři →
+              </Link>
+            </div>
           </div>
         </section>
       </main>

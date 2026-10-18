@@ -10,12 +10,12 @@ export default function HeaderLogo({ basePath = "" }: { basePath?: string }) {
   return (
     <Link
       href={basePath || "/"}
-      aria-label="How to Fish CZ — domů"
+      aria-label="HowToFish.cz — domů"
       className="flex shrink-0 items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
     >
       <Image
         src="/images/howtofish-header-logo.webp"
-        alt="How to Fish CZ"
+        alt="HowToFish.cz"
         width={900}
         height={300}
         priority

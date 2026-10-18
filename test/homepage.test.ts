@@ -46,15 +46,26 @@ describe("homepage — positioning a obsah", () => {
     }
   });
 
-  test("osobní blok „Proč tenhle web existuje“ je mezi hrami a videi", () => {
-    assert.match(source, /Proč tenhle web existuje/);
-    assert.match(source, /Původně jsem si chtěl jen sepsat věci kolem How to Fish/);
-    assert.match(source, /Takže jsem z toho udělal web\./);
-    const games = source.indexOf("Hry, ve kterých se rybaří");
-    const block = source.indexOf("Proč tenhle web existuje");
-    const videos = source.indexOf("Rybářská videa ze světa her");
-    assert.ok(games !== -1 && block !== -1 && videos !== -1, "chybí některá ze sekcí");
-    assert.ok(games < block && block < videos, "osobní blok má být mezi hrami a videi");
+  test("pořadí sekcí: hry → původní How to Fish → videa → streameři a živé vysílání", () => {
+    const order = [
+      "Hry, ve kterých se rybaří",
+      "Původní How to Fish",
+      "Rybářská videa ze světa her",
+      "Streameři a živé vysílání",
+    ].map((heading) => source.indexOf(heading));
+    assert.ok(order.every((i) => i !== -1), "chybí některá ze sekcí");
+    assert.deepEqual([...order].sort((x, y) => x - y), order);
+  });
+
+  test("odstraněné nadbytečné sekce a sliby", () => {
+    assert.doesNotMatch(source, /Proč tenhle web existuje/);
+    assert.doesNotMatch(source, /Zahraj si/);
+    assert.doesNotMatch(source, /postupně doplňujeme/);
+    assert.doesNotMatch(source, /href="\/multiplayer"/);
+  });
+
+  test("na homepage je jen jeden reklamní slot", () => {
+    assert.equal(source.match(/<AdSlot /g)?.length, 1);
   });
 
   test("featured hry bere z existujících dat (žádný druhý dataset)", () => {
@@ -86,12 +97,6 @@ describe("homepage — positioning a obsah", () => {
     assert.match(source, /WORLD_CARDS/);
   });
 
-  test("multiplayer a krabí hra jsou jen vedlejší blok", () => {
-    assert.match(source, /Zahraj si/);
-    assert.match(source, /href="\/hra"/);
-    assert.match(source, /href="\/multiplayer"/);
-  });
-
   test("canonical, title a description odpovídají novému positioningu", () => {
     assert.match(source, /alternates:\s*\{\s*canonical:\s*["']\/["']\s*\}/);
     assert.match(source, /HowToFish\.cz – rybaření ve hrách/);
@@ -100,7 +105,7 @@ describe("homepage — positioning a obsah", () => {
   });
 
   test("všechny interní odkazy na homepage vedou na existující routy", () => {
-    const routes = ["hry-s-rybarenim", "streameri", "stream", "o-hre", "hra", "multiplayer"];
+    const routes = ["hry-s-rybarenim", "streameri", "stream", "o-hre", "ryby", "navody", "predmety", "bossove", "lokace", "achievementy"];
     for (const route of routes) {
       assert.ok(
         existsSync(fileURLToPath(new URL(`../app/(sections)/${route}/page.tsx`, import.meta.url))) ||

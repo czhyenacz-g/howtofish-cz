@@ -13,49 +13,26 @@ export function isNavGroup(entry: NavEntry): entry is NavGroup {
   return "children" in entry;
 }
 
-// Streameři jsou teď hlavní obsahová osa webu (viz zadání
-// "restrukturalizace na streamery") — první položka hned za logem.
 export const STREAMERI_LINK: SimpleNavLink = { href: "/streameri", label: "Streameři" };
 export const LIVE_LINK: SimpleNavLink = { href: "/stream", label: "Živě" };
-// Krabí invaze je konkrétní minihra (dřív jen obecný label "Hra") —
-// odlišená vlastním jménem a krabí ikonou místo gamepadu.
-export const HRA_LINK: SimpleNavLink = { href: "/hra", label: "Krabí invaze" };
-// "O hře" je informační stránka o samotné hře, ne o minihře — v hlavním
-// pill menu by přidala další položku a riskovala přetečení/dvouřádkový
-// header, proto je v desktop headeru jen jako menší sekundární odkaz a
-// v mobilním panelu vložená do hlavního seznamu.
 export const O_HRE_LINK: SimpleNavLink = { href: "/o-hre", label: "O hře" };
-export const MULTIPLAYER_LINK: SimpleNavLink = { href: "/multiplayer", label: "Multiplayer ostrov" };
-// "Hry s rybařením" (/hry-s-rybarenim) je nový veřejný katalog her, ve
-// kterých se dá rybařit — začátek širšího fishing/gaming hubu, proto
-// samostatná hlavní položka (ne další sekce "Světa How to Fish", ten
-// zůstává encyklopedií konkrétně pro How to Fish).
+// Katalog her, ve kterých se rybaří — první položka menu.
 export const HRY_LINK: SimpleNavLink = { href: "/hry-s-rybarenim", label: "Hry" };
 
-// "Svět How to Fish" sloučí VŠECHNY dřívější samostatné encyklopedické
-// hlavní položky (Ryby, Předměty, Návody, Lokace, Achievementy, Bossové)
-// do jednoho dropdownu (viz zadání "hlavní menu má být výrazně
-// jednodušší") — postaveno přímo nad NAV_LINKS, ať existuje jediný zdroj
-// pravdy pro "jaké encyklopedické sekce web má" (stejné pořadí i v patičce).
+// Původní How to Fish obsah v jednom dropdownu — encyklopedické sekce
+// (NAV_LINKS, stejné pořadí jako v patičce) + informační stránka O hře.
 export const WORLD_GROUP: NavGroup = {
-  label: "Svět How to Fish",
-  children: [...NAV_LINKS],
+  label: "How to Fish",
+  children: [...NAV_LINKS, O_HRE_LINK],
 };
 
-// Nová hlavní osa webu: Hry (katalog her, ve kterých se rybaří) jdou první,
-// pak tvůrci, pak původní How to Fish (encyklopedie) a vedlejší herní
-// obsah. "Živě" zůstává jako samostatná položka, protože reálná routa
-// /stream existuje. "Videa" tu záměrně nejsou — veřejný index /videa
-// neexistuje, jen detaily videí, takže by to byla prázdná routa.
+// Hlavní menu v režimu minimální údržby (říjen 2026): jen čtyři položky.
+// Krabí invaze je v patičce, Multiplayer ostrov je pozastavený (viz
+// app/config/features.ts) a "Videa" tu nejsou, protože veřejný index
+// /videa neexistuje.
 export function buildLinks(basePath: string): NavEntry[] {
   if (basePath !== "") return [...NAV_LINKS];
-  return [HRY_LINK, STREAMERI_LINK, LIVE_LINK, WORLD_GROUP, MULTIPLAYER_LINK, HRA_LINK];
-}
-
-// Jen pro mobilní panel — "O hře" vložené před poslední položku (Krabí
-// invaze), preferované pořadí ze zadání.
-export function buildMobileLinks(links: NavEntry[]): NavEntry[] {
-  return [...links.slice(0, -1), O_HRE_LINK, links[links.length - 1]];
+  return [HRY_LINK, WORLD_GROUP, STREAMERI_LINK, LIVE_LINK];
 }
 
 export function isActive(pathname: string, href: string): boolean {
