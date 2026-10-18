@@ -23,19 +23,21 @@ export default async function AchievementyPage() {
         Achievementy How to Fish přímo ze Steamu — řazené od nejvzácnějšího po nejběžnější.
       </p>
 
-      <div className="mt-6">
-        <AdSlot pathname="/achievementy" />
-      </div>
 
       {!achievements || achievements.length === 0 ? (
         <div className="mt-10 rounded-lg border border-white/10 bg-[#0e3347]/60 p-6 text-center text-gray-400">
-          <p>Achievementy ze Steamu zatím nejsou veřejně dostupné.</p>
+          <p>Achievementy se momentálně nepodařilo načíst ze Steamu. Zkus to prosím později.</p>
         </div>
       ) : (
         <div className="mt-10">
           <AchievementBrowser achievements={achievements} />
         </div>
       )}
+
+      {/* Reklama až pod hlavním obsahem, ať nepřekáží. */}
+      <div className="mt-10">
+        <AdSlot pathname="/achievementy" />
+      </div>
     </div>
   );
 }

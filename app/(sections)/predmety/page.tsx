@@ -26,15 +26,16 @@ export default async function PredmetyPage() {
     <div className="mx-auto max-w-5xl px-4 py-16 text-white">
       <h1 className="font-serif text-3xl">Předměty</h1>
       <p className="mt-3 text-cyan-100/70">
-        Vybavení, návnady a upgrady v How to Fish — základ tvoříme my, komunita ho může doplňovat.
+        Vybavení, návnady a upgrady v How to Fish.
       </p>
-
-      <div className="mt-6">
-        <AdSlot pathname="/predmety" />
-      </div>
 
       <div className="mt-8">
         <PredmetyBrowser items={[...items, ...myPending]} />
+      </div>
+
+      {/* Reklama až pod hlavním obsahem, ať nepřekáží. */}
+      <div className="mt-10">
+        <AdSlot pathname="/predmety" />
       </div>
     </div>
   );

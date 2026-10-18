@@ -2,8 +2,12 @@ import type { LiveStream, ProviderResult } from "./types";
 import { youTubeApiGet } from "../youtube/client.ts";
 
 // Oficiální YouTube Data API v3. search.list stojí 100 quota jednotek za
-// volání (proto jen jedno, cachované 60s), videos.list na doplnění
-// viewerCount/startedAt stojí jen 1 jednotku. Dokumentace:
+// volání a navíc má vlastní denní limit "Search Queries per day" (prakticky
+// ~50 volání, viz CLAUDE.md sekce E) sdílený s ruční video pipeline —
+// proto jen jedno volání cachované 30 minut (LIVE_REVALIDATE_SECONDS).
+// Live výsledek tak může být až 30 min starý; Twitch zůstává na 60 s.
+// videos.list na doplnění viewerCount/startedAt stojí jen 1 jednotku.
+// Dokumentace:
 // https://developers.google.com/youtube/v3/docs
 //
 // Samotné HTTP volání (klíč, URL, timeout, chyby) žije v lib/youtube/
@@ -12,6 +16,11 @@ import { youTubeApiGet } from "../youtube/client.ts";
 const GAMING_CATEGORY_ID = "20";
 const SEARCH_QUERY = "How to Fish game Dazed Games";
 const MAX_RESULTS = 15;
+// ISR stránky s živými streamy (/, /stream, /streameri, /streameri/[slug])
+// se obnovují každých 60 s a všechny sdílí tenhle cachovaný fetch — délka
+// cache tedy přímo určuje maximální počet search.list volání za den
+// (1800 s => nejvýš 48/den).
+export const LIVE_REVALIDATE_SECONDS = 1800;
 
 // "How to Fish" je i běžná anglická fráze o skutečném rybaření — hlídáme
 // se proti false positives kombinací gaming kategorie a klíčových slov.
@@ -99,7 +108,7 @@ export async function getYouTubeStreams(): Promise<ProviderResult> {
         q: SEARCH_QUERY,
         maxResults: String(MAX_RESULTS),
       },
-      { revalidateSeconds: 60 }
+      { revalidateSeconds: LIVE_REVALIDATE_SECONDS }
     );
 
     const relevant = searchData.items.filter((item) =>
@@ -115,7 +124,7 @@ export async function getYouTubeStreams(): Promise<ProviderResult> {
         part: "liveStreamingDetails,snippet",
         id: relevant.map((item) => item.id.videoId).join(","),
       },
-      { revalidateSeconds: 60 }
+      { revalidateSeconds: LIVE_REVALIDATE_SECONDS }
     );
     const detailsById = new Map(videosData.items.map((v) => [v.id, v]));
 

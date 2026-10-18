@@ -29,12 +29,13 @@ export default async function NavodyPage() {
         Postupy pro How to Fish — od základů po souboje s bossy, psané námi i komunitou.
       </p>
 
-      <div className="mt-6">
-        <AdSlot pathname="/navody" />
-      </div>
-
       <div className="mt-8">
         <NavodyBrowser guides={[...guides, ...myPending]} />
+      </div>
+
+      {/* Reklama až pod hlavním obsahem, ať nepřekáží. */}
+      <div className="mt-10">
+        <AdSlot pathname="/navody" />
       </div>
     </div>
   );

@@ -27,13 +27,13 @@ export default function AffiliateBannerSlot({
   candidates,
   pathname,
   initialPick,
-  placeholderOnEmpty = true,
+  placeholderOnEmpty = false,
 }: {
   candidates: PromotionEntry[];
   pathname: string;
   initialPick: PromotionEntry | null;
-  // /ryby záměrně nezobrazuje "Reklamní prostor" placeholder, viz
-  // FishBrowser.tsx — jinde (AdSlot, StreamBrowser) zůstává výchozí chování.
+  // Výchozí false: bez aktivní promotion se nezobrazuje nic. Veřejný
+  // placeholder "Reklamní prostor" (AdPlaceholder) působil nedokončeně.
   placeholderOnEmpty?: boolean;
 }) {
   const [promotion, setPromotion] = useState<PromotionEntry | null>(initialPick);

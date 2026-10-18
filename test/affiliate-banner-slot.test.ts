@@ -59,8 +59,8 @@ test("AffiliateBannerSlot.tsx: onClick se předává AffiliateBanner jen když p
   assert.match(source, /onClick=\{promotion\.href \? handleClick : undefined\}/);
 });
 
-test("AffiliateBannerSlot.tsx: fallback placeholder je volitelný (placeholderOnEmpty, default true)", () => {
-  assert.match(source, /placeholderOnEmpty = true/);
+test("AffiliateBannerSlot.tsx: bez promotion se ve výchozím stavu nezobrazí nic (placeholderOnEmpty, default false)", () => {
+  assert.match(source, /placeholderOnEmpty = false/);
   assert.match(source, /return placeholderOnEmpty \? <AdPlaceholder \/> : null;/);
 });
 

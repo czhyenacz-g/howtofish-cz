@@ -67,10 +67,9 @@ export default function OHrePage() {
       <section className="mt-8">
         <h2 className="font-serif text-xl text-amber-300">Proč vzniká HowToFish.cz</h2>
         <p className="mt-3 text-cyan-100/80">
-          HowToFish.cz je neoficiální český komunitní web pro hráče How to Fish. Cílem je nabídnout na jednom místě
-          českou encyklopedii ryb a tvorů, informace o úlovcích, předmětech, bossech a lokacích, praktické návody,
-          živé streamy, komunitní screenshoty úlovků, přehled změn a novinek ve hře a jednoduché herní a komunitní
-          funkce.
+          HowToFish.cz je neoficiální český komunitní web pro hráče How to Fish. Najdeš tu na jednom místě českou
+          encyklopedii ryb a tvorů, informace o předmětech, bossech a lokacích, praktické návody, achievementy,
+          přehled živých streamů a českých tvůrců a malou minihru Krabí invaze.
         </p>
         <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2 font-serif text-sm">
           {SECTION_LINKS.map((link) => (

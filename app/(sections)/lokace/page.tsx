@@ -29,12 +29,13 @@ export default async function LokacePage() {
         Co v jednotlivých lokacích chytíte, na co si dát pozor a jak se do nich dostanete.
       </p>
 
-      <div className="mt-6">
-        <AdSlot pathname="/lokace" />
-      </div>
-
       <div className="mt-8">
         <LokaceBrowser locations={[...locations, ...myPending]} />
+      </div>
+
+      {/* Reklama až pod hlavním obsahem, ať nepřekáží. */}
+      <div className="mt-10">
+        <AdSlot pathname="/lokace" />
       </div>
     </div>
   );

@@ -29,12 +29,13 @@ export default async function BossovePage() {
         Jak se na souboj připravit, jaké vybavení se hodí a jaké taktiky fungují nejlépe.
       </p>
 
-      <div className="mt-6">
-        <AdSlot pathname="/bossove" />
-      </div>
-
       <div className="mt-8">
         <BossoveBrowser bosses={[...bosses, ...myPending]} />
+      </div>
+
+      {/* Reklama až pod hlavním obsahem, ať nepřekáží. */}
+      <div className="mt-10">
+        <AdSlot pathname="/bossove" />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MULTIPLAYER_ENABLED } from "../config/features";
 import { getLiveStreams } from "../../lib/streams/get-live-streams";
 import { howToFishVideos } from "../../data/how-to-fish-videos.ts";
 import HowToFishVideoCard from "../components/HowToFishVideoCard.tsx";
@@ -114,9 +115,6 @@ export default async function StreamPage() {
         {howToFishVideos.length > 0 && (
           <section className="mx-auto mt-12 max-w-4xl border-t border-white/10 pt-8">
             <h2 className="font-serif text-xl text-amber-300">Nejnovější How to Fish videa českých tvůrců</h2>
-            <p className="mt-2 text-sm text-cyan-100/70">
-              Pilotní výběr — stejný model brzy rozšíříme o další tvůrce.
-            </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {howToFishVideos.slice(0, 4).map((video) => (
                 <HowToFishVideoCard key={video.slug} video={video} />
@@ -140,18 +138,20 @@ export default async function StreamPage() {
           </Link>
         </section>
 
-        <section className="mx-auto mt-12 max-w-2xl border-t border-white/10 pt-8 text-center">
-          <h2 className="font-serif text-xl text-amber-300">Chceš hrát s ostatními?</h2>
-          <p className="mt-2 text-sm text-cyan-100/70">
-            Najdi spoluhráče na Multiplayer ostrově a zahraj si How to Fish společně.
-          </p>
-          <Link
-            href="/multiplayer"
-            className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 font-serif text-amber-300 transition hover:bg-amber-400/20"
-          >
-            🏝️ Multiplayer ostrov
-          </Link>
-        </section>
+        {MULTIPLAYER_ENABLED && (
+          <section className="mx-auto mt-12 max-w-2xl border-t border-white/10 pt-8 text-center">
+            <h2 className="font-serif text-xl text-amber-300">Chceš hrát s ostatními?</h2>
+            <p className="mt-2 text-sm text-cyan-100/70">
+              Najdi spoluhráče na Multiplayer ostrově a zahraj si How to Fish společně.
+            </p>
+            <Link
+              href="/multiplayer"
+              className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 font-serif text-amber-300 transition hover:bg-amber-400/20"
+            >
+              🏝️ Multiplayer ostrov
+            </Link>
+          </section>
+        )}
       </div>
     </div>
   );

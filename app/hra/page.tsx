@@ -52,10 +52,11 @@ export default async function HraPage() {
       <div className="mx-auto mt-8 max-w-3xl">
         <Leaderboard entries={leaderboard} />
         <div className="mt-8">
-          <AdSlot pathname="/hra" />
-        </div>
-        <div className="mt-8">
           <CrabRushGame user={user} />
+        </div>
+        {/* Reklama až pod hrou, ať nepřekáží hraní. */}
+        <div className="mt-8">
+          <AdSlot pathname="/hra" />
         </div>
       </div>
     </div>

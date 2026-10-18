@@ -8,7 +8,7 @@ export const STREAM_FAQ: FaqEntry[] = [
   {
     question: "Jak často se seznam streamů aktualizuje?",
     answer:
-      "Přibližně jednou za minutu — přesný čas poslední aktualizace vidíš přímo nad seznamem streamů.",
+      "Streamy z Twitche přibližně jednou za minutu, z YouTube zhruba jednou za půl hodiny — přesný čas poslední aktualizace vidíš přímo nad seznamem streamů.",
   },
   {
     question: "Proč tu zrovna nikdo nestreamuje?",

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { FishCategory, FishEntry } from "../../data/fish";
 import type { CommunityCatch, FishSuggestion, PromotionEntry } from "../../lib/universal-content-api/types";
+import { COMMUNITY_CONTRIBUTIONS_ENABLED } from "../config/features";
 import AddFishSuggestionCard from "../components/AddFishSuggestionCard";
 import AffiliateBannerSlot from "../components/AffiliateBannerSlot";
 import CreatorVideoCarousel from "../components/CreatorVideoCarousel";
@@ -91,19 +92,6 @@ export default function FishBrowser({
         </div>
       </div>
 
-      {/* placeholderOnEmpty=false: bez aktivní (nevyřazené) banner
-          promotion se tu nic nezobrazuje — žádný "Reklamní prostor"
-          placeholder, viz zadání. */}
-      <div className="mt-6">
-        <AffiliateBannerSlot
-          key={PATHNAME}
-          candidates={bannerCandidates}
-          pathname={PATHNAME}
-          initialPick={bannerInitialPick}
-          placeholderOnEmpty={false}
-        />
-      </div>
-
       {filtered.length === 0 && (
         <p className="mt-10 text-center text-cyan-100/60">
           Nic jsme nenašli. Zkus jiné hledání.
@@ -119,7 +107,19 @@ export default function FishBrowser({
         {suggestions.map((suggestion) => (
           <FishSuggestionCard key={suggestion.id} suggestion={suggestion} />
         ))}
-        <AddFishSuggestionCard />
+        {COMMUNITY_CONTRIBUTIONS_ENABLED && <AddFishSuggestionCard />}
+      </div>
+
+      {/* Reklama až pod encyklopedií, ať nepřekáží. Bez aktivní promotion
+          se nic nezobrazuje (žádný placeholder). */}
+      <div className="mt-10">
+        <AffiliateBannerSlot
+          key={PATHNAME}
+          candidates={bannerCandidates}
+          pathname={PATHNAME}
+          initialPick={bannerInitialPick}
+          placeholderOnEmpty={false}
+        />
       </div>
     </div>
   );

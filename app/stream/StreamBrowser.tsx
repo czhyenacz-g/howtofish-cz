@@ -89,7 +89,7 @@ export default function StreamBrowser({
         )}
       </div>
       <p className="mt-1 text-center text-xs text-cyan-100/50">
-        Seznam se aktualizuje přibližně jednou za minutu. Aktualizováno:{" "}
+        Seznam se aktualizuje přibližně jednou za minutu (YouTube zhruba jednou za půl hodiny). Aktualizováno:{" "}
         {formatTime(updatedAt)}
       </p>
 
@@ -100,10 +100,6 @@ export default function StreamBrowser({
           ))}
         </div>
       )}
-
-      <div className="mx-auto mt-6 max-w-3xl">
-        <AffiliateBannerSlot key={PATHNAME} candidates={bannerCandidates} pathname={PATHNAME} initialPick={bannerInitialPick} />
-      </div>
 
       <div className="mt-6 flex flex-wrap justify-center gap-2 font-serif">
         {FILTERS.map((f) => (
@@ -151,6 +147,11 @@ export default function StreamBrowser({
           </ul>
         </div>
       )}
+
+      {/* Reklama až pod seznamem streamů, ať nepřekáží. */}
+      <div className="mx-auto mt-8 max-w-3xl">
+        <AffiliateBannerSlot key={PATHNAME} candidates={bannerCandidates} pathname={PATHNAME} initialPick={bannerInitialPick} />
+      </div>
     </div>
   );
 }

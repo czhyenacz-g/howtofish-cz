@@ -76,6 +76,24 @@ Veřejně se zobrazí jen videa se `is_approved = true AND is_active = true`
 (max 6 na detailu). **Pozor na kvótu**: `search.list` má vlastní denní limit
 („Search Queries per day“) — prakticky 2–4 nové hry denně.
 
+## Režim minimální údržby (od října 2026)
+
+Funkce, které vyžadují moderaci nebo aktivní komunitu, jsou z veřejného UI
+skryté přepínači v `app/config/features.ts` — kód, server actions i data
+zůstávají:
+
+- `COMMUNITY_CONTRIBUTIONS_ENABLED = false` — formuláře „Navrhnout…“
+  (`/x/navrhnout` přesměruje na sekci), „Navrhnout opravu“, „Chybí tu hra?“,
+  nahrávání úlovků. Už schválený obsah se dál zobrazuje.
+- `MULTIPLAYER_ENABLED = false` — `/multiplayer` je jen informace o
+  pozastavení (noindex, mimo sitemap a navigaci).
+- Steam login je v hlavičce jen na `/hra*` (žebříček Krabí invaze).
+- Globální overlaye (Profesor/Prodavač, ambientní zvuk, boční tab
+  Multiplayeru) se v `app/layout.tsx` nerenderují; komponenty zůstávají.
+
+Bannery spravuje UCA collection `promotions` (pole `active`, `page_pattern`,
+`weight`) — bez deploye.
+
 ## Dokumentace
 
 - [`CLAUDE.md`](./CLAUDE.md) — kompletní dokumentace projektu: struktura,
