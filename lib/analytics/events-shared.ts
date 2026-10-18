@@ -17,6 +17,11 @@ export const ANALYTICS_EVENTS = [
   "affiliate_click",
   "feedback_click",
   "gear_affiliate_click",
+  // Kampaň "první skutečné rybaření" (říjen 2026): klik na interní banner
+  // RealFishingPromo (herní stránka -> /prvni-rybareni) a klik z průvodce
+  // na partnerský startovací set (Dognet -> OKfish).
+  "real_fishing_banner_click",
+  "starter_kit_affiliate_click",
 ] as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];
@@ -27,7 +32,15 @@ export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];
 // server-side akcí, které samy ověřily, že se věc skutečně stala (upload
 // prošel, score bylo přijato, ...). Kdyby šly i tyhle přes veřejný
 // endpoint, šlo by je zfalšovat (např. vymyšlené vysoké game_score).
-export const CLIENT_TRACKABLE_EVENTS = ["page_view", "affiliate_click", "feedback_click", "game_started", "gear_affiliate_click"] as const;
+export const CLIENT_TRACKABLE_EVENTS = [
+  "page_view",
+  "affiliate_click",
+  "feedback_click",
+  "game_started",
+  "gear_affiliate_click",
+  "real_fishing_banner_click",
+  "starter_kit_affiliate_click",
+] as const;
 export type ClientTrackableEvent = (typeof CLIENT_TRACKABLE_EVENTS)[number];
 
 export function isAnalyticsEvent(value: unknown): value is AnalyticsEvent {
@@ -57,6 +70,10 @@ export const METADATA_ALLOWED_KEYS: Record<AnalyticsEvent, readonly string[]> = 
   // Bez "destination"/URL — viz komentář výš, žádný event nedostane
   // syrovou/cílovou URL, jen bezpečné identifikátory.
   gear_affiliate_click: ["creator_slug", "product_name", "category", "confidence", "link_type"],
+  // Zdrojová stránka jde v `path` (trackClientEvent ji bere z location),
+  // `placement` jen rozliší umístění banneru (homepage/game/guide).
+  real_fishing_banner_click: ["placement"],
+  starter_kit_affiliate_click: ["product_id", "placement"],
 };
 
 export const MAX_METADATA_BYTES = 2000; // výrazně pod UCA limitem 64 KB (ReasonableJsonPayload), viz zadání "ideálně výrazně méně"

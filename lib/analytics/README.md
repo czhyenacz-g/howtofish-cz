@@ -7,10 +7,13 @@ externí nástroje (Google Analytics, Meta Pixel apod.).
 
 ## Whitelist eventů
 
-Přesně 11 eventů, viz `ANALYTICS_EVENTS` v `events-shared.ts`:
+Uzavřený seznam eventů, viz `ANALYTICS_EVENTS` v `events-shared.ts`:
 `steam_login`, `page_view`, `fish_upload`, `suggestion_created`,
 `game_started`, `game_score`, `multiplayer_join`, `multiplayer_leave`,
-`wave_sent`, `affiliate_click`, `feedback_click`.
+`wave_sent`, `affiliate_click`, `feedback_click`, `gear_affiliate_click`,
+`real_fishing_banner_click` (interní banner → `/prvni-rybareni`, metadata
+`placement`) a `starter_kit_affiliate_click` (partnerský startovací set,
+metadata `product_id`, `placement`). Zdrojová stránka je vždy v `path`.
 
 Cokoliv mimo tento seznam `trackEvent`/`POST /api/events` tiše zahodí.
 
@@ -32,8 +35,7 @@ přímo přes `createCommunityRecord("analytics_events", data)`. Vždy
 fail-open — chyba se jen zaloguje do konzole, primární akce (login, upload,
 uložení skóre, ...) nikdy nespadne kvůli analytics.
 
-Client-side (jen `page_view`, `affiliate_click`, `feedback_click`,
-`game_started` — viz `CLIENT_TRACKABLE_EVENTS`): `trackClientEvent()` postuje
+Client-side (jen eventy z `CLIENT_TRACKABLE_EVENTS`): `trackClientEvent()` postuje
 na interní `POST /api/events`, který teprve server-side zavolá `trackEvent`.
 Prohlížeč nikdy nedostane UCA token. Endpoint je rate-limitovaný (~60/min na
 anonymous_id/IP, in-memory, best-effort — bez Redisu, nesdílené mezi

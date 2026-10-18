@@ -10,7 +10,7 @@ import {
   sanitizePath,
 } from "../lib/analytics/events-shared.ts";
 
-test("ANALYTICS_EVENTS: obsahuje přesně požadovaných 12 eventů", () => {
+test("ANALYTICS_EVENTS: obsahuje přesně požadovaných 14 eventů", () => {
   assert.deepEqual(
     [...ANALYTICS_EVENTS].sort(),
     [
@@ -23,6 +23,8 @@ test("ANALYTICS_EVENTS: obsahuje přesně požadovaných 12 eventů", () => {
       "multiplayer_join",
       "multiplayer_leave",
       "page_view",
+      "real_fishing_banner_click",
+      "starter_kit_affiliate_click",
       "steam_login",
       "suggestion_created",
       "wave_sent",
@@ -126,4 +128,14 @@ test("sanitizeAnonymousId: nepovolené znaky/délka/typ se zahodí", () => {
   assert.equal(sanitizeAnonymousId(""), null);
   assert.equal(sanitizeAnonymousId(42), null);
   assert.equal(sanitizeAnonymousId(null), null);
+});
+
+test("kampaň první rybaření: oba eventy jdou z klienta a metadata nesou jen bezpečné identifikátory", () => {
+  assert.equal(isClientTrackableEvent("real_fishing_banner_click"), true);
+  assert.equal(isClientTrackableEvent("starter_kit_affiliate_click"), true);
+  assert.deepEqual(sanitizeMetadata("real_fishing_banner_click", { placement: "game", url: "https://x" }), { placement: "game" });
+  assert.deepEqual(
+    sanitizeMetadata("starter_kit_affiliate_click", { product_id: "delphin-yakuza-feeder", placement: "prvni-rybareni", destination: "https://go.dognet.com/" }),
+    { product_id: "delphin-yakuza-feeder", placement: "prvni-rybareni" }
+  );
 });

@@ -16,6 +16,7 @@ const EXACT_ROUTES = new Set([
   "/multiplayer",
   "/o-hre",
   "/hry-s-rybarenim",
+  "/prvni-rybareni",
 ]);
 
 // /ryby/navrhnout a /navody/navrhnout jsou formulářové submission
